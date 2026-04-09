@@ -1,0 +1,3863 @@
+<!-- ═══════════════════════════════════════════ -->
+<!--  AUTH SCREENS                               -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-login" class="screen active">
+  <div id="app-content" style="height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div class="auth-wrap">
+    <div class="auth-logo">
+      <span class="lotus-icon"><span class="mio" style="font-size:56px;color:var(--burgundy);">spa</span></span>
+      <h1>AyurAI</h1>
+      <p>Ancient Wisdom · Modern Intelligence</p>
+    </div>
+    <div class="auth-card">
+      <h2>Welcome back</h2>
+      <p class="sub">Sign in to your wellness journey</p>
+      <div class="error-msg" id="login-error"></div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="Enter your password"/>
+      </div>
+      <button class="btn-primary" onclick="doLogin()">Sign In</button>
+      <div class="auth-switch">Don't have an account? <a onclick="showScreen('screen-signup')">Create one</a></div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<div id="screen-signup" class="screen">
+  <div id="app-content-signup" style="height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div class="auth-wrap">
+    <div class="auth-logo">
+      <span class="lotus-icon"><span class="mio" style="font-size:56px;color:var(--burgundy);">spa</span></span>
+      <h1>AyurAI</h1>
+      <p>Ancient Wisdom · Modern Intelligence</p>
+    </div>
+    <div class="auth-card">
+      <h2>Begin your journey</h2>
+      <p class="sub">Create your wellness profile</p>
+      <div class="error-msg" id="signup-error"></div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="signup-name" placeholder="Your name"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="signup-email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="signup-password" placeholder="Create a password"/>
+      </div>
+      <button class="btn-primary" onclick="doSignup()">Create Account</button>
+      <div class="auth-switch">Already have an account? <a onclick="showScreen('screen-login')">Sign in</a></div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  MAIN APP (shown after login)              -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-app" class="screen">
+
+  <!-- SCROLLABLE CONTENT -->
+  <div id="app-content">
+
+    <!-- HOME TAB -->
+    <div id="tab-home" class="tab-panel">
+      <div class="home-hero">
+        <div class="home-greeting" id="home-greeting">Good Morning</div>
+        <div class="home-name" id="home-name">Loading...</div>
+        <div class="home-dosha-badge" id="home-dosha-badge"><span class="mio" style="font-size:14px;vertical-align:-2px;">self_improvement</span> Take the Dosha Quiz</div>
+      </div>
+      <div class="home-cards">
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <div class="quick-card" onclick="switchTab('symptom')">
+            <div class="qc-icon"><span class="mio" style="font-size:30px;color:var(--burgundy);">personal_injury</span></div>
+            <div class="qc-title">Symptom Check</div>
+            <div class="qc-desc">Root-cause Ayurvedic analysis</div>
+          </div>
+          <div class="quick-card" onclick="switchTab('herbs')">
+            <div class="qc-icon"><span class="mio" style="font-size:30px;color:var(--burgundy);">spa</span></div>
+            <div class="qc-title">Herb Advisor</div>
+            <div class="qc-desc">Personalised herbs & remedies</div>
+          </div>
+        </div>
+
+        <div class="section-title">Your Dosha Profile</div>
+        <div class="info-card" id="home-dosha-card">
+          <div class="info-card-title">Primary Dosha</div>
+          <div class="info-card-value" id="home-dosha-val">Not determined yet</div>
+          <div class="info-card-desc" id="home-dosha-desc">Complete the dosha quiz to reveal your Prakriti</div>
+          <div class="dosha-pills" id="home-dosha-pills"></div>
+          <!-- Rich dosha insights (populated after quiz + optional AI fetch) -->
+          <div id="home-dosha-insights"></div>
+        </div>
+
+        <div class="section-title" style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+          <span>Recent Food Checks</span>
+          <span onclick="switchTab('history')" style="font-size:12px;color:var(--lotus);font-weight:600;cursor:pointer;font-family:'Jost',sans-serif;">View All →</span>
+        </div>
+        <div id="home-recent-checks">
+          <div style="text-align:center;padding:20px;color:var(--text-light);font-size:13px;">No food checks yet — try the Food Check tab!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DINACHARYA TAB -->
+    <div id="tab-dina" class="tab-panel" style="display:none;">
+      <div class="top-bar">
+        <div>
+          <div class="top-bar-title">Daily Routine</div>
+          <div class="top-bar-sub">Your Ayurvedic Dinacharya</div>
+        </div>
+        <div class="top-bar-right">
+          <button class="new-check-btn" id="dina-refresh-btn" onclick="clearDinaCache();renderDinacharya_StartScreen(loadData());" style="display:none;">
+            <span class="mi">tune</span> Regenerate
+          </button>
+        </div>
+      </div>
+      <div class="dina-wrap" id="dina-wrap"></div>
+    </div>
+
+    <!-- QUIZ TAB -->
+    <div id="tab-quiz" class="tab-panel" style="display:none;">
+      <div class="top-bar">
+        <div>
+          <div class="top-bar-title">Dosha Quiz</div>
+          <div class="top-bar-sub">Discover your Prakriti</div>
+        </div>
+      </div>
+      <div id="quiz-container" class="quiz-wrap"></div>
+    </div>
+
+    <!-- FOOD CHECK TAB -->
+    <div id="tab-food" class="tab-panel" style="display:none;">
+      <div class="top-bar">
+        <div>
+          <div class="top-bar-title">Food Check</div>
+          <div class="top-bar-sub">AI-powered Ayurvedic analysis</div>
+        </div>
+        <div class="top-bar-right">
+          <button id="food-reset-btn" onclick="resetFoodCheck()" title="Start new check"
+            class="new-check-btn" style="display:none;">
+            <span class="mi">add_circle</span> New Check
+          </button>
+        </div>
+      </div>
+      <div class="food-wrap">
+
+        <!-- ── FOOD HERO ── -->
+        <div class="food-hero" id="food-hero">
+          <div class="food-hero-label">Ayurvedic Food Analysis</div>
+          <div class="food-hero-title">What are you<br>planning to eat?</div>
+          <div class="food-hero-sub">Get an instant Yes/No based on your dosha, season and current time — with meal boosters and do's & don'ts.</div>
+          <div class="food-hero-chips" id="food-hero-chips"></div>
+        </div>
+
+        <div id="food-api-warning" class="api-warning" style="display:none;">
+          <span class="mi" style="font-size:16px;vertical-align:-3px;margin-right:4px;">warning</span>
+          <strong>OpenAI API key not set.</strong> Go to Settings → API Configuration to add your key.
+        </div>
+
+        <!-- ── INPUT CARD ── -->
+        <div class="food-input-card" id="food-input-card">
+          <label class="food-input-label">
+            <span class="mi">edit_note</span> Describe your food
+          </label>
+          <p>E.g. "chicken biryani with raita", "avocado toast", "dal chawal"</p>
+          <textarea class="food-textarea" id="food-input" placeholder="Type your food here..."></textarea>
+
+          <!-- ── ADVANCED FILTERS TOGGLE ── -->
+          <button class="adv-filters-btn" id="adv-filters-btn" onclick="toggleAdvFilters()">
+            <span class="mi" style="font-size:16px;">tune</span>
+            Advanced Filters
+            <span class="mi adv-filters-chevron" id="adv-chevron" style="font-size:16px;margin-left:auto;transition:transform 0.25s;">expand_more</span>
+          </button>
+
+          <!-- ── ADVANCED FILTERS PANEL ── -->
+          <div class="adv-filters-panel" id="adv-filters-panel" style="display:none;">
+
+            <!-- Meal Timing -->
+            <div class="adv-filter-section">
+              <div class="adv-filter-label">
+                <span class="mi">schedule</span> When will you eat this?
+              </div>
+              <div class="meal-timing-toggle">
+                <button class="mtt-btn active" id="mtt-now" onclick="setTimingMode('now')">
+                  <span class="mi" style="font-size:15px;">bolt</span> Now
+                </button>
+                <button class="mtt-btn" id="mtt-plan" onclick="setTimingMode('plan')">
+                  <span class="mi" style="font-size:15px;">event</span> Plan Ahead
+                </button>
+              </div>
+              <div class="meal-timing-now" id="meal-timing-now-preview">
+                <span class="mi" style="font-size:15px;color:var(--text-muted);">check_circle</span>
+                <span id="meal-now-time-display" style="font-size:13px;color:var(--text-muted);">Using current time</span>
+              </div>
+              <div class="meal-timing-plan" id="meal-timing-plan-picker" style="display:none;">
+                <div class="meal-plan-row">
+                  <div class="meal-plan-field">
+                    <label class="meal-field-label"><span class="mi">calendar_today</span> Date</label>
+                    <input type="date" id="meal-plan-date" class="meal-field-input" oninput="updatePlanPreview()"/>
+                  </div>
+                  <div class="meal-plan-field">
+                    <label class="meal-field-label"><span class="mi">access_time</span> Time Window</label>
+                    <select id="meal-plan-hour" class="meal-field-input" onchange="updatePlanPreview()"></select>
+                  </div>
+                </div>
+                <div class="meal-plan-preview" id="meal-plan-preview">
+                  <span class="mi" style="font-size:15px;">event</span>
+                  <span id="meal-plan-preview-text">Select a date and time above</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Symptoms -->
+            <div class="adv-filter-section">
+              <div class="adv-filter-label">
+                <span class="mi">health_and_safety</span> Any active symptoms today?
+                <span class="adv-filter-hint">Optional</span>
+              </div>
+              <div class="adv-ailment-chips" id="adv-ailment-chips"></div>
+            </div>
+
+          </div><!-- end adv-filters-panel -->
+
+          <button class="btn-primary" style="margin-top:14px;" onclick="checkFood()">
+            <span class="mi" style="font-size:17px;vertical-align:-4px;margin-right:6px;">search</span>Analyse Food
+          </button>
+        </div>
+        <div id="food-result-area" style="padding:0 16px;"></div>
+        <div id="food-alt-area" style="padding:0 16px;"></div>
+        <div id="cuisine-pref-area" style="padding:0 16px;">
+          <div class="cuisine-pref-card" id="cuisine-section" style="display:none;">
+            <h4><span class="mi" style="font-size:18px;vertical-align:-4px;margin-right:5px;color:var(--gold);">public</span>Get Personalised Alternatives</h4>
+            <p>Describe your cuisine preference — North Indian, South Indian, veg/non-veg, Japanese, Korean, Chinese, salads etc.</p>
+            <textarea class="food-textarea" id="cuisine-input" placeholder="e.g. South Indian vegetarian, or Japanese light food..."></textarea>
+            <button class="btn-gold" style="margin-top:12px;" onclick="getCuisineAlts()"><span class="mi" style="font-size:16px;vertical-align:-3px;margin-right:5px;">format_list_numbered</span>Get My Best 5 Options</button>
+            <div id="cuisine-result-area" style="margin-top:14px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HERBS TAB -->
+    <div id="tab-herbs" class="tab-panel" style="display:none;">
+      <div class="top-bar">
+        <div>
+          <div class="top-bar-title">Herb Advisor</div>
+          <div class="top-bar-sub">Personalised Ayurvedic herbs</div>
+        </div>
+        <div class="top-bar-right">
+          <button class="icon-btn" onclick="resetHerbAdvisor()" id="herb-reset-btn" title="Start over" style="display:none;"><span class="mi" style="font-size:18px;">refresh</span></button>
+        </div>
+      </div>
+      <div class="herbs-wrap" id="herbs-wrap">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- SYMPTOM CHECKER TAB -->
+    <div id="tab-symptom" class="tab-panel" style="display:none;">
+      <div class="top-bar">
+        <div>
+          <div class="top-bar-title">Symptom Checker</div>
+          <div class="top-bar-sub">Ayurvedic root-cause analysis</div>
+        </div>
+        <div class="top-bar-right">
+          <button class="new-check-btn" id="symptom-reset-btn" onclick="resetSymptomChecker()" style="display:none;">
+            <span class="mi">add_circle</span> New Check
+          </button>
+        </div>
+      </div>
+      <div class="symptom-wrap" id="symptom-wrap"></div>
+    </div>
+
+    <!-- HISTORY TAB (kept, accessed via Home) -->
+    <div id="tab-history" class="tab-panel" style="display:none;">
+      <div class="top-bar">
+        <div>
+          <div class="top-bar-title">Food History</div>
+          <div class="top-bar-sub">Last 10 food checks</div>
+        </div>
+        <div class="top-bar-right">
+          <button class="icon-btn" onclick="clearHistory()" title="Clear history"><span class="mi" style="font-size:18px;">delete_outline</span></button>
+        </div>
+      </div>
+      <div class="history-wrap" id="history-list"></div>
+    </div>
+
+    <!-- SETTINGS TAB -->
+    <div id="tab-settings" class="tab-panel" style="display:none;">
+      <div class="settings-wrap">
+
+        <!-- Profile Hero -->
+        <div class="settings-hero">
+          <div class="settings-avatar"><span class="mio" style="font-size:36px;color:rgba(255,255,255,0.9);">person</span></div>
+          <div class="settings-name" id="settings-name">—</div>
+          <div class="settings-email" id="settings-email">—</div>
+          <div class="settings-hero-chips" id="settings-hero-chips"></div>
+        </div>
+
+        <!-- Location -->
+        <div class="settings-group">
+          <div class="settings-group-title"><span class="mi">location_on</span><span class="settings-group-title-text">Location</span></div>
+          <div class="settings-group-body">
+            <div class="settings-row-label">Your City</div>
+            <div class="settings-row-sub">Used for seasonal food & routine analysis</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <input type="text" id="settings-city" class="settings-input" placeholder="e.g. Mumbai, Singapore, Delhi" style="flex:1;"/>
+              <button class="settings-save-btn" onclick="saveCity()"><span class="mi" style="font-size:15px;">check</span> Save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- API Key -->
+        <div class="settings-group">
+          <div class="settings-group-title"><span class="mi">key</span><span class="settings-group-title-text">AI Configuration</span></div>
+          <div class="settings-group-body">
+            <div class="settings-row-label">OpenAI API Key</div>
+            <div class="settings-row-sub">Required for Food Check, Herbs, Symptoms & Dinacharya features</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <input type="password" id="settings-apikey" class="settings-input" placeholder="sk-..." style="flex:1;"/>
+              <button class="settings-save-btn" onclick="saveApiKey()"><span class="mi" style="font-size:15px;">check</span> Save</button>
+            </div>
+            <div id="settings-apikey-status" style="margin-top:8px;font-size:11px;display:none;"></div>
+            <!-- Help links for non-technical users -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+              <a href="https://platform.openai.com/api-keys" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 8px;background:var(--cream);border:1.5px solid var(--cream-dark);border-radius:8px;font-family:'Jost',sans-serif;font-size:12px;font-weight:600;color:var(--burgundy);text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='var(--lotus-pale)'" onmouseout="this.style.background='var(--cream)'">
+                <span class="mi" style="font-size:15px;">vpn_key</span> Get API Key
+              </a>
+              <a href="https://platform.openai.com/account/billing" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 8px;background:var(--cream);border:1.5px solid var(--cream-dark);border-radius:8px;font-family:'Jost',sans-serif;font-size:12px;font-weight:600;color:var(--burgundy);text-decoration:none;transition:all 0.2s;" onmouseover="this.style.background='var(--lotus-pale)'" onmouseout="this.style.background='var(--cream)'">
+                <span class="mi" style="font-size:15px;">account_balance_wallet</span> Add Credits
+              </a>
+            </div>
+            <div style="font-size:11px;color:var(--text-light);text-align:center;margin-top:8px;line-height:1.5;">
+              New to OpenAI? <a href="https://platform.openai.com/signup" target="_blank" style="color:var(--burgundy);font-weight:600;">Create a free account →</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dosha -->
+        <div class="settings-group">
+          <div class="settings-group-title"><span class="mio">self_improvement</span><span class="settings-group-title-text">Dosha Profile</span></div>
+          <div class="settings-group-body">
+            <div class="settings-row-label" id="settings-dosha-label">Not determined</div>
+            <div class="settings-row-sub" id="settings-dosha-sub">Take the quiz to discover your Prakriti</div>
+            <button class="settings-action-btn" onclick="switchTab('quiz');retakeQuiz();" style="margin-top:12px;">
+              <span class="mi" style="font-size:15px;">replay</span> Retake Dosha Quiz
+            </button>
+          </div>
+        </div>
+
+        <!-- Data Portability -->
+        <div class="settings-group">
+          <div class="settings-group-title"><span class="mi">sync_alt</span><span class="settings-group-title-text">Data Portability</span></div>
+          <div class="settings-group-body">
+            <div class="settings-row-sub" style="margin-bottom:12px;">Export your full profile as <strong>my_info.json</strong> and import it on any device to continue your journey.</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <button class="settings-port-btn export" onclick="exportJSON()">
+                <span class="mi" style="font-size:18px;">upload</span>
+                <span>Export<br><small>my_info.json</small></span>
+              </button>
+              <button class="settings-port-btn import" onclick="document.getElementById('import-file-input').click()">
+                <span class="mi" style="font-size:18px;">download</span>
+                <span>Import<br><small>my_info.json</small></span>
+              </button>
+            </div>
+            <input type="file" id="import-file-input" accept=".json" onchange="importJSON(event)" style="display:none;"/>
+            <div id="settings-export-meta" style="margin-top:10px;font-size:11px;color:var(--text-light);text-align:center;"></div>
+          </div>
+        </div>
+
+        <!-- Error Log -->
+        <div class="settings-group" id="settings-error-section">
+          <div class="settings-group-title"><span class="mi">bug_report</span><span class="settings-group-title-text">App Diagnostics</span></div>
+          <div class="settings-group-body">
+            <div class="settings-row-sub" style="margin-bottom:12px;">Last 5 errors logged automatically by the app.</div>
+            <div id="settings-error-log"></div>
+
+            <!-- Send Logs — primary CTA -->
+            <button class="settings-action-btn" id="send-logs-btn" onclick="sendErrorLogs()" style="margin-top:12px;background:var(--burgundy);color:white;border-color:var(--burgundy);">
+              <span class="mi" style="font-size:16px;">forward_to_inbox</span> Send Error Logs
+            </button>
+            <div style="font-size:11px;color:var(--text-light);line-height:1.6;margin-top:8px;padding:0 2px;">
+              Opens your email app pre-filled with error details and addressed to <strong>sid.kapse@gmail.com</strong>. Helps the developer diagnose and fix issues faster.
+            </div>
+
+            <!-- Export + Clear row -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+              <button class="settings-action-btn" onclick="exportErrorLogs()">
+                <span class="mi" style="font-size:15px;">upload</span> Export Logs
+              </button>
+              <button class="settings-action-btn" onclick="clearErrorLogs()" style="background:rgba(180,30,30,0.06);color:#8B1A1A;border-color:rgba(180,30,30,0.2);">
+                <span class="mi" style="font-size:15px;">delete_outline</span> Clear Logs
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account -->
+        <div class="settings-group">
+          <div class="settings-group-title"><span class="mi">manage_accounts</span><span class="settings-group-title-text">Account</span></div>
+          <div class="settings-group-body">
+            <button class="danger-btn" onclick="doLogout()" style="margin-top:0;">
+              <span class="mi" style="font-size:15px;vertical-align:-3px;margin-right:4px;">logout</span> Sign Out
+            </button>
+          </div>
+        </div>
+
+        <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
+          AyurAI v2.0 · Ancient Wisdom, Modern Intelligence
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- end app-content -->
+
+  <!-- BOTTOM TAB BAR -->
+  <nav id="tab-bar">
+    <div class="tab-item active" id="tabn-home" onclick="switchTab('home')">
+      <span class="tab-icon"><span class="mi">home</span></span>
+      <span class="tab-label">Home</span>
+    </div>
+    <div class="tab-item" id="tabn-dina" onclick="switchTab('dina')">
+      <span class="tab-icon"><span class="mi">wb_sunny</span></span>
+      <span class="tab-label">Routine</span>
+    </div>
+    <div class="tab-item" id="tabn-food" onclick="switchTab('food')">
+      <span class="tab-icon"><span class="mi">restaurant</span></span>
+      <span class="tab-label">Food</span>
+    </div>
+    <div class="tab-item" id="tabn-herbs" onclick="switchTab('herbs')">
+      <span class="tab-icon"><span class="mio">spa</span></span>
+      <span class="tab-label">Herbs</span>
+    </div>
+    <div class="tab-item" id="tabn-settings" onclick="switchTab('settings')">
+      <span class="tab-icon"><span class="mi">settings</span></span>
+      <span class="tab-label">Settings</span>
+      <span class="tab-warn-dot" id="settings-warn-dot"></span>
+    </div>
+  </nav>
+
+</div><!-- end screen-app -->
+
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  JAVASCRIPT                                 -->
+<!-- ═══════════════════════════════════════════ -->
+<script>
+// ── DATA LAYER (localStorage as my_info.json equivalent) ──
+const STORAGE_KEY = 'ayurai_my_info';
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data, null, 2));
+}
+// ── ERROR LOGGER ──
+const ERROR_LOG_KEY = 'ayurai_error_log';
+const MAX_ERRORS = 5;
+
+function logError(context, error) {
+  try {
+    const logs = JSON.parse(localStorage.getItem(ERROR_LOG_KEY) || '[]');
+    logs.unshift({
+      ts: new Date().toISOString(),
+      ctx: context,
+      msg: error?.message || String(error),
+      stack: error?.stack?.split('\n')[1]?.trim() || ''
+    });
+    localStorage.setItem(ERROR_LOG_KEY, JSON.stringify(logs.slice(0, MAX_ERRORS)));
+  } catch {}
+}
+
+function getErrorLogs() {
+  try { return JSON.parse(localStorage.getItem(ERROR_LOG_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function clearErrorLogs() {
+  localStorage.removeItem(ERROR_LOG_KEY);
+  renderErrorLogs();
+  showToast('Error logs cleared');
+}
+
+function exportErrorLogs() {
+  const logs = getErrorLogs();
+  if(!logs.length) { showToast('No errors to export'); return; }
+  const d = loadData();
+  const username = (d.user?.name||'user').toLowerCase().replace(/\s+/g,'_');
+  const payload = {
+    exported_at: new Date().toISOString(),
+    user: username,
+    app_version: '2.0',
+    error_count: logs.length,
+    errors: logs
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${username}_error_logs.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`Exported ${username}_error_logs.json`);
+}
+
+// Global unhandled error catch
+window.addEventListener('error', e => logError('Uncaught', e.error || e.message));
+window.addEventListener('unhandledrejection', e => logError('Promise', e.reason));
+
+// ── SAFE ELEMENT HELPER ──
+// Returns null silently instead of throwing if element missing
+function el(id) {
+  return document.getElementById(id);
+}
+
+// Safe text set — no crash if element removed
+function setText(id, text) {
+  const e = el(id); if(e) e.textContent = text;
+}
+function setHTML(id, html) {
+  const e = el(id); if(e) e.innerHTML = html;
+}
+
+function getData(path, fallback = null) {
+  const d = loadData();
+  return path.split('.').reduce((o,k) => (o && o[k] !== undefined ? o[k] : fallback), d);
+}
+function setData(path, value) {
+  const d = loadData();
+  const keys = path.split('.');
+  let o = d;
+  keys.slice(0,-1).forEach(k => { if(!o[k]) o[k]={}; o=o[k]; });
+  o[keys[keys.length-1]] = value;
+  saveData(d);
+}
+
+// ── SCREENS ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── AUTH ──
+function doSignup() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass = document.getElementById('signup-password').value;
+  const err = document.getElementById('signup-error');
+  err.style.display='none';
+  if(!name || !email || !pass) { err.textContent='Please fill in all fields.'; err.style.display='block'; return; }
+  if(pass.length < 6) { err.textContent='Password must be at least 6 characters.'; err.style.display='block'; return; }
+  const existing = loadData();
+  if(existing.user) { err.textContent='An account already exists on this device.'; err.style.display='block'; return; }
+  const data = {
+    user: { name, email, password: pass, createdAt: new Date().toISOString() },
+    dosha: null, ailments: [], city: '', foodHistory: [],
+    settings: { openaiApiKey: '' },
+    meta: { appVersion: '1.0', lastLogin: new Date().toISOString() }
+  };
+  saveData(data);
+  showToast('Account created! Welcome to AyurAI 🌸');
+  initApp();
+  showScreen('screen-app');
+  switchTab('quiz');
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  const err = document.getElementById('login-error');
+  err.style.display='none';
+  const data = loadData();
+  if(!data.user) { err.textContent='No account found. Please sign up first.'; err.style.display='block'; return; }
+  if(data.user.email !== email || data.user.password !== pass) {
+    err.textContent='Incorrect email or password.'; err.style.display='block'; return;
+  }
+  setData('meta.lastLogin', new Date().toISOString());
+  showToast('Welcome back, ' + data.user.name.split(' ')[0] + '! 🙏');
+  initApp();
+  showScreen('screen-app');
+}
+
+function doLogout() {
+  showScreen('screen-login');
+  document.getElementById('login-email').value='';
+  document.getElementById('login-password').value='';
+  showToast('Signed out. Namaste 🙏');
+}
+
+// ── APP INIT ──
+function initApp() {
+  const d = loadData();
+  if(!d.user) return;
+  // Greet
+  const hr = new Date().getHours();
+  const greet = hr<12?'Good Morning':hr<17?'Good Afternoon':'Good Evening';
+  el('home-greeting').textContent = greet;
+  el('home-name').textContent = d.user.name;
+  // Settings
+  el('settings-name').textContent = d.user.name;
+  el('settings-email').textContent = d.user.email;
+  el('settings-city').value = d.city || '';
+  el('settings-apikey').value = d.settings?.openaiApiKey || '';
+  // Dosha badge + card
+  if(d.dosha) {
+    el('home-dosha-badge').innerHTML = `<span class="mio" style="font-size:14px;vertical-align:-2px;">spa</span> ${d.dosha.primary} Dominant`;
+    el('home-dosha-val').textContent = d.dosha.primary;
+    el('home-dosha-desc').textContent = d.dosha.description || '';
+    const pills = el('home-dosha-pills');
+    pills.innerHTML = '';
+    if(d.dosha.scores) {
+      ['Vata','Pitta','Kapha'].forEach(name=>{
+        const pill=document.createElement('span');
+        pill.className=`dosha-pill pill-${name.toLowerCase()}`;
+        pill.textContent=`${name}: ${d.dosha.scores[name]||0}%`;
+        pills.appendChild(pill);
+      });
+    }
+    // Load or fetch dosha insights
+    loadDoshaInsights(d);
+  }
+  // Food hero chips
+  const foodChips = el('food-hero-chips');
+  if(foodChips) {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const month = now.toLocaleString('default',{month:'short'});
+    foodChips.innerHTML = `
+      <div class="food-hero-chip"><span class="mio" style="font-size:13px;vertical-align:-1px;">spa</span> ${d.dosha?.primary||'Take Quiz'} Dosha</div>
+      <div class="food-hero-chip"><span class="mi" style="font-size:13px;vertical-align:-1px;">location_on</span> ${d.city||'Set city'}</div>
+      <div class="food-hero-chip"><span class="mi" style="font-size:13px;vertical-align:-1px;">schedule</span> ${timeStr} · ${month}</div>
+    `;
+  }
+  // Settings hero chips
+  const shc = el('settings-hero-chips');
+  if(shc && d.dosha) {
+    shc.innerHTML = `
+      <div class="settings-hero-chip"><span class="mio" style="font-size:12px;vertical-align:-1px;">spa</span> ${d.dosha.primary}</div>
+      <div class="settings-hero-chip"><span class="mi" style="font-size:12px;vertical-align:-1px;">location_on</span> ${d.city||'No city set'}</div>
+      <div class="settings-hero-chip"><span class="mi" style="font-size:12px;vertical-align:-1px;">key</span> ${d.settings?.openaiApiKey?'API Key set':'No API key'}</div>`;
+  }
+  // Settings dosha label
+  if(d.dosha) {
+    setText('settings-dosha-label', d.dosha.primary + ' Dosha · Stage ' + (d.dosha.stage||1));
+    setText('settings-dosha-sub', d.dosha.description?.substring(0,80)+'…' || '');
+  }
+  // Export meta
+  const expMeta = el('settings-export-meta');
+  if(expMeta && d._export_meta) {
+    expMeta.textContent = `Last exported ${new Date(d._export_meta.exported_at).toLocaleDateString()}`;
+  }
+  // Error logs
+  renderErrorLogs();
+  // Restore API error warning dot if previous error was recorded
+  const storedErrType = localStorage.getItem(API_ERR_STORAGE_KEY);
+  if(storedErrType) setApiErrorState(true, storedErrType === '1' ? 'unknown' : storedErrType);
+  const noKey = !d.settings?.openaiApiKey;
+  el('food-api-warning').style.display = noKey ? 'block' : 'none';
+  // Recent checks
+  renderHomeHistory();
+  renderHistory();
+  // Init quiz
+  initQuiz();
+}
+
+// ── TABS ──
+let currentTab = 'home';
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.style.display='none');
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+  el('tab-'+name).style.display='block';
+  const tabNav = el('tabn-'+name);
+  if(tabNav) tabNav.classList.add('active');
+  currentTab = name;
+  el('app-content').scrollTop = 0;
+  if(name==='history') renderHistory();
+  if(name==='herbs') initHerbAdvisor();
+  if(name==='symptom') initSymptomChecker();
+  if(name==='food') { initFoodCheck(); setTimeout(initMealTiming, 50); }
+  if(name==='dina') initDinacharya();
+  if(name==='settings') { renderErrorLogs(); setApiErrorState(false); }
+}
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg) {
+  const t = el('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ══════════════════════════════════════════
+//  DOSHA QUIZ
+// ══════════════════════════════════════════
+const QUICK_QUIZ = [
+  {
+    q:"How would you describe your body frame?",
+    hint:"Think about your natural build",
+    opts:[
+      {text:"Thin, light, hard to gain weight",v:{V:3,P:0,K:0}},
+      {text:"Medium, muscular, moderate weight",v:{V:0,P:3,K:0}},
+      {text:"Large, solid, tends to gain weight easily",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"How is your skin naturally?",
+    hint:"Without skincare products",
+    opts:[
+      {text:"Dry, rough, or flaky",v:{V:3,P:0,K:0}},
+      {text:"Sensitive, oily in T-zone, prone to redness",v:{V:0,P:3,K:0}},
+      {text:"Thick, smooth, glowing, rarely irritated",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"How is your digestion?",
+    hint:"Think about your typical experience after meals",
+    opts:[
+      {text:"Irregular — sometimes fine, sometimes bloated",v:{V:3,P:0,K:0}},
+      {text:"Strong — I feel sharp hunger, get irritable if I skip meals",v:{V:0,P:3,K:0}},
+      {text:"Slow but steady — rarely feel very hungry",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"How do you sleep?",
+    hint:"Your natural sleep pattern",
+    opts:[
+      {text:"Light sleep, wake up easily, sometimes insomnia",v:{V:3,P:0,K:0}},
+      {text:"Moderate — fall asleep easily, wake up alert",v:{V:0,P:3,K:0}},
+      {text:"Deep, long sleep, hard to wake up early",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"How would you describe your mind and energy?",
+    hint:"Your natural tendency",
+    opts:[
+      {text:"Quick mind, creative, easily distracted, energy fluctuates",v:{V:3,P:0,K:0}},
+      {text:"Focused, driven, competitive, intense",v:{V:0,P:3,K:0}},
+      {text:"Calm, steady, slow to start but great endurance",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"How do you react to stress?",
+    hint:"Your first instinct under pressure",
+    opts:[
+      {text:"Anxiety, worry, overthinking",v:{V:3,P:0,K:0}},
+      {text:"Frustration, irritability, tendency to argue",v:{V:0,P:3,K:0}},
+      {text:"Withdrawal, denial, slow to react",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"What is your hair naturally like?",
+    hint:"Natural hair without treatments",
+    opts:[
+      {text:"Dry, thin, frizzy or curly",v:{V:3,P:0,K:0}},
+      {text:"Fine, prone to early greying or thinning",v:{V:0,P:3,K:0}},
+      {text:"Thick, oily, wavy, lustrous",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"How do you handle cold weather?",
+    hint:"Your comfort in cold climates",
+    opts:[
+      {text:"I dislike it strongly — I feel cold easily",v:{V:3,P:0,K:0}},
+      {text:"I enjoy it — heat bothers me more",v:{V:0,P:3,K:0}},
+      {text:"I manage okay but feel heavier and sluggish",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"How is your memory?",
+    hint:"How you learn and retain information",
+    opts:[
+      {text:"Quick to learn, quick to forget",v:{V:3,P:0,K:0}},
+      {text:"Sharp and precise, good retention",v:{V:0,P:3,K:0}},
+      {text:"Slow to learn but retains very well once learned",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"How do you typically feel in the morning?",
+    hint:"Right after waking up",
+    opts:[
+      {text:"Variable — energised some days, exhausted others",v:{V:3,P:0,K:0}},
+      {text:"Sharp and ready quickly",v:{V:0,P:3,K:0}},
+      {text:"Slow and groggy — need time to wake up",v:{V:0,P:0,K:3}}
+    ]
+  }
+];
+
+const DEEP_QUIZ = [
+  {
+    q:"How would you describe your appetite patterns?",
+    hint:"Your hunger throughout the day",
+    opts:[
+      {text:"Very irregular — sometimes ravenous, sometimes not hungry at all",v:{V:3,P:0,K:0}},
+      {text:"Regular and strong — get headaches or irritable if I miss a meal",v:{V:0,P:3,K:0}},
+      {text:"Low and consistent — can skip meals without issue",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"What type of weather suits you best?",
+    hint:"Where you feel most comfortable",
+    opts:[
+      {text:"Warm, humid weather",v:{V:3,P:0,K:0}},
+      {text:"Cool, well-ventilated environments",v:{V:0,P:3,K:0}},
+      {text:"Warm and dry climates",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"How would you describe your joints?",
+    hint:"Natural state of your joints",
+    opts:[
+      {text:"They crack often, feel loose or unstable",v:{V:3,P:0,K:0}},
+      {text:"Flexible and strong",v:{V:0,P:3,K:0}},
+      {text:"Large, well-lubricated, rarely crack",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"How do you speak?",
+    hint:"Your natural speaking style",
+    opts:[
+      {text:"Fast, enthusiastic, tend to talk a lot",v:{V:3,P:0,K:0}},
+      {text:"Clear, precise, articulate, sometimes sharp",v:{V:0,P:3,K:0}},
+      {text:"Slow, melodious, thoughtful before speaking",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"What are your bowel movements like typically?",
+    hint:"Your natural digestive pattern",
+    opts:[
+      {text:"Dry, hard, constipated or irregular",v:{V:3,P:0,K:0}},
+      {text:"Loose, frequent, sometimes burning",v:{V:0,P:3,K:0}},
+      {text:"Regular, well-formed, slow",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"How do you make decisions?",
+    hint:"Your natural decision-making style",
+    opts:[
+      {text:"Quickly but often change my mind",v:{V:3,P:0,K:0}},
+      {text:"Decisively and confidently",v:{V:0,P:3,K:0}},
+      {text:"Slowly and carefully after much deliberation",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"How is your skin in summer?",
+    hint:"Seasonal skin changes",
+    opts:[
+      {text:"Gets drier",v:{V:3,P:0,K:0}},
+      {text:"Gets oilier and prone to breakouts",v:{V:0,P:3,K:0}},
+      {text:"Stays mostly the same",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"Which best describes your emotional nature?",
+    hint:"Your emotional tendencies",
+    opts:[
+      {text:"Enthusiastic and changing — moods shift quickly",v:{V:3,P:0,K:0}},
+      {text:"Passionate and intense — feel things deeply",v:{V:0,P:3,K:0}},
+      {text:"Calm and attached — slow to anger, slow to forgive",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"How do you handle change?",
+    hint:"Your adaptability",
+    opts:[
+      {text:"Love change and variety — get bored easily",v:{V:3,P:0,K:0}},
+      {text:"Manage well if I'm in control of the change",v:{V:0,P:3,K:0}},
+      {text:"Prefer stability and routine",v:{V:0,P:0,K:3}}
+    ]
+  },
+  {
+    q:"Which foods do you naturally crave?",
+    hint:"Your taste preferences",
+    opts:[
+      {text:"Sweet, salty, or oily foods",v:{V:3,P:0,K:0}},
+      {text:"Spicy, sour, or salty foods",v:{V:0,P:3,K:0}},
+      {text:"Sweet, light, or dry foods",v:{V:0,P:0,K:3}}
+    ]
+  }
+];
+
+const DOSHA_INFO = {
+  Vata: {
+    description: "You are creative, energetic, and quick-thinking. Vata types are naturally flexible and enthusiastic but can be prone to anxiety, dryness, and irregularity.",
+    qualities: "Light • Dry • Mobile • Cold • Irregular",
+    balance: "Warm, grounding, nourishing foods. Regular routines. Warm oils and rest."
+  },
+  Pitta: {
+    description: "You are sharp, focused, and driven. Pitta types have strong digestion and intelligence but can be prone to inflammation, irritability, and overheating.",
+    qualities: "Hot • Sharp • Light • Oily • Intense",
+    balance: "Cooling, refreshing foods. Avoid excess spice and heat. Leisure and creative outlets."
+  },
+  Kapha: {
+    description: "You are calm, loving, and grounded. Kapha types have great endurance and stability but can be prone to weight gain, congestion, and sluggishness.",
+    qualities: "Heavy • Slow • Cool • Oily • Smooth",
+    balance: "Light, dry, warming foods. Regular vigorous exercise. Stimulation and variety."
+  }
+};
+
+const COMMON_AILMENTS = [
+  // Digestive
+  "Acidity","Acid Reflux","Heartburn","Poor Digestion","Bloating","Constipation",
+  // Skin
+  "Skin issues / Rashes","Inner thigh Boils",
+  // Head & Pain
+  "Headache","Migraines / Headaches","Backache","Joint Pain",
+  // Energy & Mind
+  "Anxiety / Stress","Fatigue / Low Energy","Insomnia / Poor Sleep",
+  // Respiratory & Immunity
+  "Common Cold / Allergies","Fever",
+  // Metabolic / Chronic
+  "High BP","Diabetes (Type 2)"
+];
+
+let quizState = { phase:'quick', qIdx:0, answers:[], scores:{V:0,P:0,K:0}, ailments:[], city:'' };
+let quizStarted = false;
+
+function initQuiz() {
+  const d = loadData();
+  if(d.dosha) { renderQuizResult(); }
+  else { renderQuizStart(); }
+}
+
+function retakeQuiz() {
+  quizState = { phase:'quick', qIdx:0, answers:[], scores:{V:0,P:0,K:0}, stage1Scores:{V:0,P:0,K:0}, ailments:[], city:'' };
+  quizStarted = false;
+  // Clear cached insights and dinacharya — dosha may change
+  setData('doshaInsights', null);
+  clearDinaCache();
+  renderQuizStart();
+  switchTab('quiz');
+  showToast('Starting fresh Dosha Quiz 🌿');
+}
+
+// Jump straight to Stage 2 using saved Stage 1 scores as base
+function retakeQuizStage2Only() {
+  const d = loadData();
+  const sc = d.dosha?.scores || {Vata:0,Pitta:0,Kapha:0};
+  // Reconstruct raw scores from percentages (approximate — good enough as base)
+  const base = { V: sc.Vata, P: sc.Pitta, K: sc.Kapha };
+  quizState = {
+    phase:'deep', qIdx:0, answers:[],
+    scores:{...base},
+    stage1Scores:{...base},
+    primaryDosha: d.dosha.primary,
+    ailments: d.ailments||[],
+    city: d.city||''
+  };
+  quizStarted = true;
+  renderQuizQuestion();
+}
+
+function renderQuizStart() {
+  el('quiz-container').innerHTML = `
+    <div class="result-card" style="background:linear-gradient(155deg,var(--charcoal),var(--burgundy-dark));">
+      <div style="margin-bottom:12px;"><span class="mio" style="font-size:56px;color:var(--gold-light);">self_improvement</span></div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--gold-light);">Discover Your Prakriti</div>
+      <p style="font-size:13px;opacity:0.75;margin-top:10px;line-height:1.6;">In Ayurveda, your Prakriti is your unique mind-body constitution.<br>This quiz will reveal your dominant dosha.</p>
+    </div>
+    <div class="dosha-desc-card">
+      <h3>How it works</h3>
+      <p>Stage 1 is a quick 10-question quiz to determine your primary dosha. After that, you'll get the option to take the full 20-question deep-dive for a more precise Prakriti analysis.</p>
+    </div>
+    <button class="btn-primary" onclick="startQuiz()">Begin Stage 1 →</button>
+  `;
+}
+
+function startQuiz() {
+  quizStarted = true;
+  quizState = { phase:'quick', qIdx:0, answers:[], scores:{V:0,P:0,K:0}, stage1Scores:{V:0,P:0,K:0}, ailments:[], city:'' };
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  const qs = quizState.phase === 'quick' ? QUICK_QUIZ : DEEP_QUIZ;
+  const total = qs.length;
+  const idx = quizState.qIdx;
+  const q = qs[idx];
+  const overallPct = quizState.phase === 'quick'
+    ? ((idx/total)*50)
+    : (50+(idx/total)*50);
+
+  el('quiz-container').innerHTML = `
+    <div class="quiz-progress">
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${overallPct}%"></div></div>
+      <div class="quiz-progress-text">${idx+1}/${total} ${quizState.phase==='quick'?'• Stage 1':'• Stage 2'}</div>
+    </div>
+    <div class="quiz-q-card">
+      <div class="quiz-q-num">Question ${idx+1}</div>
+      <div class="quiz-q-text">${q.q}</div>
+      <div class="quiz-q-hint">${q.hint}</div>
+      <div class="quiz-options">
+        ${q.opts.map((o,i)=>`
+          <div class="quiz-option" id="opt-${i}" onclick="selectOption(${i})">
+            <div class="opt-dot"></div>
+            <span>${o.text}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    <div class="quiz-nav">
+      ${idx > 0 ? `<button class="btn-back" onclick="prevQuestion()">← Back</button>` : ''}
+      <button class="btn-next btn-primary" onclick="nextQuestion()" style="opacity:0.4;pointer-events:none;" id="quiz-next-btn">
+        ${idx < total-1 ? 'Next →' : quizState.phase==='quick' ? 'See Results →' : 'Complete Quiz →'}
+      </button>
+    </div>
+  `;
+  // Restore previous selection
+  if(quizState.answers[idx] !== undefined) {
+    selectOption(quizState.answers[idx], true);
+  }
+  el('app-content').scrollTop = 0;
+}
+
+function selectOption(i, restore=false) {
+  document.querySelectorAll('.quiz-option').forEach(o=>o.classList.remove('selected'));
+  document.getElementById('opt-'+i).classList.add('selected');
+  if(!restore) quizState.answers[quizState.qIdx] = i;
+  el('quiz-next-btn').style.opacity='1';
+  el('quiz-next-btn').style.pointerEvents='auto';
+}
+
+function prevQuestion() {
+  quizState.qIdx--;
+  renderQuizQuestion();
+}
+
+function nextQuestion() {
+  if(quizState.answers[quizState.qIdx] === undefined) return;
+  const qs = quizState.phase === 'quick' ? QUICK_QUIZ : DEEP_QUIZ;
+  const selected = quizState.answers[quizState.qIdx];
+  const v = qs[quizState.qIdx].opts[selected].v;
+  quizState.scores.V += v.V;
+  quizState.scores.P += v.P;
+  quizState.scores.K += v.K;
+
+  if(quizState.qIdx < qs.length-1) {
+    quizState.qIdx++;
+    renderQuizQuestion();
+  } else if(quizState.phase === 'quick') {
+    // Stage 1 done → collect ailments + city FIRST, then show result & offer Stage 2
+    renderAilmentSelection();
+  } else {
+    // Stage 2 done → merge scores and update saved profile
+    finalizeStage2();
+  }
+}
+
+// ── AILMENT + CITY SELECTION (shown after Stage 1 Q10) ──
+function renderAilmentSelection() {
+  // Pre-populate from existing saved data if retaking
+  const existing = loadData();
+  quizState.ailments = existing.ailments ? [...existing.ailments] : [];
+  quizState.city = existing.city || '';
+
+  el('quiz-container').innerHTML = `
+    <div class="quiz-progress">
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:50%"></div></div>
+      <div class="quiz-progress-text">Stage 1 — Final Step</div>
+    </div>
+    <div class="dosha-desc-card" style="margin-bottom:16px;">
+      <h3>One last thing 🌿</h3>
+      <p>Select any health concerns you commonly experience. This helps AyurAI personalise food recommendations accurately for you.</p>
+    </div>
+    <div class="ailment-checkbox-list" id="ailment-list">
+      ${COMMON_AILMENTS.map((a,i)=>{
+        const checked = quizState.ailments.includes(a);
+        return `
+          <label class="ailment-checkbox${checked?' checked':''}" id="ailment-${i}" onclick="toggleAilment(${i})">
+            <div class="cb-box" id="cb-${i}">${checked?'✓':''}</div>
+            <span class="cb-label">${a}</span>
+          </label>`;
+      }).join('')}
+    </div>
+    <div class="form-group" style="margin-top:22px;">
+      <label>Your City</label>
+      <input type="text" id="quiz-city"
+        placeholder="e.g. Mumbai, Singapore, Bangalore"
+        value="${quizState.city}"
+        style="padding:14px 16px;border:1.5px solid var(--cream-dark);border-radius:10px;font-size:15px;width:100%;outline:none;font-family:Jost,sans-serif;background:var(--cream);color:var(--text-main);"
+        oninput="quizState.city=this.value"/>
+    </div>
+    <button class="btn-primary" onclick="saveStage1()" style="margin-top:16px;margin-bottom:12px;">
+      Save &amp; See My Stage 1 Result →
+    </button>
+  `;
+  el('app-content').scrollTop = 0;
+}
+
+function toggleAilment(i) {
+  const label = el('ailment-'+i);
+  const cb = el('cb-'+i);
+  const name = COMMON_AILMENTS[i];
+  if(quizState.ailments.includes(name)) {
+    quizState.ailments = quizState.ailments.filter(a=>a!==name);
+    label.classList.remove('checked');
+    cb.textContent='';
+  } else {
+    quizState.ailments.push(name);
+    label.classList.add('checked');
+    cb.textContent='✓';
+  }
+}
+
+// ── SAVE STAGE 1 & SHOW RESULT ──
+function saveStage1() {
+  const city = (el('quiz-city')?.value||'').trim() || quizState.city;
+  const s = quizState.scores;
+  const total = s.V+s.P+s.K||1;
+  const pct = n => Math.round(n/total*100);
+  const primary = s.V>=s.P && s.V>=s.K ? 'Vata' : s.P>=s.V && s.P>=s.K ? 'Pitta' : 'Kapha';
+  quizState.primaryDosha = primary;
+  quizState.stage1Scores = {V:s.V, P:s.P, K:s.K}; // snapshot for Stage 2 merge
+
+  // Persist Stage 1 result immediately
+  const data = loadData();
+  data.dosha = {
+    primary,
+    stage: 1,
+    completedAt: new Date().toISOString(),
+    scores: {Vata:pct(s.V), Pitta:pct(s.P), Kapha:pct(s.K)},
+    description: DOSHA_INFO[primary].description,
+    qualities: DOSHA_INFO[primary].qualities,
+    balance: DOSHA_INFO[primary].balance
+  };
+  data.ailments = quizState.ailments;
+  if(city) { data.city = city; quizState.city = city; }
+  saveData(data);
+  initApp();
+  showToast('Stage 1 saved! 🌿');
+  renderStage1Result(primary, pct(s.V), pct(s.P), pct(s.K));
+}
+
+// ── STAGE 1 RESULT + OFFER STAGE 2 ──
+function renderStage1Result(primary, vP, pP, kP) {
+  el('quiz-container').innerHTML = `
+    <div class="result-card">
+      <div style="font-size:11px;letter-spacing:2px;opacity:0.7;text-transform:uppercase;">Stage 1 Result · Saved ✓</div>
+      <div class="result-dosha-name">${primary}</div>
+      <div style="font-size:13px;opacity:0.8;">is your dominant dosha</div>
+      <div class="result-scores">
+        <div class="result-score-item ${primary==='Vata'?'primary':''}"><div class="rs-label">Vata</div><div class="rs-val">${vP}%</div></div>
+        <div class="result-score-item ${primary==='Pitta'?'primary':''}"><div class="rs-label">Pitta</div><div class="rs-val">${pP}%</div></div>
+        <div class="result-score-item ${primary==='Kapha'?'primary':''}"><div class="rs-label">Kapha</div><div class="rs-val">${kP}%</div></div>
+      </div>
+    </div>
+    <div class="dosha-desc-card">
+      <h3>Want a deeper analysis? 🔬</h3>
+      <p>Stage 2 adds 10 more questions covering mind, digestion, emotions and seasonal tendencies. Your Stage 1 result is already saved — Stage 2 will refine it further.</p>
+    </div>
+    <button class="btn-primary" onclick="startStage2()">Take Stage 2 Deep Dive →</button>
+    <button class="btn-secondary" style="margin-top:10px;margin-bottom:32px;" onclick="goHomeAfterStage1()">I'm done — Go to Home</button>
+  `;
+  el('app-content').scrollTop = 0;
+}
+
+function goHomeAfterStage1() {
+  switchTab('home');
+}
+
+// ── START STAGE 2 ──
+function startStage2() {
+  quizState.phase = 'deep';
+  quizState.qIdx = 0;
+  quizState.answers = [];
+  // Reset live scores to Stage 1 snapshot so Stage 2 answers accumulate on top
+  quizState.scores = {...quizState.stage1Scores};
+  renderQuizQuestion();
+}
+
+// ── FINALIZE STAGE 2 — merge into saved profile ──
+function finalizeStage2() {
+  const s = quizState.scores; // includes both Stage 1 + Stage 2 answers
+  const total = s.V+s.P+s.K||1;
+  const pct = n => Math.round(n/total*100);
+  const primary = s.V>=s.P && s.V>=s.K ? 'Vata' : s.P>=s.V && s.P>=s.K ? 'Pitta' : 'Kapha';
+
+  const data = loadData();
+  data.dosha = {
+    primary,
+    stage: 2,
+    completedAt: new Date().toISOString(),
+    scores: {Vata:pct(s.V), Pitta:pct(s.P), Kapha:pct(s.K)},
+    description: DOSHA_INFO[primary].description,
+    qualities: DOSHA_INFO[primary].qualities,
+    balance: DOSHA_INFO[primary].balance
+  };
+  // Ailments & city already saved in Stage 1 — keep them unless re-entered
+  saveData(data);
+  initApp();
+  showToast('Stage 2 complete! Profile refined 🙏');
+
+  // Show final refined result
+  el('quiz-container').innerHTML = `
+    <div class="result-card">
+      <div style="font-size:11px;letter-spacing:2px;opacity:0.7;text-transform:uppercase;">Full Prakriti Analysis · Stage 1 + 2</div>
+      <div class="result-dosha-name">${primary}</div>
+      <div style="font-size:13px;opacity:0.8;">Refined Dominant Dosha</div>
+      <div class="result-scores">
+        <div class="result-score-item ${primary==='Vata'?'primary':''}"><div class="rs-label">Vata</div><div class="rs-val">${pct(s.V)}%</div></div>
+        <div class="result-score-item ${primary==='Pitta'?'primary':''}"><div class="rs-label">Pitta</div><div class="rs-val">${pct(s.P)}%</div></div>
+        <div class="result-score-item ${primary==='Kapha'?'primary':''}"><div class="rs-label">Kapha</div><div class="rs-val">${pct(s.K)}%</div></div>
+      </div>
+    </div>
+    <div class="dosha-desc-card">
+      <h3>${primary} — Your Refined Prakriti</h3>
+      <p>${DOSHA_INFO[primary].description}</p>
+    </div>
+    <div class="dosha-desc-card">
+      <h3>Balance Tips</h3>
+      <p>${DOSHA_INFO[primary].balance}</p>
+    </div>
+    <button class="btn-primary" style="margin-bottom:32px;" onclick="switchTab('home')"><span class="mi" style="font-size:16px;vertical-align:-3px;margin-right:5px;">home</span>Go to Home</button>
+  `;
+  el('app-content').scrollTop = 0;
+}
+
+function renderQuizResult() {
+  const d = loadData();
+  if(!d.dosha) { renderQuizStart(); return; }
+  const info = DOSHA_INFO[d.dosha.primary]||{};
+  const sc = d.dosha.scores||{};
+  const stage = d.dosha.stage || 1;
+  el('quiz-container').innerHTML = `
+    <div class="result-card">
+      <div style="font-size:11px;letter-spacing:2px;opacity:0.7;text-transform:uppercase;">Your Prakriti · Stage ${stage} ${stage===2?'✓ Complete':'— Stage 2 Available'}</div>
+      <div class="result-dosha-name">${d.dosha.primary}</div>
+      <div style="font-size:13px;opacity:0.8;">Dominant Dosha</div>
+      <div class="result-scores">
+        <div class="result-score-item ${d.dosha.primary==='Vata'?'primary':''}"><div class="rs-label">Vata</div><div class="rs-val">${sc.Vata||0}%</div></div>
+        <div class="result-score-item ${d.dosha.primary==='Pitta'?'primary':''}"><div class="rs-label">Pitta</div><div class="rs-val">${sc.Pitta||0}%</div></div>
+        <div class="result-score-item ${d.dosha.primary==='Kapha'?'primary':''}"><div class="rs-label">Kapha</div><div class="rs-val">${sc.Kapha||0}%</div></div>
+      </div>
+    </div>
+    <div class="dosha-desc-card">
+      <h3>${d.dosha.primary} — Your Nature</h3>
+      <p>${info.description||''}</p>
+    </div>
+    <div class="dosha-desc-card">
+      <h3>Qualities</h3>
+      <p>${info.qualities||''}</p>
+    </div>
+    <div class="dosha-desc-card">
+      <h3>Balance Tips</h3>
+      <p>${info.balance||''}</p>
+    </div>
+    ${d.ailments&&d.ailments.length ? `
+    <div class="dosha-desc-card">
+      <h3>Noted Health Concerns</h3>
+      <div class="ailments-list" style="margin-top:8px;">${d.ailments.map(a=>`<span class="ailment-tag">${a}</span>`).join('')}</div>
+    </div>` : ''}
+    ${stage===1 ? `
+    <div class="dosha-desc-card" style="border:1.5px solid var(--gold);background:var(--gold-pale);">
+      <h3>🔬 Deepen Your Analysis</h3>
+      <p>You completed Stage 1. Take Stage 2 (10 more questions) to get a more refined Prakriti reading. Your current result is safe — Stage 2 will only improve it.</p>
+    </div>
+    <button class="btn-primary" onclick="retakeQuizStage2Only()" style="margin-bottom:10px;">Continue to Stage 2 →</button>
+    ` : ''}
+    <button class="btn-secondary" style="margin-bottom:32px;" onclick="retakeQuiz()"><span class="mi" style="font-size:16px;vertical-align:-3px;margin-right:5px;">replay</span>Retake Full Quiz</button>
+  `;
+}
+
+// ══════════════════════════════════════════
+//  FOOD CHECK
+// ══════════════════════════════════════════
+async function checkFood() {
+  const food = el('food-input').value.trim();
+  if(!food) { showToast('Please enter what you plan to eat'); return; }
+  const d = loadData();
+  if(!d.settings?.openaiApiKey) {
+    showToast('Please add your OpenAI API key in Settings first'); return;
+  }
+  if(!d.dosha) {
+    showToast('Please complete the Dosha Quiz first'); return;
+  }
+
+  // ── Resolve meal datetime from timing widget ──
+  const timingMode = window._mealTimingMode || 'now';
+  let mealDate;
+  if(timingMode === 'plan') {
+    const dateVal = el('meal-plan-date')?.value;
+    const hourVal = el('meal-plan-hour')?.value;
+    if(!dateVal || hourVal === undefined || hourVal === '') {
+      showToast('Please select a date and time for your planned meal'); return;
+    }
+    mealDate = new Date(dateVal + 'T' + String(hourVal).padStart(2,'0') + ':30:00');
+    if(isNaN(mealDate.getTime())) { showToast('Invalid date or time selected'); return; }
+  } else {
+    mealDate = new Date();
+  }
+
+  const isPlanned = timingMode === 'plan';
+  const month = mealDate.toLocaleString('default',{month:'long'});
+  const dayName = mealDate.toLocaleString('default',{weekday:'long'});
+  const dateStr = mealDate.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'});
+  const hour = mealDate.getHours();
+  const hourEnd = (hour + 1) % 24;
+  const fmt = h => { const ampm=h>=12?'PM':'AM'; const h12=h%12||12; return h12+':00 '+ampm; };
+  const timeRange = isPlanned ? `${fmt(hour)} – ${fmt(hourEnd)}` : mealDate.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const timeContext = isPlanned
+    ? `Planned meal on ${dayName}, ${dateStr} between ${timeRange}`
+    : `Right now at ${timeRange}`;
+  el('food-result-area').innerHTML = `
+    <div class="loading-card">
+      <span class="loading-lotus">🪷</span>
+      <div class="loading-title">${isPlanned ? 'Analysing Planned Meal' : 'Consulting Ayurvedic Wisdom'}</div>
+      <div class="loading-sub">${isPlanned ? `Checking compatibility for ${timeRange} on ${dateStr}…` : 'Analysing your food against your dosha,<br>ailments &amp; current season…'}</div>
+      <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
+      <div class="loading-steps">
+        <div class="loading-step active" id="ls1">
+          <div class="ls-icon"><span class="mi" style="font-size:15px;">person</span></div>
+          Reading your dosha profile
+        </div>
+        <div class="loading-step" id="ls2">
+          <div class="ls-icon"><span class="mi" style="font-size:15px;">cloud</span></div>
+          Checking seasonal &amp; climate context
+        </div>
+        <div class="loading-step" id="ls3">
+          <div class="ls-icon"><span class="mi" style="font-size:15px;">restaurant</span></div>
+          Evaluating food compatibility
+        </div>
+        <div class="loading-step" id="ls4">
+          <div class="ls-icon"><span class="mi" style="font-size:15px;">auto_awesome</span></div>
+          Preparing your recommendations
+        </div>
+      </div>
+    </div>`;
+  // Hide input and hero while loading
+  el('food-input-card').style.display = 'none';
+  el('food-hero').style.display = 'none';
+  // Animate steps sequentially
+  const steps = ['ls1','ls2','ls3','ls4'];
+  steps.forEach((id,i)=>{
+    setTimeout(()=>{
+      if(i>0) { const prev=el(steps[i-1]); if(prev){prev.classList.remove('active');prev.classList.add('done');prev.querySelector('.ls-icon').innerHTML='<span class="mi" style="font-size:15px;color:white;">check</span>';} }
+      const cur=el(id); if(cur) cur.classList.add('active');
+    }, i*700);
+  });
+  el('food-alt-area').innerHTML='';
+  el('cuisine-section').style.display='none';
+  el('food-reset-btn').style.display = 'none';
+  // Hide hero while result is showing
+  const heroEl = el('food-hero');
+  if(heroEl) heroEl.style.display = 'none';
+
+  const dosha = d.dosha.primary;
+  // Merge saved ailments + any active overrides selected in Advanced Filters
+  const activeAilments = window._activeAilments || [];
+  const baseAilments = d.ailments || [];
+  const allAilments = [...new Set([...baseAilments, ...activeAilments])];
+  const ailments = allAilments.length ? allAilments.join(', ') : 'None';
+  const city = d.city||'unknown location';
+
+  const prompt = `You are an expert Ayurvedic nutritionist. The user wants to know if a food is suitable for a specific meal time.
+
+User Profile:
+- Primary Dosha: ${dosha} (Scores: Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
+- Ailments (chronic + currently active): ${ailments}
+- City: ${city}
+- Meal context: ${timeContext}
+- Month: ${month} (infer the likely season and weather for this city and month)
+
+Food to analyse: "${food}"
+
+If verdict is YES, analyse the food for nutritional gaps (missing protein, fibre, healthy fat, vitamins etc.) and suggest what to ADD to make it a complete, balanced meal. Also provide top 3 do's and top 3 don'ts specific to eating this food.
+
+If verdict is NO, suggest 5 better alternative dishes AND provide the best time window(s) in the day when this specific food WOULD be suitable for this user's dosha and ailments (give 1-3 time ranges like "7:00 AM – 8:00 AM" or "12:00 PM – 1:00 PM").
+
+Respond ONLY in this exact JSON format (no markdown, no extra text):
+{
+  "verdict": "YES" or "NO",
+  "reason": "One sentence explaining why (mention dosha, time of day, and seasonal factor)",
+  "meal_boosters": [
+    {
+      "nutrient": "Nutrient type e.g. Protein / Fibre / Healthy Fat",
+      "item": "Specific food item to add e.g. A handful of roasted chickpeas",
+      "quantity": "Exact bowl/spoon/cup size e.g. 1 small bowl (100g)",
+      "why": "One short reason why this addition helps"
+    }
+  ],
+  "dos": [
+    {"action": "Short do tip e.g. Chew slowly and mindfully", "reason": "Why"},
+    {"action": "Short do tip", "reason": "Why"},
+    {"action": "Short do tip", "reason": "Why"}
+  ],
+  "donts": [
+    {"action": "Short don't tip e.g. Do not sleep immediately after", "reason": "Why"},
+    {"action": "Short don't tip", "reason": "Why"},
+    {"action": "Short don't tip", "reason": "Why"}
+  ],
+  "alternatives": [
+    {"dish": "Dish name", "why": "Short reason why it is safe"},
+    {"dish": "Dish name", "why": "Short reason why it is safe"},
+    {"dish": "Dish name", "why": "Short reason why it is safe"},
+    {"dish": "Dish name", "why": "Short reason why it is safe"},
+    {"dish": "Dish name", "why": "Short reason why it is safe"}
+  ],
+  "better_times": [
+    {"range": "e.g. 7:00 AM – 8:00 AM", "reason": "Why this time is better for this food and dosha"}
+  ]
+}
+
+Note: populate meal_boosters, dos, donts when verdict=YES. Populate alternatives and better_times when verdict=NO. Always include all keys but empty arrays are fine for unused sections.`;
+
+  try {
+    const resp = await callOpenAILarge(prompt, d.settings.openaiApiKey, 1800);
+    const raw = resp.replace(/```json|```/g,'').trim();
+    const result = JSON.parse(raw);
+    const generatedAt = new Date().toISOString();
+    // Save full result to localStorage
+    saveFoodCache({ food, result, timeContext, isPlanned, generatedAt });
+    showFoodResult(food, result, timeContext, isPlanned, generatedAt);
+    saveFoodHistory(food, result.verdict, result.reason, timeContext, isPlanned);
+    renderHistory();
+    renderHomeHistory();
+  } catch(e) {
+    el('food-result-area').innerHTML = buildApiErrHTML(e, 'checkFood', 'checkFood()');
+    el('food-input-card').style.display = 'block';
+    el('food-hero').style.display = 'block';
+    el('food-reset-btn').style.display = 'none';
+  }
+}
+
+// ── FOOD CHECK CACHE ──
+const FOOD_CACHE_KEY = 'ayurai_food_cache';
+
+let _remedyLoading = false;
+
+function loadFoodCache() {
+  try {
+    const raw = localStorage.getItem(FOOD_CACHE_KEY);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  } catch { return null; }
+}
+
+function saveFoodCache(obj) {
+  try { localStorage.setItem(FOOD_CACHE_KEY, JSON.stringify(obj)); } catch {}
+}
+
+function clearFoodCache() {
+  localStorage.removeItem(FOOD_CACHE_KEY);
+}
+
+function initFoodCheck() {
+  const cache = loadFoodCache();
+  if(cache && cache.result && cache.food) {
+    // Restore cached result — no API call needed
+    showFoodResult(cache.food, cache.result, cache.timeContext, cache.isPlanned, cache.generatedAt);
+  } else {
+    showFoodInput();
+  }
+}
+
+function showFoodInput() {
+  // Show input UI, hide result areas
+  el('food-hero').style.display = 'block';
+  el('food-input-card').style.display = 'block';
+  el('food-api-warning').style.display = loadData().settings?.openaiApiKey ? 'none' : 'block';
+  el('food-result-area').innerHTML = '';
+  el('food-alt-area').innerHTML = '';
+  el('cuisine-section').style.display = 'none';
+  el('food-reset-btn').style.display = 'none';
+  // Collapse advanced filters
+  const panel = el('adv-filters-panel');
+  const chevron = el('adv-chevron');
+  if(panel) panel.style.display = 'none';
+  if(chevron) chevron.style.transform = '';
+  el('app-content').scrollTop = 0;
+}
+
+function showFoodResult(food, result, timeContext, isPlanned, generatedAt) {
+  // Restore in-memory state so getRemedy() works after cache restore
+  window._lastCheckedFood = food;
+  // Hide input UI, show result full-screen
+  el('food-hero').style.display = 'none';
+  el('food-input-card').style.display = 'none';
+  el('food-api-warning').style.display = 'none';
+  el('food-reset-btn').style.display = 'flex';
+  renderFoodResult(result, food, timeContext, isPlanned, generatedAt);
+  // Restore remedy card if previously fetched
+  const cache = loadFoodCache();
+  if(cache?.remedy && cache.food === food) {
+    renderRemedyCard(cache.remedy);
+    const b = el('rescue-btn');
+    if(b) {
+      b.disabled = false;
+      b.innerHTML = '<span class="mi" style="font-size:16px;">refresh</span> Refresh Remedies';
+    }
+  }
+  el('app-content').scrollTop = 0;
+}
+
+
+
+function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
+  const yes = r.verdict==='YES';
+  window._lastCheckedFood = food;
+
+  el('food-result-area').innerHTML = `
+    <div class="result-banner ${yes?'yes':'no'}">
+      <div class="rb-body">
+
+        <!-- Food + time context row -->
+        <div class="rb-food-row">
+          <div class="rb-food-name">
+            <span class="mi rb-food-icon">restaurant</span>${food}
+          </div>
+          <div class="rb-time-context ${isPlanned?'planned':'now'}">
+            <span class="mi" style="font-size:12px;">${isPlanned?'event':'bolt'}</span>
+            ${isPlanned?'Planned':'Now'}
+          </div>
+        </div>
+
+        <!-- Time detail (planned only) -->
+        ${isPlanned ? `
+        <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;display:flex;align-items:center;gap:5px;">
+          <span class="mi" style="font-size:14px;color:var(--text-light);">schedule</span>
+          ${timeContext}
+        </div>` : ''}
+
+        <!-- Verdict -->
+        <div class="rb-verdict-row">
+          <div class="rb-icon">
+            <span class="mi" style="font-size:32px;color:${yes?'#2A7A3A':'#B03020'};">${yes?'check_circle':'cancel'}</span>
+          </div>
+          <div class="rb-title">${yes?'Yes, Go Ahead!':'Not Ideal at This Time'}</div>
+        </div>
+
+        <!-- Reason -->
+        <div class="rb-reason">${r.reason}</div>
+
+        ${!yes ? `
+        <button class="rescue-btn" id="rescue-btn" onclick="getRemedy()" style="margin-top:14px;">
+          <span class="mi" style="font-size:16px;">shield</span> Already cooked — how do I reduce the effect?
+        </button>` : ''}
+
+      </div>
+    </div>
+    <div id="remedy-area"></div>
+  `;
+
+  if(yes) {
+    // ── YES: Meal Boosters cards ──
+    let boostersHTML = '';
+    if(r.meal_boosters && r.meal_boosters.length) {
+      boostersHTML = `
+        <div class="alt-table-card">
+          <h4><span class="mi" style="font-size:20px;vertical-align:-4px;margin-right:6px;color:var(--gold);">add_shopping_cart</span>Complete Your Meal</h4>
+          <p class="alt-table-sub">Add these to fill nutritional gaps and balance your dosha.</p>
+          <div class="booster-list">
+            ${r.meal_boosters.map(b=>`
+              <div class="booster-item">
+                <div class="booster-left">
+                  <div class="booster-nutrient">${b.nutrient}</div>
+                  <div class="booster-qty">${b.quantity}</div>
+                </div>
+                <div class="booster-right">
+                  <div class="booster-item-name">${b.item}</div>
+                  <div class="booster-why">${b.why}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+    }
+
+    // ── YES: Do's & Don'ts table ──
+    let dosdontsHTML = '';
+    if((r.dos && r.dos.length) || (r.donts && r.donts.length)) {
+      const maxRows = Math.max((r.dos||[]).length, (r.donts||[]).length);
+      let rows = '';
+      for(let i=0;i<maxRows;i++) {
+        const d = r.dos?.[i];
+        const dn = r.donts?.[i];
+        rows += `<tr>
+          ${d ? `<td>
+            <div class="dosdonts-action do-action"><span class="mi" style="font-size:14px;vertical-align:-2px;margin-right:3px;">check_circle</span> ${d.action}</div>
+            <div class="dosdonts-reason">${d.reason}</div>
+          </td>` : '<td></td>'}
+          ${dn ? `<td>
+            <div class="dosdonts-action dont-action"><span class="mi" style="font-size:14px;vertical-align:-2px;margin-right:3px;">block</span> ${dn.action}</div>
+            <div class="dosdonts-reason">${dn.reason}</div>
+          </td>` : '<td></td>'}
+        </tr>`;
+      }
+      dosdontsHTML = `
+        <div class="alt-table-card">
+          <h4><span class="mi" style="font-size:20px;vertical-align:-4px;margin-right:6px;color:var(--burgundy);">checklist</span>Do's &amp; Don'ts After Eating</h4>
+          <p class="alt-table-sub">Follow these for best digestion and dosha balance.</p>
+          <table class="alt-table dosdonts-table">
+            <thead>
+              <tr>
+                <th style="color:#1A6B3A;font-size:12px;letter-spacing:0.5px;">✔ Do's</th>
+                <th style="color:#8B1A1A;font-size:12px;letter-spacing:0.5px;">✖ Don'ts</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }
+
+    el('food-alt-area').innerHTML = boostersHTML + dosdontsHTML;
+
+  } else {
+    // ── NO: Better time recommendation + Alternative dishes ──
+    let noHTML = '';
+
+    // Better times card
+    if(r.better_times && r.better_times.length) {
+      const slotsHTML = r.better_times.map(bt=>`
+        <div class="better-time-slot">
+          <span class="mi">schedule</span> ${bt.range}
+          <span style="font-size:11px;font-weight:400;color:#2A6AB0;margin-left:4px;">— ${bt.reason}</span>
+        </div>`).join('');
+      noHTML += `
+        <div class="better-time-card">
+          <h4><span class="mi" style="font-size:20px;">wb_twilight</span> Better Times to Eat This</h4>
+          <p>This food suits your dosha better at these times. Plan your meal then for the best results.</p>
+          <div class="better-time-slots">${slotsHTML}</div>
+        </div>`;
+    }
+
+    if(r.alternatives && r.alternatives.length) {
+      noHTML += `
+        <div class="alt-table-card">
+          <h4><span class="mio" style="font-size:20px;vertical-align:-4px;margin-right:6px;color:var(--burgundy);">swap_horiz</span>Better Alternatives for You</h4>
+          <p class="alt-table-sub">Similar dishes that are safe to consume right now based on your dosha, ailments and weather.</p>
+          <table class="alt-table">
+            <thead><tr><th>Dish</th><th>Why It's Good</th></tr></thead>
+            <tbody>
+              ${r.alternatives.map(a=>`<tr><td>${a.dish}</td><td>${a.why}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+    el('food-alt-area').innerHTML = noHTML;
+  }
+
+  el('cuisine-section').style.display='block';
+  el('food-reset-btn').style.display = 'flex';
+
+  // Add generated-at banner if cached
+  if(generatedAt) {
+    const bannerDiv = document.createElement('div');
+    bannerDiv.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:10px 16px;margin:0 0 4px;background:var(--cream-dark);border-radius:var(--radius-sm);font-size:11px;';
+    bannerDiv.innerHTML = `
+      <span style="display:flex;align-items:center;gap:5px;color:var(--text-muted);">
+        <span class="mi" style="font-size:14px;color:var(--text-light);">cached</span>
+        Checked at ${new Date(generatedAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} · ${new Date(generatedAt).toLocaleDateString([],{day:'numeric',month:'short'})}
+      </span>`;
+    el('food-result-area').prepend(bannerDiv);
+  }
+
+  el('app-content').scrollTop = 0;
+}
+
+async function getRemedy() {
+  if(_remedyLoading) return;
+  // Fallback: read food from cache if in-memory state was lost (e.g. after page refresh)
+  const food = window._lastCheckedFood || loadFoodCache()?.food;
+  if(!food) { showToast('Food name not found — please run a new analysis'); return; }
+  const d = loadData();
+  if(!d.settings?.openaiApiKey) { showToast('API key needed'); return; }
+
+  // ── Return cached remedy if already fetched for this food ──
+  const foodCache = loadFoodCache();
+  if(foodCache?.remedy && foodCache.food === food) {
+    renderRemedyCard(foodCache.remedy);
+    const b = el('rescue-btn');
+    if(b) {
+      b.disabled = false;
+      b.innerHTML = '<span class="mi" style="font-size:16px;">refresh</span> Refresh Remedies';
+    }
+    return;
+  }
+
+  _remedyLoading = true;
+
+  // Update button state immediately
+  const btn = el('rescue-btn');
+  if(btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:8px;"><span style="width:14px;height:14px;border:2px solid rgba(107,30,58,0.3);border-top-color:var(--burgundy);border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;"></span> Finding remedies...</span>';
+  }
+
+  el('remedy-area').innerHTML = `
+    <div class="loading-card" style="padding:24px;">
+      <span style="display:block;margin-bottom:12px;animation:floatLotus 2.5s ease-in-out infinite;">
+        <span class="mio" style="font-size:44px;color:var(--burgundy);">healing</span>
+      </span>
+      <div class="loading-title" style="font-size:18px;">Finding Remedies</div>
+      <div class="loading-sub">Consulting Ayurvedic texts for damage control…</div>
+      <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
+    </div>`;
+
+  const now = new Date();
+  const month = now.toLocaleString('default',{month:'long'});
+  const time = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const dosha = d.dosha.primary;
+  const ailments = d.ailments?.join(', ')||'None';
+  const city = d.city||'unknown location';
+
+  const prompt = `You are a senior Ayurvedic physician and nutritionist. The user has already prepared and must eat a food that is not ideal for their dosha and health right now. Your job is to advise them practically on how to minimise the negative impact.
+
+User Profile:
+- Primary Dosha: ${dosha} (Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
+- Known ailments: ${ailments}
+- City: ${city}
+- Current time: ${time}, Month: ${month}
+
+Food they must eat: "${food}"
+
+Provide practical Ayurvedic remedies — things to ADD to the food, consume alongside, drink before/after, or spices to mix in — that will neutralise or reduce the negative effects. Be specific and practical.
+
+Respond ONLY in this exact JSON (no markdown, no extra text):
+{
+  "effect_reduction_pct": <number 0-100 representing how much the remedies can reduce the negative effect>,
+  "summary": "One sentence on the overall remedy strategy",
+  "remedies": [
+    {
+      "icon": "<single emoji>",
+      "name": "Remedy name (ingredient or drink)",
+      "how": "Exactly how to use it — quantity, preparation, what to mix or add",
+      "timing": "before eating / mix into food / eat alongside / drink after"
+    }
+  ],
+  "ayurvedic_note": "One short sentence of ancient Ayurvedic wisdom relevant to this situation"
+}
+
+Provide 3 to 5 remedies. Prioritise items commonly available in a household kitchen.`;
+
+  try {
+    const resp = await callOpenAI(prompt, d.settings.openaiApiKey);
+    const raw = resp.replace(/```json|```/g,'').trim();
+    const result = JSON.parse(raw);
+    // Save remedy into food cache so it's not re-fetched
+    const currentCache = loadFoodCache();
+    if(currentCache) saveFoodCache({...currentCache, remedy: result});
+    renderRemedyCard(result);
+    // Re-query button AFTER renderRemedyCard (it only touches remedy-area, not rescue-btn)
+    const b = el('rescue-btn');
+    if(b) {
+      b.disabled = false;
+      b.innerHTML = '<span class="mi" style="font-size:16px;">refresh</span> Refresh Remedies';
+    }
+  } catch(e) {
+    el('remedy-area').innerHTML = buildApiErrHTML(e, 'getRemedy', 'getRemedy()');
+    const b = el('rescue-btn');
+    if(b) {
+      b.disabled = false;
+      b.innerHTML = '<span class="mi" style="font-size:16px;">shield</span> Already cooked — how do I reduce the effect?';
+    }
+  } finally {
+    _remedyLoading = false;
+  }
+}
+
+function resetFoodCheck() {
+  clearFoodCache();
+  el('food-input').value = '';
+  el('cuisine-input').value = '';
+  el('cuisine-result-area').innerHTML = '';
+  window._lastCheckedFood = null;
+  window._mealTimingMode = 'now';
+  window._activeAilments = [];
+  _remedyLoading = false;
+  setTimingMode('now');
+  initMealTiming();
+  showFoodInput();
+  showToast('Ready for a new food check');
+}
+
+function renderRemedyCard(r) {
+  const pct = Math.min(100, Math.max(0, r.effect_reduction_pct||0));
+  const fillColor = pct >= 70 ? '#5CB876' : pct >= 40 ? '#E8A838' : '#D95F45';
+
+  el('remedy-area').innerHTML = `
+    <div class="remedy-card">
+      <div class="remedy-card-title"><span class="mi" style="font-size:22px;vertical-align:-4px;margin-right:8px;color:var(--burgundy);">shield</span>Damage Control Plan</div>
+      <div class="remedy-card-sub">${r.summary || 'Follow these remedies to reduce the impact of consuming this food right now.'}</div>
+
+      <div class="remedy-effect-bar">
+        <div class="remedy-effect-label">Effect Reduced By</div>
+        <div class="remedy-effect-track">
+          <div class="remedy-effect-fill" id="remedy-fill" style="width:0%;background:${fillColor};"></div>
+        </div>
+        <div class="remedy-effect-pct">${pct}%</div>
+      </div>
+
+      <div class="remedy-items">
+        ${(r.remedies||[]).map(rem=>`
+          <div class="remedy-item">
+            <div class="remedy-item-name"><span class="mio" style="font-size:18px;vertical-align:-3px;margin-right:6px;color:var(--gold);">eco</span>${rem.name}</div>
+            <div class="remedy-item-how">${rem.how}</div>
+            <span class="remedy-item-timing">${rem.timing}</span>
+          </div>
+        `).join('')}
+      </div>
+
+      ${r.ayurvedic_note ? `
+      <div class="remedy-warning">
+        <span class="mio" style="font-size:14px;vertical-align:-2px;margin-right:4px;">auto_stories</span><em>${r.ayurvedic_note}</em>
+      </div>` : ''}
+    </div>
+  `;
+
+  // Animate the progress bar after render
+  requestAnimationFrame(()=>{
+    setTimeout(()=>{
+      const fill = el('remedy-fill');
+      if(fill) fill.style.width = pct+'%';
+    }, 100);
+  });
+}
+
+async function getCuisineAlts() {
+  const pref = el('cuisine-input').value.trim();
+  if(!pref) { showToast('Describe your cuisine preference first 🍜'); return; }
+  const d = loadData();
+  if(!d.settings?.openaiApiKey) { showToast('API key needed'); return; }
+  el('cuisine-result-area').innerHTML=`
+    <div class="loading-card" style="padding:22px;">
+      <span style="display:block;margin-bottom:10px;animation:floatLotus 2.5s ease-in-out infinite;">
+        <span class="mi" style="font-size:40px;color:var(--burgundy);">public</span>
+      </span>
+      <div class="loading-title" style="font-size:16px;">Finding Your Options</div>
+      <div class="loading-sub">Matching cuisine to your dosha & season…</div>
+      <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
+    </div>`;
+
+  const now = new Date();
+  const month = now.toLocaleString('default',{month:'long'});
+  const time = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+  const prompt = `You are an expert Ayurvedic nutritionist. Suggest the best 5 dishes to eat right now.
+
+User Profile:
+- Primary Dosha: ${d.dosha.primary}
+- Common ailments: ${d.ailments?.join(', ')||'None'}
+- City: ${d.city||'unknown'}
+- Current time: ${time}, Month: ${month}
+- Cuisine/food preference: "${pref}"
+
+Give exactly 5 options best suited to the user's dosha, ailments, time of day, and inferred seasonal climate.
+
+Respond ONLY in this JSON format (no markdown):
+{
+  "options": [
+    {"dish": "Dish name", "why": "Short reason why perfect for this user right now"},
+    {"dish": "Dish name", "why": "Short reason"},
+    {"dish": "Dish name", "why": "Short reason"},
+    {"dish": "Dish name", "why": "Short reason"},
+    {"dish": "Dish name", "why": "Short reason"}
+  ]
+}`;
+
+  try {
+    const resp = await callOpenAI(prompt, d.settings.openaiApiKey);
+    const raw = resp.replace(/```json|```/g,'').trim();
+    const result = JSON.parse(raw);
+    el('cuisine-result-area').innerHTML = `
+      <div class="alt-table-card" style="padding:0;">
+        <h4 style="padding:16px 20px 0;">🌏 Your Top 5 Options</h4>
+        <table class="alt-table">
+          <thead><tr><th>Dish</th><th>Why It's Perfect</th></tr></thead>
+          <tbody>
+            ${result.options.map(a=>`<tr><td>${a.dish}</td><td>${a.why}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  } catch(e) {
+    el('cuisine-result-area').innerHTML = buildApiErrHTML(e, 'getCuisineAlts', 'getCuisineAlts()');
+  }
+}
+
+async function callOpenAI(prompt, apiKey) {
+  try {
+    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+      body:JSON.stringify({ model:'gpt-4o-mini', messages:[{role:'user',content:prompt}], temperature:0.3, max_tokens:1000 })
+    });
+    if(!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+    const data = await resp.json();
+    setApiErrorState(false); // clear warning dot on success
+    return data.choices[0].message.content;
+  } catch(e) {
+    logError('callOpenAI', e);
+    throw e;
+  }
+}
+
+async function callOpenAILarge(prompt, apiKey, maxTokens=3500) {
+  try {
+    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+      body:JSON.stringify({ model:'gpt-4o-mini', messages:[{role:'user',content:prompt}], temperature:0.3, max_tokens:maxTokens })
+    });
+    if(!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+    const data = await resp.json();
+    setApiErrorState(false); // clear warning dot on success
+    return data.choices[0].message.content;
+  } catch(e) {
+    logError('callOpenAILarge', e);
+    throw e;
+  }
+}
+
+// ── API ERROR CLASSIFICATION ──
+const API_ERR_STORAGE_KEY = 'ayurai_api_err';
+
+function classifyApiError(e) {
+  const msg = (e.message || '').toLowerCase();
+  if(msg.includes('exceeded') || msg.includes('quota') || msg.includes('billing') ||
+     msg.includes('insufficient_quota') || msg.includes('you exceeded')) {
+    return 'quota';
+  }
+  if(msg.includes('invalid') && (msg.includes('key') || msg.includes('api'))) {
+    return 'invalid_key';
+  }
+  if(msg.includes('rate') || msg.includes('429') || msg.includes('too many')) {
+    return 'rate_limit';
+  }
+  if(msg.includes('network') || msg.includes('fetch') || msg.includes('failed to fetch') ||
+     msg.includes('networkerror') || msg.includes('connection')) {
+    return 'network';
+  }
+  return 'unknown';
+}
+
+function setApiErrorState(hasError, errorType) {
+  const dot = el('settings-warn-dot');
+
+  // Warning dot only for actionable errors — quota exhausted or invalid key
+  const isActionable = errorType === 'quota' || errorType === 'invalid_key';
+  if(dot) dot.style.display = (hasError && isActionable) ? 'block' : 'none';
+
+  if(hasError && isActionable) {
+    localStorage.setItem(API_ERR_STORAGE_KEY, errorType);
+  } else if(!hasError) {
+    localStorage.removeItem(API_ERR_STORAGE_KEY);
+    const status = el('settings-apikey-status');
+    if(status) status.style.display = 'none';
+  }
+
+  // Show inline message in API Key section for quota or invalid_key only
+  if(hasError && isActionable) {
+    const status = el('settings-apikey-status');
+    if(status) {
+      const isQuota = errorType === 'quota';
+      status.style.cssText = 'margin-top:10px;padding:10px 12px;border-radius:8px;font-size:12px;line-height:1.55;display:block;' +
+        'background:rgba(217,95,69,0.08);border:1px solid rgba(217,95,69,0.25);color:#7A1A1A;';
+      status.innerHTML = isQuota
+        ? `<span class="mi" style="font-size:14px;vertical-align:-3px;margin-right:4px;">credit_card_off</span>
+           <strong>Credits exhausted</strong> — Your OpenAI balance is zero.
+           <a href="https://platform.openai.com/account/billing" target="_blank" style="color:var(--burgundy);font-weight:600;margin-left:4px;">Top up at platform.openai.com →</a>`
+        : `<span class="mi" style="font-size:14px;vertical-align:-3px;margin-right:4px;">error_outline</span>
+           <strong>Invalid API key</strong> — Please enter a valid key starting with <code style="font-size:11px;background:rgba(0,0,0,0.06);padding:1px 4px;border-radius:3px;">sk-</code>`;
+    }
+  }
+}
+
+function buildApiErrHTML(e, context, retryFn) {
+  const type = classifyApiError(e);
+  setApiErrorState(true, type);
+  logError(context, e);
+
+  const configs = {
+    quota: {
+      icon: '💳',
+      title: 'OpenAI Credits Exhausted',
+      msg: 'Your OpenAI API credits have run out. AyurAI uses your personal OpenAI key — you need to top up your credits at <strong>platform.openai.com</strong> to continue using AI features.',
+      actions: `
+        <a class="api-err-btn primary" href="https://platform.openai.com/account/billing" target="_blank">
+          <span class="mi" style="font-size:15px;">open_in_new</span> Top Up Credits
+        </a>
+        <button class="api-err-btn secondary" onclick="switchTab('settings')">
+          <span class="mi" style="font-size:15px;">key</span> Check API Key
+        </button>`
+    },
+    invalid_key: {
+      icon: '🔑',
+      title: 'Invalid API Key',
+      msg: 'Your OpenAI API key appears to be invalid or has been revoked. Please go to Settings and enter a valid key starting with <strong>sk-...</strong>',
+      actions: `
+        <button class="api-err-btn primary" onclick="switchTab('settings')">
+          <span class="mi" style="font-size:15px;">settings</span> Update API Key
+        </button>`
+    },
+    rate_limit: {
+      icon: '⏱️',
+      title: 'Too Many Requests',
+      msg: 'OpenAI is temporarily rate-limiting your requests. This usually resolves in 30–60 seconds. Please wait a moment and try again.',
+      actions: retryFn ? `
+        <button class="api-err-btn primary" onclick="${retryFn}">
+          <span class="mi" style="font-size:15px;">refresh</span> Try Again
+        </button>` : ''
+    },
+    network: {
+      icon: '📡',
+      title: 'No Internet Connection',
+      msg: 'Could not reach the OpenAI API. Please check your internet connection and try again.',
+      actions: retryFn ? `
+        <button class="api-err-btn primary" onclick="${retryFn}">
+          <span class="mi" style="font-size:15px;">refresh</span> Retry
+        </button>` : ''
+    },
+    unknown: {
+      icon: '⚠️',
+      title: 'Something Went Wrong',
+      msg: `An unexpected error occurred: <strong>${e.message}</strong>. Please try again or check the App Diagnostics in Settings.`,
+      actions: `
+        <button class="api-err-btn secondary" onclick="switchTab('settings')">
+          <span class="mi" style="font-size:15px;">bug_report</span> View Diagnostics
+        </button>
+        ${retryFn ? `<button class="api-err-btn primary" onclick="${retryFn}">
+          <span class="mi" style="font-size:15px;">refresh</span> Retry
+        </button>` : ''}`
+    }
+  };
+
+  const cfg = configs[type] || configs.unknown;
+  return `
+    <div class="api-err-card">
+      <span class="api-err-icon">${cfg.icon}</span>
+      <div class="api-err-title">${cfg.title}</div>
+      <div class="api-err-msg">${cfg.msg}</div>
+      <div class="api-err-actions">${cfg.actions}</div>
+    </div>`;
+}
+
+// Restore warning dot on page load if a previous error was recorded
+function saveFoodHistory(food, verdict, reason, timeContext, isPlanned) {
+  const d = loadData();
+  if(!d.foodHistory) d.foodHistory=[];
+  d.foodHistory.unshift({
+    food, verdict, reason,
+    timeContext: timeContext || null,
+    isPlanned: isPlanned || false,
+    timestamp: new Date().toISOString()
+  });
+  if(d.foodHistory.length>10) d.foodHistory=d.foodHistory.slice(0,10);
+  saveData(d);
+}
+
+function renderHistory() {
+  const d = loadData();
+  const list = el('history-list');
+  if(!d.foodHistory||!d.foodHistory.length) {
+    list.innerHTML=`<div class="history-empty"><div class="he-icon"><span class="mio" style="font-size:48px;color:var(--text-light);">history</span></div><p>No food checks yet.<br>Use the Food Check tab to get started!</p></div>`;
+    return;
+  }
+  list.innerHTML = d.foodHistory.map(h=>{
+    const dt = new Date(h.timestamp);
+    const checkedAt = dt.toLocaleDateString([],{day:'numeric',month:'short'}) + ' · ' + dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const mealCtx = h.timeContext
+      ? `<span class="history-meal-time ${h.isPlanned?'planned':'now'}">
+           <span class="mi">${h.isPlanned?'event':'bolt'}</span>
+           <span>${h.timeContext}</span>
+         </span>`
+      : '';
+    return `
+      <div class="history-item ${h.verdict==='YES'?'yes-item':'no-item'}">
+        <div class="history-item-top">
+          <div class="history-food">${h.food}</div>
+          <div class="history-verdict">${h.verdict}</div>
+        </div>
+        <div class="history-reason">${h.reason}</div>
+        <div class="history-meta">
+          <span class="history-checked-at"><span class="mi">history</span>${checkedAt}</span>
+          ${mealCtx}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderHomeHistory() {
+  const d = loadData();
+  const container = el('home-recent-checks');
+  if(!d.foodHistory||!d.foodHistory.length) {
+    container.innerHTML=`<div style="text-align:center;padding:20px;color:var(--text-light);font-size:13px;">No food checks yet — try the Food Check tab!</div>`;
+    return;
+  }
+  container.innerHTML = d.foodHistory.slice(0,3).map(h=>{
+    const dt = new Date(h.timestamp);
+    const checkedAt = dt.toLocaleDateString([],{day:'numeric',month:'short'}) + ' · ' + dt.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const mealCtx = h.timeContext
+      ? `<span class="history-meal-time ${h.isPlanned?'planned':'now'}">
+           <span class="mi">${h.isPlanned?'event':'bolt'}</span>
+           <span>${h.timeContext}</span>
+         </span>`
+      : '';
+    return `
+      <div class="history-item ${h.verdict==='YES'?'yes-item':'no-item'}" style="margin-bottom:10px;">
+        <div class="history-item-top">
+          <div class="history-food">${h.food}</div>
+          <div class="history-verdict">${h.verdict}</div>
+        </div>
+        <div class="history-reason">${h.reason}</div>
+        <div class="history-meta">
+          <span class="history-checked-at"><span class="mi">history</span>${checkedAt}</span>
+          ${mealCtx}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function clearHistory() {
+  if(!confirm('Clear all food check history?')) return;
+  setData('foodHistory',[]);
+  renderHistory();
+  renderHomeHistory();
+  showToast('History cleared');
+}
+
+// ── SETTINGS ──
+function saveCity() {
+  const city = el('settings-city').value.trim();
+  if(!city) { showToast('Please enter a city name'); return; }
+  setData('city', city);
+  // Refresh food hero chips which show city
+  initApp();
+  showToast('City saved: ' + city);
+}
+
+function renderErrorLogs() {
+  const container = el('settings-error-log');
+  if(!container) return;
+  const logs = getErrorLogs();
+  if(!logs.length) {
+    container.innerHTML = `<div style="font-size:12px;color:var(--text-light);text-align:center;padding:8px 0;"><span class="mi" style="font-size:16px;vertical-align:-3px;color:#5CB876;margin-right:4px;">check_circle</span>No errors logged — app is running smoothly</div>`;
+    return;
+  }
+  container.innerHTML = logs.map(l=>`
+    <div class="error-log-entry">
+      <div class="error-log-ts">${new Date(l.ts).toLocaleString()}</div>
+      <div class="error-log-ctx">${l.ctx}</div>
+      <div class="error-log-msg">${l.msg}</div>
+      ${l.stack?`<div class="error-log-msg" style="opacity:0.6;font-size:10px;margin-top:2px;">${l.stack}</div>`:''}
+    </div>`).join('');
+}
+
+function sendErrorLogs() {
+  const logs = getErrorLogs();
+  if(!logs.length) { showToast('No errors to send'); return; }
+  const d = loadData();
+  const username = d.user?.name || 'Unknown';
+  const subject = encodeURIComponent(`AyurAI Error Report — ${username} — ${new Date().toLocaleDateString()}`);
+  const body = encodeURIComponent(
+`Hi,
+
+I am reporting errors from AyurAI app for investigation.
+
+User: ${username}
+App Version: 2.1.0
+Date: ${new Date().toLocaleString()}
+Error Count: ${logs.length}
+
+--- ERROR DETAILS ---
+${logs.map((l,i)=>`
+${i+1}. [${new Date(l.ts).toLocaleString()}]
+   Context: ${l.ctx}
+   Message: ${l.msg}${l.stack?'\n   Stack: '+l.stack:''}`).join('\n')}
+
+Thanks`
+  );
+  window.location.href = `mailto:sid.kapse@gmail.com?subject=${subject}&body=${body}`;
+  showToast('Opening your email app…');
+}
+
+function saveApiKey() {
+  const key = el('settings-apikey').value.trim();
+  if(!key) { showToast('Please enter your OpenAI API key'); return; }
+  if(!key.startsWith('sk-')) { showToast('API key should start with sk-'); return; }
+  setData('settings.openaiApiKey', key);
+  el('food-api-warning').style.display='none';
+  // Clear any previous key error state since user just updated the key
+  setApiErrorState(false);
+  // Update hero chip
+  const shc = el('settings-hero-chips');
+  if(shc) {
+    const d = loadData();
+    shc.innerHTML = `
+      <div class="settings-hero-chip"><span class="mio" style="font-size:12px;vertical-align:-1px;">spa</span> ${d.dosha?.primary||'No quiz'}</div>
+      <div class="settings-hero-chip"><span class="mi" style="font-size:12px;vertical-align:-1px;">location_on</span> ${d.city||'No city'}</div>
+      <div class="settings-hero-chip"><span class="mi" style="font-size:12px;vertical-align:-1px;">key</span> API Key set</div>`;
+  }
+  showToast('API key saved');
+}
+
+// ── DOSHA INSIGHTS (Home Card) ──
+async function loadDoshaInsights(d) {
+  const container = el('home-dosha-insights');
+  if(!container) return;
+
+  // Use cached insights if available
+  if(d.doshaInsights) {
+    renderDoshaInsights(d.doshaInsights);
+    return;
+  }
+
+  // Need API key to fetch
+  if(!d.settings?.openaiApiKey) {
+    container.innerHTML = `
+      <div class="dosha-insights">
+        <div style="font-size:12px;color:var(--text-light);padding-top:4px;">
+          <span class="mi" style="font-size:14px;vertical-align:-2px;color:var(--text-light);">info</span>
+          Add your API key in Settings to get personalised dosha tips.
+        </div>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="dosha-insights">
+      <div class="dosha-insights-loading">
+        <div class="dosha-insights-mini-spinner"></div>
+        Loading your personalised dosha insights…
+      </div>
+    </div>`;
+
+  const prompt = `You are an expert Ayurvedic nutritionist. Based on this person's dosha, provide concise personalised insights.
+
+Dosha: ${d.dosha.primary} (Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
+Known ailments: ${d.ailments?.join(', ')||'None'}
+
+Respond ONLY in this exact JSON (no markdown):
+{
+  "foods_to_avoid": ["food1","food2","food3","food4","food5"],
+  "top3_care": [
+    {"icon":"material_icon_name","tip":"Concise actionable tip specific to this dosha"},
+    {"icon":"material_icon_name","tip":"Concise actionable tip"},
+    {"icon":"material_icon_name","tip":"Concise actionable tip"}
+  ],
+  "best_meal_times": "e.g. Breakfast 7–8 AM, Lunch 12–1 PM, Dinner 6–7 PM — one sentence",
+  "dosha_strength": "One sentence on a key strength of this dosha type"
+}
+Use only real Material Icons names like: restaurant, bedtime, wb_sunny, self_improvement, favorite, directions_walk, eco, water_drop, air.`;
+
+  try {
+    const resp = await callOpenAI(prompt, d.settings.openaiApiKey);
+    const raw = resp.replace(/```json|```/g,'').trim();
+    const insights = JSON.parse(raw);
+    // Save to localStorage so we don't re-fetch
+    setData('doshaInsights', insights);
+    renderDoshaInsights(insights);
+  } catch(e) {
+    const type = classifyApiError(e);
+    setApiErrorState(true);
+    logError('loadDoshaInsights', e);
+    const msgs = {
+      quota: 'OpenAI credits exhausted — top up at platform.openai.com to see your personalised insights.',
+      invalid_key: 'Invalid API key — update your key in Settings to see insights.',
+      rate_limit: 'Rate limited — please wait a moment and revisit this page.',
+      network: 'No internet connection — connect and refresh to load insights.',
+      unknown: 'Could not load insights — check App Diagnostics in Settings.'
+    };
+    if(container) container.innerHTML = `
+      <div class="dosha-insights">
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:rgba(217,95,69,0.07);border-radius:8px;border-left:3px solid #D95F45;">
+          <span class="mi" style="font-size:18px;color:#D95F45;flex-shrink:0;">error_outline</span>
+          <span style="font-size:12px;color:var(--text-muted);line-height:1.5;">${msgs[type]||msgs.unknown}</span>
+        </div>
+      </div>`;
+  }
+}
+
+function renderDoshaInsights(ins) {
+  const container = el('home-dosha-insights');
+  if(!container || !ins) return;
+
+  const avoidTags = (ins.foods_to_avoid||[]).map(f=>
+    `<span class="dosha-avoid-tag">${f}</span>`).join('');
+
+  const careTips = (ins.top3_care||[]).map(t=>`
+    <div class="dosha-insight-item">
+      <span class="mi" style="font-size:14px;color:var(--burgundy);">${t.icon||'arrow_right'}</span>
+      <span>${t.tip}</span>
+    </div>`).join('');
+
+  container.innerHTML = `
+    <div class="dosha-insights">
+      ${ins.dosha_strength?`
+      <div class="dosha-insight-block" style="background:var(--gold-pale);border-left:3px solid var(--gold);">
+        <div class="dosha-insight-title"><span class="mi">stars</span><span class="dosha-insight-title-text">Your Strength</span></div>
+        <div style="font-size:12px;color:var(--charcoal-mid);line-height:1.55;">${ins.dosha_strength}</div>
+      </div>`:''}
+
+      <div class="dosha-insight-block">
+        <div class="dosha-insight-title"><span class="mi">schedule</span><span class="dosha-insight-title-text">Best Meal Times</span></div>
+        <div style="font-size:12px;color:var(--charcoal-mid);line-height:1.55;">${ins.best_meal_times||''}</div>
+      </div>
+
+      <div class="dosha-insight-block">
+        <div class="dosha-insight-title"><span class="mi">block</span><span class="dosha-insight-title-text">Foods to Avoid</span></div>
+        <div class="dosha-avoid-tags">${avoidTags}</div>
+      </div>
+
+      <div class="dosha-insight-block">
+        <div class="dosha-insight-title"><span class="mi">tips_and_updates</span><span class="dosha-insight-title-text">Top 3 Things to Care About</span></div>
+        <div class="dosha-insight-list">${careTips}</div>
+      </div>
+    </div>`;
+}
+
+// ── JSON EXPORT / IMPORT ──
+function exportJSON() {
+  const d = loadData();
+  // Include all current feature data in export
+  const exportData = {
+    ...d,
+    _export_meta: {
+      exported_at: new Date().toISOString(),
+      app_version: '2.0',
+      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+    }
+  };
+  const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='my_info.json'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('Exported my_info.json');
+}
+
+function importJSON(evt) {
+  const file = evt.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(!data.user) { showToast('Invalid my_info.json — missing user profile'); return; }
+      // Strip export meta before saving
+      delete data._export_meta;
+      saveData(data);
+      // Reset in-memory caches so they reload from imported data
+      dinaCache = null;
+      clearDinaCache();
+      clearFoodCache();
+      herbState.resultsShown = false;
+      showToast('Profile imported! Welcome back 🙏');
+      initApp();
+      switchTab('home');
+    } catch {
+      showToast('Could not read file — make sure it is a valid my_info.json');
+    }
+  };
+  reader.readAsText(file);
+  evt.target.value='';
+}
+
+
+// ══════════════════════════════════════════
+//  HERB & SUPPLEMENT ADVISOR
+// ══════════════════════════════════════════
+
+const HERB_CONCERNS = [
+  'Digestive issues','Acidity / Reflux','Bloating','Constipation',
+  'Low immunity','Stress / Anxiety','Poor sleep','Low energy / Fatigue',
+  'Skin health','Weight management','Joint pain','Respiratory health',
+  'Memory / Focus','Hormonal balance','Liver health','Heart health'
+];
+
+let herbState = {
+  mode: null,          // 'profile' | 'concern' | 'chat'
+  selectedConcerns: [],
+  chatHistory: [],
+  chatLoading: false,
+  resultsShown: false
+};
+
+function initHerbAdvisor() {
+  const d = loadData();
+  const wrap = el('herbs-wrap');
+  if(!d.dosha) {
+    wrap.innerHTML = `
+      <div class="herb-hero">
+        <div class="herb-hero-label">Herb Advisor</div>
+        <div class="herb-hero-title">Complete your Dosha Quiz first 🌿</div>
+        <div class="herb-hero-sub">The Herb Advisor needs your dosha profile to give personalised recommendations.</div>
+      </div>
+      <button class="btn-primary" onclick="switchTab('quiz')">Go to Dosha Quiz →</button>`;
+    return;
+  }
+  if(!herbState.resultsShown) renderHerbHome(d);
+}
+
+function renderHerbHome(d) {
+  const dosha = d.dosha?.primary || '—';
+  el('herbs-wrap').innerHTML = `
+    <div class="herb-hero">
+      <div class="herb-hero-label">Ayurvedic Herb Advisor</div>
+      <div class="herb-hero-title">Find Herbs &amp;<br>Supplements for You</div>
+      <div class="herb-hero-sub">Get personalised herb recommendations based on your dosha, current ailments, or ask anything about Ayurvedic herbs.</div>
+      <div class="herb-dosha-chip"><span class="mio" style="font-size:14px;vertical-align:-2px;">spa</span> ${dosha} Dosha · ${d.city||'Location not set'}</div>
+    </div>
+
+    <div class="section-title">How would you like to explore?</div>
+    <div class="herb-mode-grid">
+      <div class="herb-mode-card" id="hmode-profile" onclick="selectHerbMode('profile')">
+        <div class="herb-mode-icon"><span class="mio" style="font-size:30px;color:var(--burgundy);">self_improvement</span></div>
+        <div class="herb-mode-title">By My Dosha</div>
+        <div class="herb-mode-desc">Best herbs for your ${dosha} constitution</div>
+      </div>
+      <div class="herb-mode-card" id="hmode-concern" onclick="selectHerbMode('concern')">
+        <div class="herb-mode-icon"><span class="mi" style="font-size:30px;color:var(--burgundy);">track_changes</span></div>
+        <div class="herb-mode-title">By Concern</div>
+        <div class="herb-mode-desc">Target a specific health goal or ailment</div>
+      </div>
+      <div class="herb-mode-card" id="hmode-chat" onclick="selectHerbMode('chat')">
+        <div class="herb-mode-icon"><span class="mio" style="font-size:30px;color:var(--burgundy);">chat_bubble</span></div>
+        <div class="herb-mode-title">Ask Anything</div>
+        <div class="herb-mode-desc">Chat with your Ayurvedic herb expert</div>
+      </div>
+      <div class="herb-mode-card" id="hmode-seasonal" onclick="selectHerbMode('seasonal')">
+        <div class="herb-mode-icon"><span class="mio" style="font-size:30px;color:var(--burgundy);">wb_sunny</span></div>
+        <div class="herb-mode-title">Seasonal Herbs</div>
+        <div class="herb-mode-desc">What to take this season in ${d.city||'your city'}</div>
+      </div>
+    </div>
+    <div id="herb-mode-content"></div>
+  `;
+}
+
+function selectHerbMode(mode) {
+  herbState.mode = mode;
+  document.querySelectorAll('.herb-mode-card').forEach(c=>c.classList.remove('selected'));
+  el('hmode-'+mode)?.classList.add('selected');
+  const content = el('herb-mode-content');
+  if(!content) return;
+
+  if(mode === 'profile') {
+    content.innerHTML = `
+      <div class="herb-concern-card">
+        <h4><span class="mio" style="font-size:18px;vertical-align:-4px;margin-right:5px;color:var(--burgundy);">self_improvement</span>Herbs for Your Dosha</h4>
+        <p>Get the top Ayurvedic herbs and supplements tailored to your ${loadData().dosha?.primary} constitution and known ailments.</p>
+        <button class="btn-primary" onclick="getHerbsByDosha()"><span class="mi" style="font-size:16px;vertical-align:-3px;margin-right:5px;">spa</span>Get My Herb Recommendations</button>
+      </div>`;
+  } else if(mode === 'concern') {
+    content.innerHTML = `
+      <div class="herb-concern-card">
+        <h4><span class="mi" style="font-size:18px;vertical-align:-4px;margin-right:5px;color:var(--burgundy);">track_changes</span>Choose Your Health Concerns</h4>
+        <p>Select one or more areas you want to address. You can pick from your known ailments or choose something new.</p>
+        <div class="herb-tags" id="herb-concern-tags">
+          ${HERB_CONCERNS.map((c,i)=>`
+            <div class="herb-tag ${herbState.selectedConcerns.includes(c)?'active':''}"
+              id="htag-${i}" onclick="toggleHerbConcern('${c}',${i})">${c}</div>
+          `).join('')}
+        </div>
+        <button class="btn-primary" onclick="getHerbsByConcern()"><span class="mi" style="font-size:16px;vertical-align:-3px;margin-right:5px;">search</span>Find Herbs for These Concerns</button>
+      </div>`;
+  } else if(mode === 'chat') {
+    renderHerbChat();
+  } else if(mode === 'seasonal') {
+    content.innerHTML = `
+      <div class="herb-concern-card">
+        <h4><span class="mio" style="font-size:18px;vertical-align:-4px;margin-right:5px;color:var(--burgundy);">wb_sunny</span>Seasonal Herb Guide</h4>
+        <p>Get herbs and supplements recommended for the current season in your city, aligned with your dosha.</p>
+        <button class="btn-primary" onclick="getSeasonalHerbs()"><span class="mi" style="font-size:16px;vertical-align:-3px;margin-right:5px;">event</span>Get Seasonal Recommendations</button>
+      </div>`;
+  }
+}
+
+function toggleHerbConcern(name, idx) {
+  if(herbState.selectedConcerns.includes(name)) {
+    herbState.selectedConcerns = herbState.selectedConcerns.filter(c=>c!==name);
+    el('htag-'+idx)?.classList.remove('active');
+  } else {
+    herbState.selectedConcerns.push(name);
+    el('htag-'+idx)?.classList.add('active');
+  }
+}
+
+// ── SHARED HERB RESULT RENDERER ──
+function renderHerbResults(data, titlePrefix) {
+  const wrap = el('herbs-wrap');
+  const pct = data.effect_confidence || 85;
+  const fillColor = pct>=75?'#2D5A3D':pct>=50?'#C9A84C':'#D95F45';
+
+  const herbsHTML = (data.herbs||[]).map(h=>{
+    const safetyClass = h.safety==='Safe'?'safe-yes':h.safety==='Use with caution'?'safe-caution':'safe-no';
+    return `
+      <div class="herb-item">
+        <div class="herb-item-top">
+          <div class="herb-item-icon">${h.icon||'spa'}</div>
+          <div style="flex:1;">
+            <div class="herb-item-name">${h.name}</div>
+            <div class="herb-item-sanskrit">${h.sanskrit||''}</div>
+            <span class="herb-safety-badge ${safetyClass}">${h.safety||'Safe'}</span>
+          </div>
+        </div>
+        <div class="herb-item-desc">${h.benefit}</div>
+        <div class="herb-item-how"><strong>How to use:</strong> ${h.how}</div>
+        ${h.warning?`<div class="herb-interaction-warning"><span class="mi" style="font-size:14px;vertical-align:-2px;margin-right:4px;">warning</span>${h.warning}</div>`:''}
+      </div>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div class="top-bar" style="position:sticky;top:0;z-index:10;margin:-20px -16px 16px;padding:14px 16px;">
+      <div>
+        <div class="top-bar-title">Your Herb Guide</div>
+        <div class="top-bar-sub">${titlePrefix}</div>
+      </div>
+      <button onclick="resetHerbAdvisor()" style="display:inline-flex;align-items:center;gap:4px;padding:7px 14px;background:var(--lotus-pale);border:1.5px solid var(--lotus);border-radius:20px;font-family:'Jost',sans-serif;font-size:12px;font-weight:600;color:var(--burgundy);cursor:pointer;"><span class="mi" style="font-size:15px;">arrow_back</span> New Search</button>
+    </div>
+
+    <div class="herb-result-card">
+      <h4>${data.title||'Your Personalised Herbs'}</h4>
+      <div class="hr-sub">${data.summary||''}</div>
+
+      <div class="remedy-effect-bar" style="margin-bottom:18px;">
+        <div class="remedy-effect-label">Match Confidence</div>
+        <div class="remedy-effect-track">
+          <div class="remedy-effect-fill" id="herb-conf-fill" style="width:0%;background:${fillColor};"></div>
+        </div>
+        <div class="remedy-effect-pct">${pct}%</div>
+      </div>
+
+      ${herbsHTML}
+
+      ${data.avoid_list?.length ? `
+      <div style="margin-top:16px;padding:14px;background:rgba(180,30,30,0.06);border-radius:10px;border-left:3px solid #D95F45;">
+        <div style="font-size:11px;font-weight:700;color:#8B1A1A;margin-bottom:8px;display:flex;align-items:center;gap:6px;"><span class="mi" style="font-size:16px;">warning</span><span style="letter-spacing:1px;text-transform:uppercase;">Herbs to Avoid for Your Dosha</span></div>
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">${data.avoid_list.join(' · ')}</div>
+      </div>` : ''}
+
+      ${data.lifestyle_tip ? `
+      <div style="margin-top:14px;padding:12px 14px;background:rgba(45,90,61,0.07);border-radius:10px;border-left:3px solid #2D5A3D;">
+        <div style="font-size:11px;font-weight:700;color:#1A3A2A;margin-bottom:4px;display:flex;align-items:center;gap:6px;"><span class="mio" style="font-size:16px;">eco</span><span style="letter-spacing:1px;text-transform:uppercase;">Lifestyle Tip</span></div>
+        <div style="font-size:12px;color:var(--charcoal-mid);line-height:1.6;">${data.lifestyle_tip}</div>
+      </div>` : ''}
+    </div>
+
+    <div class="herb-disclaimer">
+      <span class="mio" style="font-size:14px;vertical-align:-2px;margin-right:4px;">menu_book</span>
+      <em>This guidance is based on classical Ayurvedic texts. Consult a qualified Vaidya or physician before starting any herbal regimen, especially if you are on medication.</em>
+    </div>
+
+    <button class="btn-secondary" style="margin-top:14px;margin-bottom:32px;display:inline-flex;align-items:center;gap:6px;" onclick="renderHerbChat()">
+      <span class="mio" style="font-size:17px;">chat_bubble</span> Ask follow-up questions
+    </button>
+  `;
+
+  herbState.resultsShown = true;
+  el('herb-reset-btn').style.display='flex';
+  el('app-content').scrollTop = 0;
+
+  requestAnimationFrame(()=>{
+    setTimeout(()=>{
+      const fill = el('herb-conf-fill');
+      if(fill) fill.style.width = pct+'%';
+    },120);
+  });
+}
+
+// ── BUILD HERB PROMPT ──
+function buildHerbContext() {
+  const d = loadData();
+  const now = new Date();
+  return {
+    dosha: d.dosha?.primary||'Unknown',
+    scores: d.dosha?.scores||{},
+    ailments: d.ailments?.join(', ')||'None',
+    city: d.city||'unknown city',
+    month: now.toLocaleString('default',{month:'long'}),
+    time: now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),
+    apiKey: d.settings?.openaiApiKey||''
+  };
+}
+
+function buildHerbJsonSpec() {
+  return `{
+  "title": "Short descriptive title",
+  "summary": "2-sentence overall recommendation rationale",
+  "effect_confidence": <60-95 integer>,
+  "herbs": [
+    {
+      "icon": "<single herb emoji>",
+      "name": "Common English name",
+      "sanskrit": "Sanskrit / Ayurvedic name",
+      "benefit": "Why this herb suits this person specifically — mention dosha, ailment, season",
+      "how": "Exact dosage, form (powder/capsule/tea/oil), timing, duration",
+      "safety": "Safe" | "Use with caution" | "Avoid in pregnancy",
+      "warning": "Optional: specific interaction or contraindication warning, or omit key"
+    }
+  ],
+  "avoid_list": ["Herb to avoid for this dosha", "..."],
+  "lifestyle_tip": "One actionable lifestyle tip to enhance the herbs' effect"
+}
+
+Provide 4 to 6 herbs. Prioritise classical Ayurvedic herbs. Respond ONLY in this JSON, no markdown.`;
+}
+
+// ── GET BY DOSHA ──
+async function getHerbsByDosha() {
+  const ctx = buildHerbContext();
+  if(!ctx.apiKey) { showToast('Please add your OpenAI API key in Settings'); return; }
+  showHerbLoading('Consulting the Ayurvedic scriptures...');
+
+  const prompt = `You are a senior Ayurvedic Vaidya (physician). Recommend the best herbs and supplements for this person based on their dosha constitution and known ailments.
+
+User Profile:
+- Primary Dosha: ${ctx.dosha} (Vata ${ctx.scores.Vata||0}%, Pitta ${ctx.scores.Pitta||0}%, Kapha ${ctx.scores.Kapha||0}%)
+- Known ailments: ${ctx.ailments}
+- City: ${ctx.city}, Month: ${ctx.month}
+- Time: ${ctx.time}
+
+Consider the current season inferred from city + month. Recommend herbs that support this dosha's natural balance and address the known ailments.
+
+Respond in this JSON format:
+${buildHerbJsonSpec()}`;
+
+  await fetchAndRenderHerbs(prompt, ctx.apiKey, `${ctx.dosha} constitution · ${ctx.month}`);
+}
+
+// ── GET BY CONCERN ──
+async function getHerbsByConcern() {
+  if(!herbState.selectedConcerns.length) {
+    showToast('Please select at least one concern 🎯'); return;
+  }
+  const ctx = buildHerbContext();
+  if(!ctx.apiKey) { showToast('Please add your OpenAI API key in Settings'); return; }
+  showHerbLoading('Finding herbs for your concerns...');
+
+  const prompt = `You are a senior Ayurvedic Vaidya. Recommend herbs and supplements to address the user's specific health concerns, considering their dosha.
+
+User Profile:
+- Primary Dosha: ${ctx.dosha} (Vata ${ctx.scores.Vata||0}%, Pitta ${ctx.scores.Pitta||0}%, Kapha ${ctx.scores.Kapha||0}%)
+- Known ailments: ${ctx.ailments}
+- City: ${ctx.city}, Month: ${ctx.month}
+- Target concerns: ${herbState.selectedConcerns.join(', ')}
+
+Prioritise herbs that address these specific concerns without aggravating the ${ctx.dosha} dosha.
+
+Respond in this JSON format:
+${buildHerbJsonSpec()}`;
+
+  await fetchAndRenderHerbs(prompt, ctx.apiKey, herbState.selectedConcerns.slice(0,2).join(' · '));
+}
+
+// ── GET SEASONAL ──
+async function getSeasonalHerbs() {
+  const ctx = buildHerbContext();
+  if(!ctx.apiKey) { showToast('Please add your OpenAI API key in Settings'); return; }
+  showHerbLoading('Reading the seasonal almanac...');
+
+  const prompt = `You are a senior Ayurvedic Vaidya. Recommend seasonal herbs and supplements appropriate for this person's location, current month, and dosha.
+
+User Profile:
+- Primary Dosha: ${ctx.dosha}
+- Known ailments: ${ctx.ailments}
+- City: ${ctx.city}, Current Month: ${ctx.month}
+
+Infer the current season (Ritu) for ${ctx.city} in ${ctx.month}. Recommend herbs that are classically indicated for this season to maintain balance and prevent seasonal ailments.
+
+Respond in this JSON format:
+${buildHerbJsonSpec()}`;
+
+  await fetchAndRenderHerbs(prompt, ctx.apiKey, `${ctx.month} · ${ctx.city}`);
+}
+
+async function fetchAndRenderHerbs(prompt, apiKey, subtitle) {
+  try {
+    const resp = await callOpenAILarge(prompt, apiKey, 2000);
+    const raw = resp.replace(/```json|```/g,'').trim();
+    const result = JSON.parse(raw);
+    renderHerbResults(result, subtitle);
+  } catch(e) {
+    el('herbs-wrap').innerHTML += buildApiErrHTML(e, 'fetchAndRenderHerbs', 'initHerbAdvisor()');
+  }
+}
+
+function showHerbLoading(msg) {
+  el('herbs-wrap').innerHTML = `
+    <div class="loading-card" style="margin-top:20px;">
+      <span style="display:block;margin-bottom:16px;animation:floatLotus 2.5s ease-in-out infinite;">
+        <span class="mio" style="font-size:52px;color:var(--burgundy);">spa</span>
+      </span>
+      <div class="loading-title">${msg}</div>
+      <div class="loading-sub">Drawing from classical Ayurvedic texts…</div>
+      <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
+    </div>`;
+}
+
+// ── HERB CHAT ──
+function renderHerbChat() {
+  const d = loadData();
+  herbState.chatHistory = herbState.chatHistory.length ? herbState.chatHistory : [
+    {role:'ai', text:`Namaste 🙏 I'm your Ayurvedic herb advisor. You are a <strong>${d.dosha?.primary||'—'}</strong> type. Ask me anything about herbs, supplements, combinations, dosage, or any specific health concern.`}
+  ];
+
+  el('herbs-wrap').innerHTML = `
+    <div class="top-bar" style="position:sticky;top:0;z-index:10;margin:-20px -16px 16px;padding:14px 16px;">
+      <div>
+        <div class="top-bar-title">Herb Chat</div>
+        <div class="top-bar-sub">Your Ayurvedic expert</div>
+      </div>
+      <button onclick="resetHerbAdvisor()" style="display:inline-flex;align-items:center;gap:4px;padding:7px 14px;background:var(--lotus-pale);border:1.5px solid var(--lotus);border-radius:20px;font-family:'Jost',sans-serif;font-size:12px;font-weight:600;color:var(--burgundy);cursor:pointer;"><span class="mi" style="font-size:15px;">arrow_back</span> Back</button>
+    </div>
+    <div class="herb-chat-card">
+      <div class="herb-chat-history" id="herb-chat-history">
+        ${renderChatBubbles()}
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="herb-chat-input"
+          placeholder="Ask about any herb or supplement..."
+          onkeydown="if(event.key==='Enter')sendHerbChat()"/>
+        <button class="chat-send-btn" id="herb-send-btn" onclick="sendHerbChat()">
+          <span class="mi" style="font-size:20px;">send</span>
+        </button>
+      </div>
+    </div>
+    <div class="herb-disclaimer">
+      <span class="mio" style="font-size:14px;vertical-align:-2px;margin-right:4px;">info</span> For serious conditions, always consult a qualified Vaidya or physician.
+    </div>
+  `;
+  herbState.resultsShown = true;
+  el('herb-reset-btn').style.display='flex';
+  scrollChatToBottom();
+}
+
+function renderChatBubbles() {
+  return herbState.chatHistory.map(m=>`
+    <div class="chat-bubble ${m.role==='user'?'user':'ai'}">${m.text}</div>
+  `).join('');
+}
+
+function scrollChatToBottom() {
+  setTimeout(()=>{
+    const h = el('herb-chat-history');
+    if(h) h.scrollTop = h.scrollHeight;
+  },80);
+}
+
+async function sendHerbChat() {
+  if(herbState.chatLoading) return;
+  const input = el('herb-chat-input');
+  const msg = input?.value.trim();
+  if(!msg) return;
+  const d = loadData();
+  if(!d.settings?.openaiApiKey) { showToast('Please add your OpenAI API key in Settings'); return; }
+
+  input.value = '';
+  herbState.chatHistory.push({role:'user', text: msg});
+  herbState.chatLoading = true;
+
+  const sendBtn = el('herb-send-btn');
+  if(sendBtn) { sendBtn.disabled=true; sendBtn.innerHTML='<span class="loading-spinner" style="width:18px;height:18px;border-width:2px;margin:0;"></span>'; }
+
+  // Add loading bubble
+  herbState.chatHistory.push({role:'ai', text:'<span style="opacity:0.6">Consulting the Vaidya...</span>', loading:true});
+  updateChatDisplay();
+
+  const ctx = buildHerbContext();
+  const history = herbState.chatHistory
+    .filter(m=>!m.loading)
+    .slice(-8)
+    .map(m=>({role: m.role==='user'?'user':'assistant', content: m.text.replace(/<[^>]+>/g,'')}));
+
+  const systemPrompt = `You are an expert Ayurvedic Vaidya and herbalist. The user's profile:
+- Dosha: ${ctx.dosha} (Vata ${ctx.scores.Vata||0}%, Pitta ${ctx.scores.Pitta||0}%, Kapha ${ctx.scores.Kapha||0}%)
+- Ailments: ${ctx.ailments}
+- City: ${ctx.city}, Month: ${ctx.month}
+
+Answer herb and supplement questions from a classical Ayurvedic perspective. Be specific, practical, and always mention dosage, form, and timing. Flag any safety concerns. Keep answers concise (3-5 sentences). Never recommend stopping prescribed medications.`;
+
+  try {
+    const resp = await fetch('https://api.openai.com/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+ctx.apiKey},
+      body:JSON.stringify({
+        model:'gpt-4o-mini',
+        messages:[{role:'system',content:systemPrompt},...history],
+        temperature:0.4, max_tokens:500
+      })
+    });
+    if(!resp.ok){const e=await resp.json();throw new Error(e.error?.message||'API error');}
+    const data = await resp.json();
+    const aiText = data.choices[0].message.content;
+    // Replace loading bubble
+    herbState.chatHistory = herbState.chatHistory.filter(m=>!m.loading);
+    herbState.chatHistory.push({role:'ai', text: aiText});
+  } catch(e) {
+    const type = classifyApiError(e);
+    setApiErrorState(true);
+    logError('sendHerbChat', e);
+    const chatMsgs = {
+      quota: 'Your OpenAI credits have run out. Please top up at platform.openai.com to continue.',
+      invalid_key: 'Your API key is invalid. Please update it in Settings.',
+      rate_limit: 'Too many requests — please wait a moment and try again.',
+      network: 'No internet connection. Please check your network.',
+      unknown: `Could not connect right now. (${e.message})`
+    };
+    herbState.chatHistory = herbState.chatHistory.filter(m=>!m.loading);
+    herbState.chatHistory.push({role:'ai', text: chatMsgs[type] || chatMsgs.unknown});
+  } finally {
+    herbState.chatLoading = false;
+    if(sendBtn){sendBtn.disabled=false;sendBtn.innerHTML='<span class="mi" style="font-size:20px;">send</span>';}
+    updateChatDisplay();
+  }
+}
+
+function updateChatDisplay() {
+  const h = el('herb-chat-history');
+  if(h) { h.innerHTML = renderChatBubbles(); scrollChatToBottom(); }
+}
+
+function resetHerbAdvisor() {
+  herbState = { mode:null, selectedConcerns:[], chatHistory:[], chatLoading:false, resultsShown:false };
+  el('herb-reset-btn').style.display='none';
+  const d = loadData();
+  renderHerbHome(d);
+  el('app-content').scrollTop=0;
+}
+
+
+
+
+// ══════════════════════════════════════════
+//  MEAL TIMING WIDGET
+// ══════════════════════════════════════════
+window._mealTimingMode = 'now';
+window._activeAilments = [];
+
+function toggleAdvFilters() {
+  const panel = el('adv-filters-panel');
+  const btn = el('adv-filters-btn');
+  const chevron = el('adv-chevron');
+  if(!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  btn?.classList.toggle('open', !isOpen);
+  if(chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+  if(!isOpen) { initMealTiming(); initAdvAilmentChips(); }
+}
+
+function initAdvAilmentChips() {
+  const container = el('adv-ailment-chips');
+  if(!container) return;
+  container.innerHTML = COMMON_AILMENTS.map(name=>{
+    const active = window._activeAilments.includes(name);
+    const safe = name.replace(/'/g,'&apos;');
+    return `<div class="adv-ailment-chip ${active?'selected':''}" onclick="toggleActiveAilment('${safe}')">
+      ${active?'<span class="mi" style="font-size:13px;margin-right:3px;">check</span>':''}${name}
+    </div>`;
+  }).join('');
+}
+
+function toggleActiveAilment(name) {
+  if(window._activeAilments.includes(name)) {
+    window._activeAilments = window._activeAilments.filter(a=>a!==name);
+  } else {
+    window._activeAilments.push(name);
+  }
+  initAdvAilmentChips();
+}
+
+function initMealTiming() {
+  // Set date input min to today, default to today
+  const dateInput = el('meal-plan-date');
+  if(!dateInput) return;
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+  dateInput.min = todayStr;
+  dateInput.value = todayStr;
+
+  // Populate hour select (0–23 as 12h format with AM/PM)
+  const hourSel = el('meal-plan-hour');
+  if(hourSel) {
+    hourSel.innerHTML = '';
+    for(let h=0;h<24;h++) {
+      const ampm = h>=12?'PM':'AM';
+      const h12 = h%12||12;
+      const endH = (h+1)%24;
+      const endAmpm = endH>=12?'PM':'AM';
+      const endH12 = endH%12||12;
+      const opt = document.createElement('option');
+      opt.value = h;
+      opt.textContent = `${h12}:00 ${ampm} – ${endH12}:00 ${endAmpm}`;
+      if(h === today.getHours()) opt.selected = true;
+      hourSel.appendChild(opt);
+    }
+  }
+
+  // Update the "now" preview text
+  const nowDisp = el('meal-now-time-display');
+  if(nowDisp) {
+    const t = today.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const day = today.toLocaleDateString([],{weekday:'short',day:'numeric',month:'short'});
+    nowDisp.textContent = `Using current time — ${day}, ${t}`;
+  }
+  updatePlanPreview();
+}
+
+function setTimingMode(mode) {
+  window._mealTimingMode = mode;
+  const nowBtn = el('mtt-now');
+  const planBtn = el('mtt-plan');
+  const nowPreview = el('meal-timing-now-preview');
+  const planPicker = el('meal-timing-plan-picker');
+  if(mode === 'now') {
+    nowBtn?.classList.add('active');
+    planBtn?.classList.remove('active');
+    nowPreview && (nowPreview.style.display='flex');
+    planPicker && (planPicker.style.display='none');
+  } else {
+    planBtn?.classList.add('active');
+    nowBtn?.classList.remove('active');
+    nowPreview && (nowPreview.style.display='none');
+    planPicker && (planPicker.style.display='block');
+    updatePlanPreview();
+  }
+}
+
+function updatePlanPreview() {
+  const dateVal = el('meal-plan-date')?.value;
+  const hourVal = el('meal-plan-hour')?.value;
+  const preview = el('meal-plan-preview');
+  const previewText = el('meal-plan-preview-text');
+  if(!preview || !previewText) return;
+  if(!dateVal || hourVal===undefined || hourVal==='') {
+    previewText.textContent = 'Select a date and time window above';
+    return;
+  }
+  const d = new Date(dateVal+'T12:00:00'); // noon to avoid TZ issues for display
+  const dayName = d.toLocaleString('default',{weekday:'long'});
+  const dateDisplay = d.toLocaleDateString([],{day:'numeric',month:'long',year:'numeric'});
+  const h = parseInt(hourVal);
+  const ampm = h>=12?'PM':'AM';
+  const h12 = h%12||12;
+  const endH = (h+1)%24;
+  const endAmpm = endH>=12?'PM':'AM';
+  const endH12 = endH%12||12;
+  const isToday = dateVal === new Date().toISOString().split('T')[0];
+  const isTomorrow = dateVal === new Date(Date.now()+86400000).toISOString().split('T')[0];
+  const dayLabel = isToday?'Today':isTomorrow?'Tomorrow':dayName;
+  previewText.textContent = `${dayLabel}, ${dateDisplay} · ${h12}:00 ${ampm} – ${endH12}:00 ${endAmpm}`;
+}
+
+// ══════════════════════════════════════════
+//  SYMPTOM CHECKER
+// ══════════════════════════════════════════
+
+const BODY_AREAS = [
+  { id:'head',    icon:'face',                  label:'Head / Mind'     },
+  { id:'gut',     icon:'lunch_dining',           label:'Gut / Digestion' },
+  { id:'skin',    icon:'back_hand',              label:'Skin'             },
+  { id:'joints',  icon:'accessibility_new',      label:'Joints / Body'   },
+  { id:'energy',  icon:'battery_charging_full',  label:'Energy'          },
+  { id:'sleep',   icon:'bedtime',                label:'Sleep'            },
+  { id:'chest',   icon:'favorite',               label:'Chest / Heart'   },
+  { id:'throat',  icon:'record_voice_over',      label:'Throat / Nose'   },
+  { id:'mood',    icon:'mood_bad',               label:'Mood / Emotion'  },
+];
+
+const DURATIONS = ['Today','2–3 days','1 week','2+ weeks','1+ month','Chronic'];
+
+let symptomState = {
+  selectedAreas:[],
+  duration:null,
+  severity:5,
+  description:'',
+  resultShown:false
+};
+
+function initSymptomChecker() {
+  if(!symptomState.resultShown) renderSymptomHome();
+}
+
+function renderSymptomHome() {
+  const d = loadData();
+  const dosha = d.dosha?.primary||null;
+  el('symptom-wrap').innerHTML = `
+    <div class="symptom-hero">
+      <div class="symptom-hero-label">Ayurvedic Symptom Analysis</div>
+      <div class="symptom-hero-title">How are you<br>feeling today?</div>
+      <div class="symptom-hero-sub">Describe your symptoms and get a personalised Ayurvedic root-cause analysis with actionable remedies.</div>
+      ${dosha?`<div class="symptom-hero-chip"><span class="mio" style="font-size:14px;vertical-align:-2px;">spa</span> ${dosha} Dosha Profile Loaded</div>`:''}
+    </div>
+
+    <div class="symptom-section-card">
+      <h4><span class="mi" style="font-size:19px;color:#4A2060;">touch_app</span> Where do you feel it?</h4>
+      <div class="body-areas-grid">
+        ${BODY_AREAS.map(a=>`
+          <div class="body-area-chip ${symptomState.selectedAreas.includes(a.id)?'selected':''}" id="ba-${a.id}" onclick="toggleBodyArea('${a.id}')">
+            <span class="mio ba-icon">${a.icon}</span>
+            <span class="ba-label">${a.label}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="symptom-section-card">
+      <h4><span class="mi" style="font-size:19px;color:#4A2060;">edit_note</span> Describe your symptoms</h4>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">Be specific — include when it started, what makes it worse or better, and any patterns.</p>
+      <textarea class="food-textarea" id="symptom-desc" style="height:110px;" placeholder="e.g. Sharp burning in stomach after meals, worse in afternoon, with acidity and bloating…">${symptomState.description}</textarea>
+    </div>
+
+    <div class="symptom-section-card">
+      <h4><span class="mi" style="font-size:19px;color:#4A2060;">schedule</span> How long have you had this?</h4>
+      <div class="duration-chips">
+        ${DURATIONS.map(dur=>`
+          <div class="duration-chip ${symptomState.duration===dur?'selected':''}" onclick="selectDuration('${dur}')" id="dur-${dur.replace(/[^a-z0-9]/gi,'')}">${dur}</div>`).join('')}
+      </div>
+    </div>
+
+    <div class="symptom-section-card">
+      <h4><span class="mi" style="font-size:19px;color:#4A2060;">signal_cellular_alt</span> How severe is it?</h4>
+      <div class="severity-row">
+        <span class="severity-label">Mild</span>
+        <input type="range" class="severity-slider" id="severity-slider" min="1" max="10" value="${symptomState.severity}" oninput="updateSeverity(this.value)"/>
+        <span class="severity-label">Severe</span>
+        <span class="severity-val" id="severity-val">${symptomState.severity}/10</span>
+      </div>
+    </div>
+
+    <button class="btn-primary" style="width:100%;padding:16px;" onclick="runSymptomCheck()">
+      <span class="mi" style="font-size:18px;vertical-align:-4px;margin-right:6px;">biotech</span>Analyse My Symptoms
+    </button>
+    <div id="symptom-result-area" style="margin-top:14px;"></div>
+  `;
+}
+
+function toggleBodyArea(id) {
+  if(symptomState.selectedAreas.includes(id)) {
+    symptomState.selectedAreas = symptomState.selectedAreas.filter(a=>a!==id);
+    el('ba-'+id)?.classList.remove('selected');
+  } else {
+    symptomState.selectedAreas.push(id);
+    el('ba-'+id)?.classList.add('selected');
+  }
+}
+
+function selectDuration(dur) {
+  symptomState.duration = dur;
+  document.querySelectorAll('.duration-chip').forEach(c=>c.classList.remove('selected'));
+  el('dur-'+dur.replace(/[^a-z0-9]/gi,''))?.classList.add('selected');
+}
+
+function updateSeverity(val) {
+  symptomState.severity = parseInt(val);
+  const sv = el('severity-val');
+  if(sv) sv.textContent = val+'/10';
+}
+
+async function runSymptomCheck() {
+  const desc = (el('symptom-desc')?.value||'').trim();
+  if(!desc) { showToast('Please describe your symptoms first'); return; }
+  if(!symptomState.selectedAreas.length) { showToast('Please select at least one body area'); return; }
+  if(!symptomState.duration) { showToast('Please select how long you\'ve had this'); return; }
+
+  const d = loadData();
+  if(!d.settings?.openaiApiKey) { showToast('Please add your OpenAI API key in Settings first'); return; }
+  symptomState.description = desc;
+
+  const resultArea = el('symptom-result-area');
+  resultArea.innerHTML = `
+    <div class="loading-card">
+      <span style="display:block;margin-bottom:16px;animation:floatLotus 2.5s ease-in-out infinite;">
+        <span class="mio" style="font-size:48px;color:#4A2060;">personal_injury</span>
+      </span>
+      <div class="loading-title">Analysing Your Symptoms</div>
+      <div class="loading-sub">Cross-referencing Ayurvedic Nidana (diagnosis)…</div>
+      <div class="loading-bar-track"><div class="loading-bar-fill" style="animation-duration:4.5s;"></div></div>
+      <div class="loading-steps">
+        <div class="loading-step active" id="ss1"><div class="ls-icon"><span class="mi" style="font-size:15px;">manage_search</span></div>Reading symptom patterns</div>
+        <div class="loading-step" id="ss2"><div class="ls-icon"><span class="mio" style="font-size:15px;">spa</span></div>Mapping to dosha imbalances</div>
+        <div class="loading-step" id="ss3"><div class="ls-icon"><span class="mio" style="font-size:15px;">biotech</span></div>Identifying root causes</div>
+        <div class="loading-step" id="ss4"><div class="ls-icon"><span class="mi" style="font-size:15px;">healing</span></div>Preparing remedies &amp; actions</div>
+      </div>
+    </div>`;
+
+  ['ss1','ss2','ss3','ss4'].forEach((id,i)=>{
+    setTimeout(()=>{
+      if(i>0){const prev=el(['ss1','ss2','ss3','ss4'][i-1]);if(prev){prev.classList.remove('active');prev.classList.add('done');prev.querySelector('.ls-icon').innerHTML='<span class="mi" style="font-size:15px;color:white;">check</span>';}}
+      const cur=el(id);if(cur)cur.classList.add('active');
+    },i*900);
+  });
+
+  const areas = symptomState.selectedAreas.map(id=>BODY_AREAS.find(a=>a.id===id)?.label||id).join(', ');
+  const now = new Date();
+  const month = now.toLocaleString('default',{month:'long'});
+  const time = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+  const prompt = `You are a senior Ayurvedic physician (Vaidya) with 30 years of clinical experience. Perform a thorough Ayurvedic Nidana (diagnostic) analysis.
+
+Patient Profile:
+- Primary Dosha: ${d.dosha?.primary||'Unknown'} (Vata ${d.dosha?.scores?.Vata||0}%, Pitta ${d.dosha?.scores?.Pitta||0}%, Kapha ${d.dosha?.scores?.Kapha||0}%)
+- Known ailments: ${d.ailments?.join(', ')||'None'}
+- City: ${d.city||'Unknown'}, Month: ${month}, Time: ${time}
+
+Symptom Report:
+- Affected areas: ${areas}
+- Duration: ${symptomState.duration}
+- Severity: ${symptomState.severity}/10
+- Description: "${desc}"
+
+Consider seasonal influence (infer season from city+month) and dosha time-clock (Vata 2–6am/pm, Pitta 10–2, Kapha 6–10).
+
+Respond ONLY in this exact JSON (no markdown):
+{
+  "condition_name": "Ayurvedic name (e.g. Amlapitta, Vata Vyadhi)",
+  "condition_modern": "Modern medical equivalent or closest term",
+  "primary_dosha_imbalance": ["Vata"|"Pitta"|"Kapha"],
+  "severity_assessment": "Mild"|"Moderate"|"Severe",
+  "root_causes": [
+    {"cause": "Title", "explanation": "2-sentence Ayurvedic explanation"}
+  ],
+  "immediate_actions": [
+    {"timing": "Immediate"|"Daily"|"Ongoing", "action": "Title", "detail": "Exact how-to with quantity/timing"}
+  ],
+  "foods_to_eat": ["food1","food2","food3","food4","food5"],
+  "foods_to_avoid": ["food1","food2","food3","food4"],
+  "herbs_recommended": [
+    {"name": "Herb name", "how": "Form, dose, timing"}
+  ],
+  "lifestyle_changes": ["Change 1","Change 2","Change 3"],
+  "seek_doctor_if": "Specific warning signs needing immediate medical attention",
+  "prognosis": "Expected improvement timeline with these remedies",
+  "ayurvedic_sutra": "Relevant classical principle — transliterated Sanskrit + English meaning"
+}
+Provide 3 root causes, 4-6 immediate actions, 2-3 herbs. Be specific and practical.`;
+
+  try {
+    const resp = await callOpenAILarge(prompt, d.settings.openaiApiKey, 2000);
+    const raw = resp.replace(/```json|```/g,'').trim();
+    const result = JSON.parse(raw);
+    renderSymptomResult(result);
+    symptomState.resultShown = true;
+    el('symptom-reset-btn').style.display = 'flex';
+  } catch(e) {
+    resultArea.innerHTML = buildApiErrHTML(e, 'runSymptomCheck', 'runSymptomCheck()');
+    el('symptom-reset-btn').style.display = 'flex';
+  }
+}
+
+function renderSymptomResult(r) {
+  const imbalanceChips = (r.primary_dosha_imbalance||[]).map(d=>`
+    <span class="imbalance-chip imbalance-${d.toLowerCase()}">${d} Aggravated</span>`).join('');
+
+  const timingClass = t=>t==='Immediate'?'badge-immediate':t==='Daily'?'badge-daily':'badge-ongoing';
+
+  const rootCauses = (r.root_causes||[]).map((rc,i)=>`
+    <div class="root-cause-item">
+      <div class="rc-num">${i+1}</div>
+      <div class="rc-body">
+        <div class="rc-cause">${rc.cause}</div>
+        <div class="rc-explain">${rc.explanation}</div>
+      </div>
+    </div>`).join('');
+
+  const actions = (r.immediate_actions||[]).map(a=>`
+    <div class="action-row">
+      <span class="action-badge ${timingClass(a.timing)}">${a.timing}</span>
+      <div class="action-text"><strong>${a.action}</strong><br><span style="font-weight:400;font-size:12px;color:var(--text-muted);">${a.detail}</span></div>
+    </div>`).join('');
+
+  const herbs = (r.herbs_recommended||[]).map(h=>`
+    <div class="action-row">
+      <div class="action-text"><span class="mio" style="font-size:16px;vertical-align:-3px;color:var(--gold);margin-right:6px;">eco</span><strong>${h.name}</strong><br><span style="font-weight:400;font-size:12px;color:var(--text-muted);">${h.how}</span></div>
+    </div>`).join('');
+
+  const eatTags = (r.foods_to_eat||[]).map(f=>`<span style="padding:5px 11px;background:#D1FAE5;color:#065F46;border-radius:12px;font-size:12px;font-weight:500;">${f}</span>`).join('');
+  const avoidTags = (r.foods_to_avoid||[]).map(f=>`<span style="padding:5px 11px;background:#FEE2E2;color:#991B1B;border-radius:12px;font-size:12px;font-weight:500;">${f}</span>`).join('');
+  const lifestyle = (r.lifestyle_changes||[]).map(l=>`
+    <div class="action-row" style="padding:9px 0;">
+      <div class="action-text"><span class="mi" style="font-size:15px;vertical-align:-2px;color:#4A2060;margin-right:6px;">arrow_right</span>${l}</div>
+    </div>`).join('');
+
+  el('symptom-result-area').innerHTML = `
+    <div class="symptom-result-hero">
+      <div style="font-size:10px;letter-spacing:2px;opacity:0.6;text-transform:uppercase;margin-bottom:8px;">Ayurvedic Diagnosis</div>
+      <div class="symptom-result-title">${r.condition_name||'Analysis Complete'}</div>
+      <div class="symptom-result-sub">${r.condition_modern||''}</div>
+      <div class="imbalance-chips">${imbalanceChips}</div>
+      <div style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.1);border-radius:14px;padding:5px 12px;font-size:11px;font-weight:600;">
+        <span class="mi" style="font-size:14px;">signal_cellular_alt</span> Severity: ${r.severity_assessment||'Moderate'}
+      </div>
+    </div>
+
+    <div class="symptom-section-card">
+      <h4><span class="mi" style="font-size:19px;color:#4A2060;">troubleshoot</span> Ayurvedic Root Causes</h4>
+      ${rootCauses}
+    </div>
+
+    <div class="symptom-section-card">
+      <h4><span class="mi" style="font-size:19px;color:#4A2060;">bolt</span> What To Do Now</h4>
+      ${actions}
+    </div>
+
+    <div class="symptom-section-card">
+      <h4><span class="mi" style="font-size:19px;color:#4A2060;">restaurant</span> Food Guidance</h4>
+      <div style="margin-bottom:14px;">
+        <div style="font-size:10px;font-weight:700;color:#065F46;margin-bottom:8px;display:flex;align-items:center;gap:6px;"><span class="mi" style="font-size:15px;">check_circle</span><span style="letter-spacing:1px;text-transform:uppercase;">Eat These</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;">${eatTags}</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:#991B1B;margin-bottom:8px;display:flex;align-items:center;gap:6px;"><span class="mi" style="font-size:15px;">block</span><span style="letter-spacing:1px;text-transform:uppercase;">Avoid These</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;">${avoidTags}</div>
+      </div>
+    </div>
+
+    ${herbs?`<div class="symptom-section-card"><h4><span class="mio" style="font-size:19px;color:#4A2060;">spa</span> Recommended Herbs</h4>${herbs}</div>`:''}
+
+    ${lifestyle?`<div class="symptom-section-card"><h4><span class="mio" style="font-size:19px;color:#4A2060;">self_improvement</span> Lifestyle Changes</h4>${lifestyle}</div>`:''}
+
+    ${r.prognosis?`
+    <div class="symptom-section-card" style="background:linear-gradient(135deg,#F5F0FF,#EDE6FF);border:1px solid rgba(74,32,96,0.15);">
+      <h4><span class="mi" style="font-size:19px;color:#4A2060;">trending_up</span> Expected Recovery</h4>
+      <p style="font-size:13px;color:var(--charcoal-mid);line-height:1.6;">${r.prognosis}</p>
+    </div>`:''}
+
+    ${r.seek_doctor_if?`
+    <div class="warning-card">
+      <span class="mi" style="font-size:22px;color:#991B1B;flex-shrink:0;">emergency</span>
+      <div><strong style="display:block;margin-bottom:4px;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">See a Doctor If:</strong>${r.seek_doctor_if}</div>
+    </div>`:''}
+
+    ${r.ayurvedic_sutra?`
+    <div class="symptom-section-card" style="background:linear-gradient(135deg,#2A1A3E,#3D2558);color:white;margin-top:14px;">
+      <h4 style="color:rgba(255,255,255,0.85);"><span class="mio" style="font-size:19px;color:rgba(255,255,255,0.65);">auto_stories</span> Ancient Wisdom</h4>
+      <p style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.7;font-style:italic;">${r.ayurvedic_sutra}</p>
+    </div>`:''}
+
+    <div class="symptom-disclaimer">
+      <span class="mio" style="font-size:16px;color:var(--text-muted);flex-shrink:0;">info</span>
+      <span>This Ayurvedic analysis is for informational purposes only and does not replace professional medical advice. If symptoms are severe or worsening, please consult a qualified physician or Ayurvedic Vaidya.</span>
+    </div>
+
+    <button class="btn-secondary" style="margin-top:14px;margin-bottom:32px;display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%;" onclick="switchTab('herbs')">
+      <span class="mio" style="font-size:17px;">spa</span> Explore Herbs for These Symptoms
+    </button>
+  `;
+  el('app-content').scrollTop = 0;
+}
+
+function resetSymptomChecker() {
+  symptomState = {selectedAreas:[],duration:null,severity:5,description:'',resultShown:false};
+  el('symptom-reset-btn').style.display = 'none';
+  renderSymptomHome();
+  el('app-content').scrollTop = 0;
+  showToast('Ready for a new symptom check');
+}
+
+
+// ══════════════════════════════════════════
+//  DINACHARYA — DAILY ROUTINE
+// ══════════════════════════════════════════
+
+let dinaCache = null; // in-memory mirror of localStorage cache
+
+const DINA_CACHE_KEY = 'ayurai_dina_cache';
+
+function loadDinaCache() {
+  try {
+    const raw = localStorage.getItem(DINA_CACHE_KEY);
+    if(!raw) return null;
+    const c = JSON.parse(raw);
+    if(!c || !c.data || !c.targetDateStr) return null;
+    // Expire: cached date must still be today or in the future
+    const cachedDate = new Date(c.targetDateStr);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    cachedDate.setHours(0,0,0,0);
+    if(cachedDate < today) {
+      localStorage.removeItem(DINA_CACHE_KEY);
+      return null;
+    }
+    return c;
+  } catch { return null; }
+}
+
+function saveDinaCache(cacheObj) {
+  try { localStorage.setItem(DINA_CACHE_KEY, JSON.stringify(cacheObj)); } catch {}
+}
+
+function clearDinaCache() {
+  localStorage.removeItem(DINA_CACHE_KEY);
+  dinaCache = null;
+}
+
+function initDinacharya() {
+  const d = loadData();
+  const wrap = el('dina-wrap');
+
+  // No dosha profile yet
+  if(!d.dosha) {
+    wrap.innerHTML = `
+      <div class="dina-hero">
+        <div class="dina-hero-label">Dinacharya</div>
+        <div class="dina-hero-title">Complete your Dosha Quiz first</div>
+        <div class="dina-hero-sub">Your daily routine is personalised to your dosha. Complete the quiz to unlock it.</div>
+      </div>
+      <button class="btn-primary" onclick="switchTab('quiz')">
+        <span class="mio" style="font-size:17px;vertical-align:-4px;margin-right:6px;">self_improvement</span>Take the Dosha Quiz
+      </button>`;
+    return;
+  }
+
+  // Check in-memory cache first (tab revisit without refresh)
+  if(dinaCache && dinaCache.targetDateStr) {
+    const cachedDate = new Date(dinaCache.targetDateStr);
+    const today = new Date(); today.setHours(0,0,0,0);
+    cachedDate.setHours(0,0,0,0);
+    if(cachedDate >= today) {
+      renderDinacharya(dinaCache.data,
+        new Date(dinaCache.targetDateStr),
+        dinaCache.wakeDisplay,
+        dinaCache.sleepDisplay,
+        dinaCache.generatedAt
+      );
+      el('dina-refresh-btn').style.display = 'flex';
+      return;
+    }
+  }
+
+  // Check localStorage cache (survives page refresh)
+  const stored = loadDinaCache();
+  if(stored) {
+    dinaCache = stored; // restore in-memory mirror
+    renderDinacharya(stored.data,
+      new Date(stored.targetDateStr),
+      stored.wakeDisplay,
+      stored.sleepDisplay,
+      stored.generatedAt
+    );
+    el('dina-refresh-btn').style.display = 'flex';
+    return;
+  }
+
+  // No valid cache — show filter/start screen
+  renderDinacharya_StartScreen(d);
+}
+
+// ── DINA FILTER STATE ──
+const DINA_DEFAULT_WAKE = '06:30';
+const DINA_DEFAULT_SLEEP = '22:30';
+
+const DINA_DIET_PREFS = [
+  { id:'veg',          label:'Vegetarian',              icon:'eco' },
+  { id:'veg_nonveg',   label:'Veg + Non-Veg',           icon:'restaurant' },
+  { id:'vegan',        label:'Vegan',                   icon:'spa' },
+  { id:'seafood',      label:'Seafood Only',            icon:'set_meal' },
+  { id:'keto',         label:'Keto Diet',               icon:'local_fire_department' },
+  { id:'dash',         label:'DASH Diet',               icon:'favorite' },
+  { id:'lowcarb',      label:'Low-Carb / High-Protein', icon:'fitness_center' },
+  { id:'liquid',       label:'Liquid Diet',             icon:'local_cafe' },
+  { id:'am_fast',      label:'AM Fasting',              icon:'wb_sunny' },
+  { id:'pm_fast',      label:'PM Fasting',              icon:'bedtime' },
+  { id:'fullday_fast', label:'Full Day Fasting',        icon:'do_not_disturb' },
+  { id:'intermittent', label:'Intermittent Fasting',    icon:'timer' },
+];
+
+function getDinaPrefs() {
+  try {
+    const p = JSON.parse(localStorage.getItem('ayurai_dina_prefs')||'{}');
+    return {
+      wake:     p.wake     || DINA_DEFAULT_WAKE,
+      sleep:    p.sleep    || DINA_DEFAULT_SLEEP,
+      dayOffset:(p.dayOffset !== undefined) ? p.dayOffset : 1,
+      diets:    p.diets    || []
+    };
+  } catch { return { wake:DINA_DEFAULT_WAKE, sleep:DINA_DEFAULT_SLEEP, dayOffset:1, diets:[] }; }
+}
+
+function saveDinaPrefs(wake, sleep, dayOffset, diets) {
+  localStorage.setItem('ayurai_dina_prefs', JSON.stringify({wake, sleep, dayOffset, diets}));
+}
+
+let dinaFilterState = {
+  dayOffset: 1,
+  wake: DINA_DEFAULT_WAKE,
+  sleep: DINA_DEFAULT_SLEEP,
+  symptoms: [],
+  diets: []   // persisted dietary preferences
+};
+
+function renderDinacharya_StartScreen(d) {
+  // Load persisted prefs
+  const prefs = getDinaPrefs();
+  dinaFilterState.wake = prefs.wake;
+  dinaFilterState.sleep = prefs.sleep;
+  dinaFilterState.dayOffset = prefs.dayOffset;
+  dinaFilterState.diets = prefs.diets || [];
+  dinaFilterState.symptoms = [];
+
+  const dosha = d.dosha.primary;
+
+  // Build 3-day options: Today, Tomorrow, Day after tomorrow
+  const dayOptions = [0,1,2].map(offset=>{
+    const dt = new Date(); dt.setDate(dt.getDate()+offset);
+    return {
+      offset,
+      label: offset===0?'Today':offset===1?'Tomorrow':dt.toLocaleString('default',{weekday:'long'}),
+      date: dt.toLocaleDateString([],{day:'numeric',month:'short'})
+    };
+  });
+
+  const fmt12 = t => {
+    const [hh,mm] = t.split(':').map(Number);
+    const ampm = hh>=12?'PM':'AM';
+    const h12 = hh%12||12;
+    return `${h12}:${String(mm).padStart(2,'0')} ${ampm}`;
+  };
+
+  el('dina-wrap').innerHTML = `
+    <div class="dina-hero">
+      <div class="dina-hero-label">Ayurvedic Dinacharya</div>
+      <div class="dina-hero-title">Your Daily<br>Routine</div>
+      <div class="dina-hero-sub">Get a personalised day schedule built around your dosha, season, wake/sleep times and today's symptoms.</div>
+      <div class="dina-meta-row" style="margin-top:14px;">
+        <div class="dina-meta-chip"><span class="mio" style="font-size:13px;vertical-align:-1px;">spa</span> ${dosha} Dosha</div>
+        <div class="dina-meta-chip"><span class="mi" style="font-size:13px;vertical-align:-1px;">location_on</span> ${d.city||'Set city in Settings'}</div>
+      </div>
+    </div>
+
+    <!-- ── FILTER CARD ── -->
+    <div class="dina-filter-card">
+      <h4><span class="mi" style="font-size:19px;color:#1C2E4A;">tune</span> Customise Your Routine</h4>
+
+      <!-- Day selector -->
+      <div class="dina-filter-section">
+        <div class="dina-filter-label">
+          <span class="mi">calendar_today</span> Plan for
+        </div>
+        <div class="dina-day-pills">
+          ${dayOptions.map(o=>`
+            <div class="dina-day-pill ${dinaFilterState.dayOffset===o.offset?'selected':''}"
+                 id="ddpill-${o.offset}" onclick="selectDinaDay(${o.offset})">
+              <span class="dpill-day">${o.label}</span>
+              <span class="dpill-date">${o.date}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <!-- Wake & Sleep time -->
+      <div class="dina-filter-section">
+        <div class="dina-filter-label">
+          <span class="mi">bedtime</span> Sleep schedule
+        </div>
+        <div class="dina-time-row">
+          <div class="dina-time-field">
+            <label><span class="mi">wb_sunny</span> Wake up</label>
+            <input type="time" class="dina-time-input" id="dina-wake"
+              value="${dinaFilterState.wake}" onchange="dinaFilterState.wake=this.value"/>
+          </div>
+          <div class="dina-time-field">
+            <label><span class="mi">bedtime</span> Sleep by</label>
+            <input type="time" class="dina-time-input" id="dina-sleep"
+              value="${dinaFilterState.sleep}" onchange="dinaFilterState.sleep=this.value"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active symptoms -->
+      <div class="dina-filter-section">
+        <div class="dina-filter-label">
+          <span class="mi">health_and_safety</span> Any symptoms today?
+          <span style="font-size:11px;font-weight:400;color:var(--text-light);">Optional</span>
+        </div>
+        <div class="dina-symptom-chips" id="dina-symptom-chips">
+          ${COMMON_AILMENTS.map(s=>`
+            <div class="dina-symptom-chip" onclick="toggleDinaSymptom('${s.replace(/'/g,'&apos;')}')" id="dsc-${s.replace(/[^a-z0-9]/gi,'')}">${s}</div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Dietary Preferences -->
+      <div class="dina-filter-section">
+        <div class="dina-filter-label">
+          <span class="mi">restaurant_menu</span> Dietary Preferences
+          <span style="font-size:11px;font-weight:400;color:var(--text-light);">Saved · multi-select</span>
+        </div>
+        <div class="dina-symptom-chips">
+          ${DINA_DIET_PREFS.map(p=>`
+            <div class="dina-symptom-chip ${dinaFilterState.diets.includes(p.id)?'selected':''}"
+                 id="ddiet-${p.id}"
+                 onclick="toggleDinaDiet('${p.id}')">
+              <span class="mi" style="font-size:13px;">${p.icon}</span> ${p.label}
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- What's included -->
+    <div style="background:var(--cream-dark);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:18px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">What's included</div>
+      ${[
+        ['wb_sunny','8 personalised time blocks from wake-up to wind-down'],
+        ['schedule','Ayurvedic Vata·Pitta·Kapha time-clock applied to your dosha'],
+        ['wb_cloudy','Seasonal adjustments for your city & month'],
+        ['auto_stories','A classical Ayurvedic wisdom shloka'],
+      ].map(([icon,text])=>`
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px;">
+          <span class="mi" style="font-size:16px;color:var(--gold);">${icon}</span>
+          <span style="font-size:12px;color:var(--text-muted);">${text}</span>
+        </div>`).join('')}
+    </div>
+
+    <button class="btn-primary" style="width:100%;padding:17px;font-size:15px;" onclick="generateDinacharya(false)">
+      <span class="mi" style="font-size:19px;vertical-align:-5px;margin-right:8px;">wb_sunny</span>
+      Build My Dinacharya
+    </button>
+  `;
+  el('dina-refresh-btn').style.display = 'none';
+}
+
+function selectDinaDay(offset) {
+  dinaFilterState.dayOffset = offset;
+  document.querySelectorAll('.dina-day-pill').forEach(p=>p.classList.remove('selected'));
+  el('ddpill-'+offset)?.classList.add('selected');
+}
+
+function toggleDinaSymptom(name) {
+  const id = 'dsc-'+name.replace(/[^a-z0-9]/gi,'');
+  const chip = el(id);
+  if(dinaFilterState.symptoms.includes(name)) {
+    dinaFilterState.symptoms = dinaFilterState.symptoms.filter(s=>s!==name);
+    chip?.classList.remove('selected');
+  } else {
+    dinaFilterState.symptoms.push(name);
+    chip?.classList.add('selected');
+  }
+}
+
+function toggleDinaDiet(id) {
+  const chip = el('ddiet-'+id);
+  if(dinaFilterState.diets.includes(id)) {
+    dinaFilterState.diets = dinaFilterState.diets.filter(d=>d!==id);
+    chip?.classList.remove('selected');
+  } else {
+    dinaFilterState.diets.push(id);
+    chip?.classList.add('selected');
+  }
+  // Persist immediately — diets are a saved preference
+  saveDinaPrefs(
+    el('dina-wake')?.value || dinaFilterState.wake,
+    el('dina-sleep')?.value || dinaFilterState.sleep,
+    dinaFilterState.dayOffset,
+    dinaFilterState.diets
+  );
+}
+
+async function generateDinacharya(forceRefresh=false) {
+  const d = loadData();
+  if(!d.settings?.openaiApiKey) { showToast('Please add your OpenAI API key in Settings first'); return; }
+
+  // Read current filter values from inputs (in case user typed directly)
+  const wakeVal = el('dina-wake')?.value || dinaFilterState.wake;
+  const sleepVal = el('dina-sleep')?.value || dinaFilterState.sleep;
+  dinaFilterState.wake = wakeVal;
+  dinaFilterState.sleep = sleepVal;
+
+  // Persist prefs
+  saveDinaPrefs(wakeVal, sleepVal, dinaFilterState.dayOffset, dinaFilterState.diets);
+
+  // Clear existing cache — fresh generation requested
+  clearDinaCache();
+
+  // Resolve target date
+  const targetDate = new Date();
+  targetDate.setDate(targetDate.getDate() + dinaFilterState.dayOffset);
+  const month = targetDate.toLocaleString('default',{month:'long'});
+  const dayName = targetDate.toLocaleString('default',{weekday:'long'});
+  const dateStr = targetDate.toLocaleDateString([],{day:'numeric',month:'long',year:'numeric'});
+
+  // Format times for display and prompt
+  const fmt12 = t => {
+    const [hh,mm] = t.split(':').map(Number);
+    const ampm = hh>=12?'PM':'AM';
+    const h12 = hh%12||12;
+    return `${h12}:${String(mm).padStart(2,'0')} ${ampm}`;
+  };
+  const wakeDisplay = fmt12(wakeVal);
+  const sleepDisplay = fmt12(sleepVal);
+
+  // Merge profile ailments + active filter symptoms
+  const baseAilments = d.ailments||[];
+  const activeSymptoms = dinaFilterState.symptoms;
+  const allAilments = [...new Set([...baseAilments,...activeSymptoms])];
+
+  const wrap = el('dina-wrap');
+  wrap.innerHTML = `
+    <div class="loading-card">
+      <span style="display:block;margin-bottom:16px;animation:floatLotus 2.5s ease-in-out infinite;">
+        <span class="mi" style="font-size:52px;color:#2C4A72;">wb_sunny</span>
+      </span>
+      <div class="loading-title">Building Your Dinacharya</div>
+      <div class="loading-sub">Crafting your routine for ${dinaFilterState.dayOffset===0?'Today':dinaFilterState.dayOffset===1?'Tomorrow':dayName} · ${wakeDisplay} – ${sleepDisplay}…</div>
+      <div class="loading-bar-track"><div class="loading-bar-fill" style="animation-duration:5s;"></div></div>
+      <div class="loading-steps">
+        <div class="loading-step active" id="dl1"><div class="ls-icon"><span class="mio" style="font-size:15px;">spa</span></div>Reading your dosha &amp; ailments</div>
+        <div class="loading-step" id="dl2"><div class="ls-icon"><span class="mi" style="font-size:15px;">wb_sunny</span></div>Analysing season &amp; climate</div>
+        <div class="loading-step" id="dl3"><div class="ls-icon"><span class="mi" style="font-size:15px;">schedule</span></div>Mapping your ${wakeDisplay}–${sleepDisplay} schedule</div>
+        <div class="loading-step" id="dl4"><div class="ls-icon"><span class="mi" style="font-size:15px;">auto_awesome</span></div>Personalising each time block</div>
+      </div>
+    </div>`;
+
+  ['dl1','dl2','dl3','dl4'].forEach((id,i)=>{
+    setTimeout(()=>{
+      if(i>0){const prev=el(['dl1','dl2','dl3','dl4'][i-1]);if(prev){prev.classList.remove('active');prev.classList.add('done');prev.querySelector('.ls-icon').innerHTML='<span class="mi" style="font-size:15px;color:white;">check</span>';}}
+      const cur=el(id);if(cur)cur.classList.add('active');
+    },i*1000);
+  });
+
+  // Resolve diet labels for prompt
+  const activeDietLabels = dinaFilterState.diets
+    .map(id => DINA_DIET_PREFS.find(p=>p.id===id)?.label)
+    .filter(Boolean);
+  const dietContext = activeDietLabels.length
+    ? activeDietLabels.join(', ')
+    : 'No specific preference';
+
+  // Build fasting rules for prompt
+  const fastingRules = [];
+  if(dinaFilterState.diets.includes('am_fast'))      fastingRules.push('User does AM fasting — no solid food recommendations before noon');
+  if(dinaFilterState.diets.includes('pm_fast'))       fastingRules.push('User does PM fasting — no solid food recommendations after 3 PM');
+  if(dinaFilterState.diets.includes('fullday_fast'))  fastingRules.push('User is on a full-day fast today — only hydration, herbal teas, and rest-based activities in food blocks');
+  if(dinaFilterState.diets.includes('intermittent'))  fastingRules.push('User does intermittent fasting — suggest a 16:8 or 14:10 eating window aligned with their dosha');
+  if(dinaFilterState.diets.includes('liquid'))        fastingRules.push('User is on a liquid diet — only juices, soups, herbal teas, broths in meal suggestions');
+  if(dinaFilterState.diets.includes('veg'))           fastingRules.push('User is vegetarian — no meat, fish or eggs in any food suggestions');
+  if(dinaFilterState.diets.includes('vegan'))         fastingRules.push('User is vegan — no animal products including dairy, eggs or honey');
+  if(dinaFilterState.diets.includes('seafood'))       fastingRules.push('User eats seafood only — no land meat, suggest fish/shellfish where appropriate');
+  if(dinaFilterState.diets.includes('keto'))          fastingRules.push('User follows keto — high fat, moderate protein, very low carb food suggestions only');
+  if(dinaFilterState.diets.includes('dash'))          fastingRules.push('User follows DASH diet — low sodium, high potassium, emphasise fruits/vegetables/whole grains');
+  if(dinaFilterState.diets.includes('lowcarb'))       fastingRules.push('User follows Low-Carb/High-Protein — reduce grains/sugar, emphasise protein-rich foods');
+
+  const prompt = `You are a master Ayurvedic physician. Create a personalised Dinacharya (daily routine) for this person.
+
+Profile:
+- Dosha: ${d.dosha.primary} (V${d.dosha.scores?.Vata||0}% P${d.dosha.scores?.Pitta||0}% K${d.dosha.scores?.Kapha||0}%)
+- Chronic ailments: ${baseAilments.join(', ')||'None'}
+- Active symptoms today: ${activeSymptoms.join(', ')||'None'}
+- Dietary preferences: ${dietContext}
+- City: ${d.city||'unknown'}, Month: ${month}
+- Day: ${dayName} (${dateStr})
+- Wake up time: ${wakeDisplay}
+- Sleep time: ${sleepDisplay}
+
+Rules:
+- Infer the Ritu (season) for this city+month
+- Apply Ayurvedic time clock (Vata 2-6, Pitta 10-2, Kapha 6-10)
+- Start blocks from their wake time (${wakeDisplay}), end at sleep time (${sleepDisplay})
+- Create exactly 8 time blocks covering their full day
+- If they have active symptoms, avoid activities that could aggravate those
+- Each block must be specific, actionable, personalised. No generic advice.
+${fastingRules.length ? '- DIETARY RULES (strictly follow these):\n' + fastingRules.map(r=>'  * '+r).join('\n') : ''}
+
+Respond ONLY as valid JSON (no markdown, no trailing commas):
+{
+  "season": "Ritu name e.g. Grishma (Summer)",
+  "season_note": "One sentence: how this season affects this dosha today",
+  "day_mantra": "Short Sanskrit-rooted intention for this dosha",
+  "blocks": [
+    {
+      "time_start": "${wakeDisplay}",
+      "time_end": "next block start",
+      "activity": "Activity name",
+      "description": "2 sentences, dosha+season personalised",
+      "tips": ["Tip 1 dosha-specific","Tip 2 seasonal or symptom-aware"],
+      "dosha_note": "1 sentence why this suits their dosha/ailment"
+    }
+  ],
+  "ayurvedic_wisdom": "Short classical shloka/principle with transliteration and meaning"
+}`;
+
+  try {
+    const resp = await callOpenAILarge(prompt, d.settings.openaiApiKey, 3000);
+    const raw = resp.replace(/```json|```/g,'').trim();
+    const result = JSON.parse(raw);
+    // Build cache object — persists across page refreshes
+    const cacheObj = {
+      data: result,
+      targetDateStr: targetDate.toISOString(),
+      dayOffset: dinaFilterState.dayOffset,
+      wakeDisplay,
+      sleepDisplay,
+      generatedAt: new Date().toISOString()
+    };
+    dinaCache = cacheObj;
+    saveDinaCache(cacheObj);
+    renderDinacharya(result, targetDate, wakeDisplay, sleepDisplay, cacheObj.generatedAt);
+    el('dina-refresh-btn').style.display = 'flex';
+  } catch(e) {
+    el('dina-wrap').innerHTML = `
+      <div style="padding:16px;">
+        ${buildApiErrHTML(e, 'generateDinacharya', 'generateDinacharya(false)')}
+        <button class="btn-secondary" style="width:100%;margin-top:4px;display:inline-flex;align-items:center;justify-content:center;gap:6px;"
+          onclick="renderDinacharya_StartScreen(loadData())">
+          <span class="mi" style="font-size:16px;">arrow_back</span> Back to Filters
+        </button>
+      </div>`;
+  }
+}
+
+function renderDinacharya(data, targetDate, wakeDisplay, sleepDisplay, generatedAt) {
+  const now = new Date();
+  const tDate = targetDate || now;
+  const nowMins = now.getHours()*60 + now.getMinutes();
+  const d = loadData();
+  const dayName = tDate.toLocaleString('default',{weekday:'long'});
+  const dateStr = tDate.toLocaleDateString([],{day:'numeric',month:'long',year:'numeric'});
+  const isToday = tDate.toDateString() === now.toDateString();
+  const dayLabel = dinaFilterState.dayOffset===0?'Today':dinaFilterState.dayOffset===1?'Tomorrow':dayName;
+  const timeNow = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+
+  function fmt12h(t='06:30'){
+    const [hh,mm]=(t||'06:30').split(':').map(Number);
+    const ampm=hh>=12?'PM':'AM';const h12=hh%12||12;
+    return `${h12}:${String(mm).padStart(2,'0')} ${ampm}`;
+  }
+
+  const wk = wakeDisplay || fmt12h(dinaFilterState.wake);
+  const sl = sleepDisplay || fmt12h(dinaFilterState.sleep);
+
+  function parseTimeMins(t) {
+    if(!t) return 0;
+    const [time,ampm] = t.split(' ');
+    let [h,m] = time.split(':').map(Number);
+    if(ampm==='PM'&&h!==12) h+=12;
+    if(ampm==='AM'&&h===12) h=0;
+    return h*60+(m||0);
+  }
+
+  const blocks = data.blocks||[];
+  // Only highlight current block when viewing today's routine
+  let currentIdx = -1;
+  if(isToday) {
+    blocks.forEach((b,i)=>{
+      const start = parseTimeMins(b.time_start);
+      const end = parseTimeMins(b.time_end)||parseTimeMins(blocks[i+1]?.time_start)||(start+60);
+      if(nowMins>=start && nowMins<end) currentIdx=i;
+    });
+  }
+  const timelineHTML = blocks.map((b,i)=>{
+    const isCurrent = i===currentIdx;
+    const isPast = currentIdx>=0 && i<currentIdx;
+    const stateClass = isCurrent?'current':isPast?'past':'';
+    const tips = (b.tips||[]).map(t=>`
+      <div class="dina-tip"><span class="mi">arrow_right</span><span>${t}</span></div>`).join('');
+
+    // Section dividers
+    let divider = '';
+    if(i===0) divider = `<div class="dina-section-div"><span class="dina-section-label">Morning</span><div class="dina-section-line"></div></div>`;
+    else if(b.time_start?.includes('12')||b.time_start?.includes('1:00 PM')||b.time_start?.includes('1 PM')) divider = `<div class="dina-section-div"><span class="dina-section-label">Afternoon</span><div class="dina-section-line"></div></div>`;
+    else if(b.time_start?.includes('5:00 PM')||b.time_start?.includes('6:00 PM')||b.time_start?.includes('5 PM')||b.time_start?.includes('6 PM')) divider = `<div class="dina-section-div"><span class="dina-section-label">Evening</span><div class="dina-section-line"></div></div>`;
+
+    return `${divider}
+    <div class="dina-block ${stateClass}">
+      <div class="dina-block-dot">${isPast?`<span class="mi">check</span>`:''}</div>
+      <div class="dina-card">
+        <div class="dina-card-header">
+          <span class="dina-time-badge">${b.time_start} – ${b.time_end}</span>
+          ${isCurrent?`<span class="dina-current-badge">Now</span>`:''}
+        </div>
+        <div class="dina-activity-name">${b.activity}</div>
+        <div class="dina-activity-desc">${b.description}</div>
+        ${tips?`<div class="dina-tips">${tips}</div>`:''}
+        ${b.dosha_note?`<div class="dina-dosha-note"><span class="mio" style="font-size:12px;vertical-align:-1px;margin-right:4px;">spa</span>${b.dosha_note}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  el('dina-wrap').innerHTML = `
+    <div class="dina-hero">
+      <div class="dina-hero-label">Your Dinacharya · ${data.season||'Today'}</div>
+      <div class="dina-hero-title">${dayLabel}</div>
+      <div class="dina-hero-sub">${data.season_note||''}</div>
+      <div class="dina-meta-row">
+        <div class="dina-meta-chip"><span class="mio" style="font-size:13px;vertical-align:-1px;">spa</span> ${d.dosha.primary} Dosha</div>
+        <div class="dina-meta-chip"><span class="mi" style="font-size:13px;vertical-align:-1px;">location_on</span> ${d.city||'Your city'}</div>
+        <div class="dina-meta-chip"><span class="mi" style="font-size:13px;vertical-align:-1px;">calendar_today</span> ${dateStr}</div>
+        <div class="dina-meta-chip"><span class="mi" style="font-size:13px;vertical-align:-1px;">bedtime</span> ${wk} – ${sl}</div>
+        ${dinaFilterState.diets.length ? dinaFilterState.diets.map(id=>{
+          const pref=DINA_DIET_PREFS.find(p=>p.id===id);
+          return pref?`<div class="dina-meta-chip"><span class="mi" style="font-size:13px;vertical-align:-1px;">${pref.icon}</span> ${pref.label}</div>`:'';
+        }).join('') : ''}
+      </div>
+    </div>
+
+    ${isToday && currentIdx>=0?`
+    <div style="background:linear-gradient(135deg,#1C2E4A,#2C4A72);border-radius:var(--radius);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;color:white;">
+      <div class="dina-now-dot"></div>
+      <div>
+        <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:0.65;margin-bottom:2px;">Right now · ${timeNow}</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;">${blocks[currentIdx]?.activity||''}</div>
+      </div>
+    </div>`:''}
+
+    ${data.day_mantra?`
+    <div style="background:var(--gold-pale);border:1px solid rgba(201,168,76,0.3);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:16px;text-align:center;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">Today's Intention</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--burgundy);line-height:1.4;">${data.day_mantra}</div>
+    </div>`:''}
+
+    <div class="dina-timeline">${timelineHTML}</div>
+
+    ${data.ayurvedic_wisdom?`
+    <div class="dina-wisdom-card">
+      <h4><span class="mio" style="font-size:20px;color:rgba(255,255,255,0.7);">auto_stories</span> Ancient Wisdom</h4>
+      <p>${data.ayurvedic_wisdom}</p>
+    </div>`:''}
+
+    <div class="dina-disclaimer">
+      <span class="mio" style="font-size:16px;color:var(--text-muted);flex-shrink:0;">info</span>
+      <span>Personalised to your ${d.dosha.primary} dosha and current season.${generatedAt ? ` Generated at ${new Date(generatedAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} · ${new Date(generatedAt).toLocaleDateString([],{day:'numeric',month:'short'})}.` : ''} Tap <strong>Regenerate</strong> (top right) to adjust filters.</span>
+    </div>
+
+    <button class="btn-secondary" style="margin-top:14px;margin-bottom:32px;display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%;" onclick="clearDinaCache();renderDinacharya_StartScreen(loadData());">
+      <span class="mi" style="font-size:17px;">tune</span> Adjust Filters &amp; Regenerate
+    </button>
+  `;
+
+  // Scroll to current block if it exists
+  if(currentIdx>=0) {
+    setTimeout(()=>{
+      const blocks = el('dina-wrap').querySelectorAll('.dina-block');
+      if(blocks[currentIdx]) {
+        const blockTop = blocks[currentIdx].offsetTop;
+        el('app-content').scrollTo({top: blockTop - 80, behavior:'smooth'});
+      }
+    }, 300);
+  }
+  el('dina-refresh-btn').style.display = 'flex';
+}
+
+// ── STARTUP ──
+(function(){
+  const d = loadData();
+  if(d.user) {
+    showScreen('screen-app');
+    initApp();
+    setTimeout(initMealTiming, 100);
+  // Restore food check cache if exists (handles page refresh)
+  if(loadFoodCache()) initFoodCheck();
+  } else {
+    showScreen('screen-login');
+  }
+})();
+</script>

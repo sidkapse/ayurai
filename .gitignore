@@ -1,0 +1,53 @@
+# ── OS ──
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ── Editors ──
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Node (if build tools added later) ──
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.yarn-integrity
+
+# ── Build outputs ──
+dist/
+build/
+.cache/
+
+# ── Environment / secrets ──
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# ── Logs ──
+*.log
+logs/
+
+# ── Temporary ──
+tmp/
+temp/
+*.tmp
+
+# ── Claude Desktop / AI tools ──
+.claude/
+
+# ── Never commit these ──
+# API keys should never be in source — they are stored in localStorage by the user
+# my_info.json is user data — never commit it
+my_info.json
+*_error_logs.json

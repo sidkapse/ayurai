@@ -1,0 +1,243 @@
+// ── DATA LAYER (localStorage as my_info.json equivalent) ──
+const STORAGE_KEY = 'ayurai_my_info';
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch { return {}; }
+}
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data, null, 2));
+}
+// ── ERROR LOGGER ──
+const ERROR_LOG_KEY = 'ayurai_error_log';
+const MAX_ERRORS = 5;
+
+function logError(context, error) {
+  try {
+    const logs = JSON.parse(localStorage.getItem(ERROR_LOG_KEY) || '[]');
+    logs.unshift({
+      ts: new Date().toISOString(),
+      ctx: context,
+      msg: error?.message || String(error),
+      stack: error?.stack?.split('\n')[1]?.trim() || ''
+    });
+    localStorage.setItem(ERROR_LOG_KEY, JSON.stringify(logs.slice(0, MAX_ERRORS)));
+  } catch {}
+}
+
+function getErrorLogs() {
+  try { return JSON.parse(localStorage.getItem(ERROR_LOG_KEY) || '[]'); }
+  catch { return []; }
+}
+
+function clearErrorLogs() {
+  localStorage.removeItem(ERROR_LOG_KEY);
+  renderErrorLogs();
+  showToast('Error logs cleared');
+}
+
+function exportErrorLogs() {
+  const logs = getErrorLogs();
+  if(!logs.length) { showToast('No errors to export'); return; }
+  const d = loadData();
+  const username = (d.user?.name||'user').toLowerCase().replace(/\s+/g,'_');
+  const payload = {
+    exported_at: new Date().toISOString(),
+    user: username,
+    app_version: '2.0',
+    error_count: logs.length,
+    errors: logs
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${username}_error_logs.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast(`Exported ${username}_error_logs.json`);
+}
+
+// Global unhandled error catch
+window.addEventListener('error', e => logError('Uncaught', e.error || e.message));
+window.addEventListener('unhandledrejection', e => logError('Promise', e.reason));
+
+// ── SAFE ELEMENT HELPER ──
+// Returns null silently instead of throwing if element missing
+function el(id) {
+  return document.getElementById(id);
+}
+
+// Safe text set — no crash if element removed
+function setText(id, text) {
+  const e = el(id); if(e) e.textContent = text;
+}
+function setHTML(id, html) {
+  const e = el(id); if(e) e.innerHTML = html;
+}
+
+function getData(path, fallback = null) {
+  const d = loadData();
+  return path.split('.').reduce((o,k) => (o && o[k] !== undefined ? o[k] : fallback), d);
+}
+function setData(path, value) {
+  const d = loadData();
+  const keys = path.split('.');
+  let o = d;
+  keys.slice(0,-1).forEach(k => { if(!o[k]) o[k]={}; o=o[k]; });
+  o[keys[keys.length-1]] = value;
+  saveData(d);
+}
+
+// ── SCREENS ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── AUTH ──
+function doSignup() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass = document.getElementById('signup-password').value;
+  const err = document.getElementById('signup-error');
+  err.style.display='none';
+  if(!name || !email || !pass) { err.textContent='Please fill in all fields.'; err.style.display='block'; return; }
+  if(pass.length < 6) { err.textContent='Password must be at least 6 characters.'; err.style.display='block'; return; }
+  const existing = loadData();
+  if(existing.user) { err.textContent='An account already exists on this device.'; err.style.display='block'; return; }
+  const data = {
+    user: { name, email, password: pass, createdAt: new Date().toISOString() },
+    dosha: null, ailments: [], city: '', foodHistory: [],
+    settings: { openaiApiKey: '' },
+    meta: { appVersion: '1.0', lastLogin: new Date().toISOString() }
+  };
+  saveData(data);
+  showToast('Account created! Welcome to AyurAI 🌸');
+  initApp();
+  showScreen('screen-app');
+  switchTab('quiz');
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  const err = document.getElementById('login-error');
+  err.style.display='none';
+  const data = loadData();
+  if(!data.user) { err.textContent='No account found. Please sign up first.'; err.style.display='block'; return; }
+  if(data.user.email !== email || data.user.password !== pass) {
+    err.textContent='Incorrect email or password.'; err.style.display='block'; return;
+  }
+  setData('meta.lastLogin', new Date().toISOString());
+  showToast('Welcome back, ' + data.user.name.split(' ')[0] + '! 🙏');
+  initApp();
+  showScreen('screen-app');
+}
+
+function doLogout() {
+  showScreen('screen-login');
+  document.getElementById('login-email').value='';
+  document.getElementById('login-password').value='';
+  showToast('Signed out. Namaste 🙏');
+}
+
+// ── APP INIT ──
+function initApp() {
+  const d = loadData();
+  if(!d.user) return;
+  // Greet
+  const hr = new Date().getHours();
+  const greet = hr<12?'Good Morning':hr<17?'Good Afternoon':'Good Evening';
+  el('home-greeting').textContent = greet;
+  el('home-name').textContent = d.user.name;
+  // Settings
+  el('settings-name').textContent = d.user.name;
+  el('settings-email').textContent = d.user.email;
+  el('settings-city').value = d.city || '';
+  el('settings-apikey').value = d.settings?.openaiApiKey || '';
+  // Dosha badge + card
+  if(d.dosha) {
+    el('home-dosha-badge').innerHTML = `<span class="mio" style="font-size:14px;vertical-align:-2px;">spa</span> ${d.dosha.primary} Dominant`;
+    el('home-dosha-val').textContent = d.dosha.primary;
+    el('home-dosha-desc').textContent = d.dosha.description || '';
+    const pills = el('home-dosha-pills');
+    pills.innerHTML = '';
+    if(d.dosha.scores) {
+      ['Vata','Pitta','Kapha'].forEach(name=>{
+        const pill=document.createElement('span');
+        pill.className=`dosha-pill pill-${name.toLowerCase()}`;
+        pill.textContent=`${name}: ${d.dosha.scores[name]||0}%`;
+        pills.appendChild(pill);
+      });
+    }
+    // Load or fetch dosha insights
+    loadDoshaInsights(d);
+  }
+  // Food hero chips
+  const foodChips = el('food-hero-chips');
+  if(foodChips) {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    const month = now.toLocaleString('default',{month:'short'});
+    foodChips.innerHTML = `
+      <div class="food-hero-chip"><span class="mio" style="font-size:13px;vertical-align:-1px;">spa</span> ${d.dosha?.primary||'Take Quiz'} Dosha</div>
+      <div class="food-hero-chip"><span class="mi" style="font-size:13px;vertical-align:-1px;">location_on</span> ${d.city||'Set city'}</div>
+      <div class="food-hero-chip"><span class="mi" style="font-size:13px;vertical-align:-1px;">schedule</span> ${timeStr} · ${month}</div>
+    `;
+  }
+  // Settings hero chips
+  const shc = el('settings-hero-chips');
+  if(shc && d.dosha) {
+    shc.innerHTML = `
+      <div class="settings-hero-chip"><span class="mio" style="font-size:12px;vertical-align:-1px;">spa</span> ${d.dosha.primary}</div>
+      <div class="settings-hero-chip"><span class="mi" style="font-size:12px;vertical-align:-1px;">location_on</span> ${d.city||'No city set'}</div>
+      <div class="settings-hero-chip"><span class="mi" style="font-size:12px;vertical-align:-1px;">key</span> ${d.settings?.openaiApiKey?'API Key set':'No API key'}</div>`;
+  }
+  // Settings dosha label
+  if(d.dosha) {
+    setText('settings-dosha-label', d.dosha.primary + ' Dosha · Stage ' + (d.dosha.stage||1));
+    setText('settings-dosha-sub', d.dosha.description?.substring(0,80)+'…' || '');
+  }
+  // Export meta
+  const expMeta = el('settings-export-meta');
+  if(expMeta && d._export_meta) {
+    expMeta.textContent = `Last exported ${new Date(d._export_meta.exported_at).toLocaleDateString()}`;
+  }
+  // Error logs
+  renderErrorLogs();
+  // Restore API error warning dot if previous error was recorded
+  const storedErrType = localStorage.getItem(API_ERR_STORAGE_KEY);
+  if(storedErrType) setApiErrorState(true, storedErrType === '1' ? 'unknown' : storedErrType);
+  const noKey = !d.settings?.openaiApiKey;
+  el('food-api-warning').style.display = noKey ? 'block' : 'none';
+  // Recent checks
+  renderHomeHistory();
+  renderHistory();
+  // Init quiz
+  initQuiz();
+}
+
+// ── TABS ──
+let currentTab = 'home';
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.style.display='none');
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+  el('tab-'+name).style.display='block';
+  const tabNav = el('tabn-'+name);
+  if(tabNav) tabNav.classList.add('active');
+  currentTab = name;
+  el('app-content').scrollTop = 0;
+  if(name==='history') renderHistory();
+  if(name==='herbs') initHerbAdvisor();
+  if(name==='symptom') initSymptomChecker();
+  if(name==='food') { initFoodCheck(); setTimeout(initMealTiming, 50); }
+  if(name==='dina') initDinacharya();
+  if(name==='settings') { renderErrorLogs(); setApiErrorState(false); }
+}
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg) {
+  const t = el('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);

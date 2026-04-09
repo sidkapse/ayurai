@@ -1,0 +1,23 @@
+{
+  "name": "ayurai",
+  "version": "2.1.0",
+  "description": "AyurAI — Ayurvedic wellness web app. Client-side, no backend required.",
+  "main": "public/index.html",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "validate": "node scripts/validate.js",
+    "dev": "python3 -m http.server 8080 --directory public",
+    "dev:node": "npx serve public -p 8080",
+    "deploy": "gh-pages -d public"
+  },
+  "keywords": ["ayurveda", "wellness", "dosha", "ai", "openai"],
+  "author": "Sidd",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.0.0"
+  }
+}
