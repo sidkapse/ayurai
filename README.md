@@ -22,6 +22,7 @@ A fully client-side Ayurvedic wellness web application. No backend required. Run
 
 | Feature | Description |
 |---|---|
+| **Onboarding** | 4-slide introduction shown to first-time visitors — covers Dosha, Food, Herbs & Daily Routine before reaching sign-up |
 | **Dosha Quiz** | Two-stage quiz (10Q + 10Q deep-dive) to determine Vata/Pitta/Kapha constitution |
 | **Food Check** | AI verdict on whether a food suits your dosha, time, season & ailments |
 | **Meal Planner** | Plan meals in advance with date/time window selector |

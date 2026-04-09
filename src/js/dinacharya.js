@@ -782,8 +782,12 @@ function renderDinacharya(data, targetDate, wakeDisplay, sleepDisplay, generated
     showScreen('screen-app');
     initApp();
     setTimeout(initMealTiming, 100);
-  // Restore food check cache if exists (handles page refresh)
-  if(loadFoodCache()) initFoodCheck();
+    // Restore food check cache if exists (handles page refresh)
+    if(loadFoodCache()) initFoodCheck();
+  } else if(isFirstTimeUser()) {
+    showScreen('screen-onboarding');
+    goToOnboardingSlide(1);
+    setTimeout(initOnboardingParticles, 50);
   } else {
     showScreen('screen-login');
   }

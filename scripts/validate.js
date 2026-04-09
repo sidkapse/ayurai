@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 const fs=require('fs'),path=require('path'),os=require('os'),cp=require('child_process');
-const HTML_FILE=path.join(__dirname,'..','public','index.html');
+const HTML_FILE=path.join(__dirname,'..','docs','index.html');
 const html=fs.readFileSync(HTML_FILE,'utf8');
 const jsMatch=html.match(/<script>([\s\S]*?)<\/script>/);
 const js=jsMatch?jsMatch[1]:'';
@@ -28,11 +28,13 @@ console.log('\n2. Required Functions:');
  'loadDoshaInsights','renderDoshaInsights','exportJSON','importJSON',
  'callOpenAI','callOpenAILarge','el','setText','setHTML','showToast','switchTab',
  'initAdvAilmentChips','initMealTiming','saveFoodHistory','renderHistory','renderHomeHistory',
- 'saveCity','saveApiKey'
+ 'saveCity','saveApiKey',
+ 'isFirstTimeUser','goToOnboardingSlide','skipOnboarding','nextOnboardingSlide','replayOnboarding'
 ].forEach(function(fn){check(fn+'()',js.includes('function '+fn));});
 // 3. Required HTML IDs
 console.log('\n3. Required HTML IDs:');
-['screen-login','screen-signup','screen-app',
+['screen-onboarding','onboarding-slide-1','onboarding-slide-2','onboarding-slide-3','onboarding-slide-4','onboarding-slide-5',
+ 'screen-login','screen-signup','screen-app',
  'tab-home','tab-food','tab-herbs','tab-dina','tab-settings','tab-quiz','tab-symptom','tab-history',
  'food-input','food-result-area','food-alt-area','food-hero','food-hero-chips','food-api-warning',
  'quiz-container','herbs-wrap','dina-wrap','symptom-wrap',

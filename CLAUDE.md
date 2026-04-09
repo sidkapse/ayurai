@@ -28,6 +28,19 @@ docs/DATA_MODEL.md    ← localStorage schema
 5. **All icons use Material Icons** — `<span class="mi">icon_name</span>` (filled) or `<span class="mio">icon_name</span>` (outlined). Never use emoji for UI icons.
 6. **Never use `text-transform:uppercase` or `letter-spacing` on a parent that contains Material Icon spans** — it breaks glyph rendering.
 
+## Screens
+
+| Screen ID | When shown |
+|---|---|
+| `#screen-onboarding` | First-time visitors (no `d.user` in localStorage). 4 feature slides + CTA. |
+| `#screen-login` | Returning users who are not logged in. |
+| `#screen-signup` | New users after completing/skipping onboarding. |
+| `#screen-app` | Authenticated users — 7-tab main app. |
+
+Onboarding slide IDs: `onboarding-slide-1` through `onboarding-slide-5`.
+JS functions: `isFirstTimeUser()`, `goToOnboardingSlide(n)`, `skipOnboarding()`, `nextOnboardingSlide()`.
+CSS classes use `ob-` prefix (e.g. `.ob-hero`, `.ob-feat-item`, `.ob-s1`–`.ob-s5`).
+
 ## Architecture at a Glance
 
 ```

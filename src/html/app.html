@@ -1,4 +1,152 @@
 <!-- ═══════════════════════════════════════════ -->
+<!--  ONBOARDING SCREEN (first-time users only)  -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-onboarding" class="screen">
+
+  <!-- SLIDE 1 – Know Your Dosha -->
+  <div id="onboarding-slide-1" class="onboarding-slide ob-s1 active">
+    <div class="ob-particles" id="ob-particles-1"></div>
+    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <div class="ob-hero-content">
+      <div class="ob-slide-num">01 &nbsp;/&nbsp; 04</div>
+      <div class="ob-big-icon">
+        <span class="mio" style="font-size:52px;color:#fff;">self_improvement</span>
+      </div>
+      <div class="ob-title">Know Your<br>Dosha</div>
+      <div class="ob-tagline">Discover your unique Vata, Pitta or Kapha constitution</div>
+    </div>
+    <div class="ob-bottom-card">
+      <div class="ob-pill-row">
+        <div class="ob-pill"><span class="mio ob-pill-icon">quiz</span><span>20-Q Quiz</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">insights</span><span>AI Insights</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">psychology</span><span>Personalised</span></div>
+      </div>
+      <div class="ob-dots">
+        <div class="ob-dot active" onclick="goToOnboardingSlide(1)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(2)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(3)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(4)"></div>
+      </div>
+      <div class="ob-btn-row">
+        <button class="ob-skip-btn" onclick="skipOnboarding()">Skip</button>
+        <button class="ob-btn-next" onclick="nextOnboardingSlide()"><span>Next</span><span class="mi ob-next-icon">arrow_forward</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 – Eat Right for You -->
+  <div id="onboarding-slide-2" class="onboarding-slide ob-s2">
+    <div class="ob-particles" id="ob-particles-2"></div>
+    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <div class="ob-hero-content">
+      <div class="ob-slide-num">02 &nbsp;/&nbsp; 04</div>
+      <div class="ob-big-icon">
+        <span class="mio" style="font-size:52px;color:#fff;">restaurant</span>
+      </div>
+      <div class="ob-title">Eat Right<br>for You</div>
+      <div class="ob-tagline">AI-guided food intelligence for your dosha</div>
+    </div>
+    <div class="ob-bottom-card">
+      <div class="ob-pill-row">
+        <div class="ob-pill"><span class="mio ob-pill-icon">check_circle</span><span>Yes/No Verdict</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">schedule</span><span>Meal Timing</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">healing</span><span>Damage Control</span></div>
+      </div>
+      <div class="ob-dots">
+        <div class="ob-dot" onclick="goToOnboardingSlide(1)"></div>
+        <div class="ob-dot active" onclick="goToOnboardingSlide(2)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(3)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(4)"></div>
+      </div>
+      <div class="ob-btn-row">
+        <button class="ob-skip-btn" onclick="skipOnboarding()">Skip</button>
+        <button class="ob-btn-next" onclick="nextOnboardingSlide()"><span>Next</span><span class="mi ob-next-icon">arrow_forward</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 – Herbs & Symptoms -->
+  <div id="onboarding-slide-3" class="onboarding-slide ob-s3">
+    <div class="ob-particles" id="ob-particles-3"></div>
+    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <div class="ob-hero-content">
+      <div class="ob-slide-num">03 &nbsp;/&nbsp; 04</div>
+      <div class="ob-big-icon">
+        <span class="mio" style="font-size:52px;color:#fff;">eco</span>
+      </div>
+      <div class="ob-title">Herbs &amp;<br>Symptoms</div>
+      <div class="ob-tagline">Ancient remedies guided by modern AI</div>
+    </div>
+    <div class="ob-bottom-card">
+      <div class="ob-pill-row">
+        <div class="ob-pill"><span class="mio ob-pill-icon">grass</span><span>Herb Advisor</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">category</span><span>By Concern</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">monitor_heart</span><span>Nidana Check</span></div>
+      </div>
+      <div class="ob-dots">
+        <div class="ob-dot" onclick="goToOnboardingSlide(1)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(2)"></div>
+        <div class="ob-dot active" onclick="goToOnboardingSlide(3)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(4)"></div>
+      </div>
+      <div class="ob-btn-row">
+        <button class="ob-skip-btn" onclick="skipOnboarding()">Skip</button>
+        <button class="ob-btn-next" onclick="nextOnboardingSlide()"><span>Next</span><span class="mi ob-next-icon">arrow_forward</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 – Live Your Best Day -->
+  <div id="onboarding-slide-4" class="onboarding-slide ob-s4">
+    <div class="ob-particles" id="ob-particles-4"></div>
+    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <div class="ob-hero-content">
+      <div class="ob-slide-num">04 &nbsp;/&nbsp; 04</div>
+      <div class="ob-big-icon">
+        <span class="mio" style="font-size:52px;color:#fff;">wb_sunny</span>
+      </div>
+      <div class="ob-title">Live Your<br>Best Day</div>
+      <div class="ob-tagline">Your personalised Dinacharya, every day</div>
+    </div>
+    <div class="ob-bottom-card">
+      <div class="ob-pill-row">
+        <div class="ob-pill"><span class="mio ob-pill-icon">alarm</span><span>8-Block Day</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">today</span><span>Plan Ahead</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">wb_sunny</span><span>Dosha-Crafted</span></div>
+      </div>
+      <div class="ob-dots">
+        <div class="ob-dot" onclick="goToOnboardingSlide(1)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(2)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(3)"></div>
+        <div class="ob-dot active" onclick="goToOnboardingSlide(4)"></div>
+      </div>
+      <div class="ob-btn-row">
+        <button class="ob-skip-btn" onclick="skipOnboarding()">Skip</button>
+        <button class="ob-btn-next" onclick="nextOnboardingSlide()"><span>Get Started</span><span class="mi ob-next-icon">arrow_forward</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 – CTA -->
+  <div id="onboarding-slide-5" class="onboarding-slide ob-s5">
+    <div class="ob-particles" id="ob-particles-5"></div>
+    <div class="ob-hero-content ob-hero-cta">
+      <div class="ob-big-icon ob-icon-cta">
+        <span class="mi" style="font-size:56px;color:#fff;">spa</span>
+      </div>
+      <div class="ob-title ob-title-cta">Begin Your<br>Journey</div>
+      <div class="ob-tagline">Ancient wisdom · Modern intelligence</div>
+    </div>
+    <div class="ob-bottom-card ob-bottom-cta">
+      <p class="ob-cta-desc">Create your free account to unlock your personalised Ayurvedic experience.</p>
+      <button class="ob-cta-primary" onclick="showScreen('screen-signup')">Create Account</button>
+      <button class="ob-cta-secondary" onclick="showScreen('screen-login')">Sign In</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
 <!--  AUTH SCREENS                               -->
 <!-- ═══════════════════════════════════════════ -->
 <div id="screen-login" class="screen active">
@@ -70,6 +218,10 @@
     <!-- HOME TAB -->
     <div id="tab-home" class="tab-panel">
       <div class="home-hero">
+        <button class="home-tour-btn" onclick="replayOnboarding()" title="Explore app features">
+          <span class="mio" style="font-size:16px;vertical-align:-3px;">explore</span>
+          <span>App Tour</span>
+        </button>
         <div class="home-greeting" id="home-greeting">Good Morning</div>
         <div class="home-name" id="home-name">Loading...</div>
         <div class="home-dosha-badge" id="home-dosha-badge"><span class="mio" style="font-size:14px;vertical-align:-2px;">self_improvement</span> Take the Dosha Quiz</div>
@@ -304,6 +456,20 @@
           <div class="settings-name" id="settings-name">—</div>
           <div class="settings-email" id="settings-email">—</div>
           <div class="settings-hero-chips" id="settings-hero-chips"></div>
+        </div>
+
+        <!-- App Tour -->
+        <div class="settings-group">
+          <div class="settings-group-title"><span class="mio">explore</span><span class="settings-group-title-text">Discover AyurAI</span></div>
+          <div class="settings-group-body">
+            <div class="settings-row-label">App Tour</div>
+            <div class="settings-row-sub">Revisit the feature walkthrough to explore everything AyurAI can do for you</div>
+            <button class="settings-tour-btn" onclick="replayOnboarding()">
+              <span class="mio" style="font-size:18px;">explore</span>
+              <span>Start App Tour</span>
+              <span class="mi" style="font-size:16px;margin-left:auto;">arrow_forward</span>
+            </button>
+          </div>
         </div>
 
         <!-- Location -->

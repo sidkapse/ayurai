@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AyurAI – Onboarding Redesign</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Jost', sans-serif;
+  background: #e8ddd4;
+  min-height: 100vh;
+  padding: 24px 12px 48px;
+}
+h1 { font-size: 18px; font-weight: 600; color: #6B1E3A; text-align: center; margin-bottom: 4px; }
+.subtitle { font-size: 12px; color: #8B6F5E; text-align: center; margin-bottom: 28px; }
+
+.showcase { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+
+/* ── Phone shell ── */
+.phone {
+  width: 300px; height: 600px;
+  border-radius: 36px;
+  border: 2px solid rgba(107,30,58,0.2);
+  box-shadow: 0 24px 64px rgba(107,30,58,0.22);
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.phone:hover { transform: translateY(-4px); box-shadow: 0 32px 80px rgba(107,30,58,0.28); }
+.phone.selected { outline: 3px solid #C9A84C; outline-offset: 4px; }
+
+.phone-label {
+  text-align: center; margin-top: 10px;
+  font-size: 13px; font-weight: 600; color: #6B1E3A;
+}
+.phone-sublabel { text-align: center; font-size: 11px; color: #8B6F5E; margin-top: 2px; }
+.rec-badge {
+  display: inline-block; font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px;
+  background: #C9A84C; color: #fff;
+  margin: 4px auto 0; display: block; width: fit-content;
+}
+
+/* ══════════════════════════════
+   DIRECTION A — Floating Particles
+══════════════════════════════ */
+.dir-a {
+  background: linear-gradient(160deg, #4A0E25 0%, #6B1E3A 40%, #8B2E50 70%, #D4758A 100%);
+  height: 100%;
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+}
+.dir-a .particles { position: absolute; inset: 0; pointer-events: none; }
+.dir-a .particle {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  animation: floatUp linear infinite;
+}
+@keyframes floatUp {
+  0%   { transform: translateY(0) scale(1); opacity: 0.6; }
+  50%  { opacity: 0.3; }
+  100% { transform: translateY(-600px) scale(0.5); opacity: 0; }
+}
+.dir-a .hero-content {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 40px 24px 20px; position: relative; z-index: 2;
+}
+.dir-a .big-icon {
+  width: 110px; height: 110px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255,255,255,0.3);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 22px;
+  animation: pulseGlow 3s ease-in-out infinite;
+  box-shadow: 0 0 40px rgba(212,117,138,0.4);
+}
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 30px rgba(212,117,138,0.3); transform: scale(1); }
+  50%       { box-shadow: 0 0 60px rgba(212,117,138,0.6); transform: scale(1.04); }
+}
+.dir-a .big-icon .material-icons-outlined { font-size: 52px; color: #fff; }
+.dir-a .slide-num { font-size: 11px; color: rgba(255,255,255,0.45); letter-spacing: 2px; margin-bottom: 10px; }
+.dir-a .title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: #fff; text-align: center; line-height: 1.15; margin-bottom: 8px; }
+.dir-a .tagline { font-size: 12px; color: rgba(255,255,255,0.65); text-align: center; line-height: 1.6; max-width: 200px; }
+.dir-a .bottom-card {
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 24px 24px 0 0;
+  padding: 20px 20px 28px;
+  position: relative; z-index: 2;
+}
+.dir-a .pill-row { display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; margin-bottom: 16px; }
+.dir-a .pill {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 20px; padding: 6px 12px;
+  font-size: 11px; color: #fff; font-weight: 500;
+}
+.dir-a .pill .material-icons-outlined { font-size: 14px; }
+.dir-a .dots-row { display: flex; justify-content: center; gap: 6px; margin-bottom: 14px; }
+.dir-a .dot { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.3); transition: all 0.3s; }
+.dir-a .dot.on { width: 20px; background: #C9A84C; }
+.dir-a .dot:not(.on) { width: 5px; }
+.dir-a .btn-row { display: flex; justify-content: space-between; align-items: center; }
+.dir-a .skip { font-size: 12px; color: rgba(255,255,255,0.55); background: none; border: none; cursor: pointer; font-family: 'Jost', sans-serif; }
+.dir-a .next-btn {
+  background: #C9A84C; color: #fff; border: none; border-radius: 24px;
+  padding: 10px 22px; font-size: 13px; font-weight: 600;
+  font-family: 'Jost', sans-serif; cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+}
+.dir-a .next-btn .material-icons { font-size: 16px; }
+
+/* ══════════════════════════════
+   DIRECTION B — Split + Wave
+══════════════════════════════ */
+.dir-b { background: #FDF6EE; height: 100%; display: flex; flex-direction: column; }
+.dir-b .wave-hero {
+  position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #6B1E3A 0%, #8B2E50 60%, #C9A84C 100%);
+  padding: 44px 24px 64px; text-align: center;
+  flex-shrink: 0;
+}
+.dir-b .wave-hero::after {
+  content: '';
+  position: absolute; bottom: -1px; left: 0; right: 0; height: 50px;
+  background: #FDF6EE;
+  clip-path: ellipse(60% 100% at 50% 100%);
+}
+.dir-b .accent-ring {
+  width: 100px; height: 100px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px;
+  position: relative;
+  animation: spinRing 12s linear infinite;
+}
+.dir-b .accent-ring::before {
+  content: ''; position: absolute; inset: -8px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255,255,255,0.2);
+  animation: spinRing 20s linear infinite reverse;
+}
+@keyframes spinRing {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.dir-b .accent-ring .inner {
+  width: 84px; height: 84px; border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  display: flex; align-items: center; justify-content: center;
+  animation: spinRing 12s linear infinite reverse; /* counter-rotate so icon stays upright */
+}
+.dir-b .accent-ring .inner .material-icons-outlined { font-size: 42px; color: #fff; }
+.dir-b .wave-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: #fff; margin-bottom: 5px; }
+.dir-b .wave-tag { font-size: 11px; color: rgba(255,255,255,0.65); }
+.dir-b .content { flex: 1; padding: 8px 18px 0; overflow: hidden; }
+.dir-b .feat-item {
+  display: flex; align-items: center; gap: 13px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(107,30,58,0.08);
+}
+.dir-b .feat-item:last-child { border-bottom: none; }
+.dir-b .feat-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, #6B1E3A, #D4758A);
+  color: #fff; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.dir-b .feat-text strong { display: block; font-size: 13px; font-weight: 600; color: #2C1810; margin-bottom: 1px; }
+.dir-b .feat-text span { font-size: 11px; color: #8B6F5E; }
+.dir-b .foot { padding: 12px 18px 24px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.dir-b .dots-row { display: flex; gap: 6px; }
+.dir-b .dot { height: 6px; border-radius: 3px; transition: all 0.3s; }
+.dir-b .dot.on { width: 20px; background: #6B1E3A; }
+.dir-b .dot:not(.on) { width: 6px; background: #ddd4cc; }
+.dir-b .next-btn {
+  width: 100%; background: #6B1E3A; color: #fff; border: none;
+  border-radius: 14px; padding: 13px; font-size: 13px; font-weight: 600;
+  font-family: 'Jost', sans-serif; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.dir-b .next-btn .material-icons { font-size: 17px; }
+.dir-b .skip-row { display: flex; justify-content: center; }
+.dir-b .skip { font-size: 11px; color: #B89A8A; background: none; border: none; cursor: pointer; font-family: 'Jost', sans-serif; }
+
+/* ══════════════════════════════
+   DIRECTION C — Dark Elegance
+══════════════════════════════ */
+.dir-c {
+  background: #1A0A12;
+  height: 100%; display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+}
+.dir-c .bg-glow {
+  position: absolute; width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(107,30,58,0.6) 0%, transparent 70%);
+  top: -60px; left: 50%; transform: translateX(-50%);
+  animation: breathe 4s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.7; }
+  50%       { transform: translateX(-50%) scale(1.15); opacity: 1; }
+}
+.dir-c .skip-top {
+  position: absolute; top: 14px; right: 18px; z-index: 10;
+  font-size: 11px; color: rgba(212,117,138,0.7); background: none; border: none;
+  cursor: pointer; font-family: 'Jost', sans-serif; letter-spacing: 0.5px;
+}
+.dir-c .hero { position: relative; z-index: 2; padding: 52px 24px 20px; text-align: center; }
+.dir-c .lotus-icon { font-size: 56px; color: #D4758A; display: block; margin-bottom: 16px; animation: floatLotus 3s ease-in-out infinite; }
+@keyframes floatLotus {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+.dir-c .slide-label { font-size: 10px; color: rgba(212,117,138,0.5); letter-spacing: 3px; margin-bottom: 10px; }
+.dir-c .title { font-family: 'Cormorant Garamond', serif; font-size: 30px; font-weight: 600; color: #FDF6EE; line-height: 1.1; margin-bottom: 6px; }
+.dir-c .tagline { font-size: 12px; color: rgba(253,246,238,0.45); line-height: 1.6; max-width: 200px; margin: 0 auto; }
+.dir-c .cards-area { position: relative; z-index: 2; flex: 1; padding: 16px 18px 0; }
+.dir-c .feat-card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(212,117,138,0.18);
+  border-radius: 14px; padding: 12px 14px;
+  display: flex; align-items: flex-start; gap: 12px;
+  margin-bottom: 9px;
+}
+.dir-c .feat-card .icon-wrap {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: rgba(107,30,58,0.5); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.dir-c .feat-card .icon-wrap .material-icons-outlined { font-size: 18px; color: #D4758A; }
+.dir-c .feat-card strong { display: block; font-size: 12.5px; font-weight: 600; color: #FDF6EE; margin-bottom: 2px; }
+.dir-c .feat-card p { font-size: 11px; color: rgba(253,246,238,0.5); line-height: 1.4; }
+.dir-c .foot { position: relative; z-index: 2; padding: 12px 18px 26px; }
+.dir-c .progress-bar {
+  height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px;
+  margin-bottom: 14px; overflow: hidden;
+}
+.dir-c .progress-fill {
+  height: 100%; width: 25%; background: linear-gradient(90deg, #6B1E3A, #D4758A);
+  border-radius: 2px; transition: width 0.4s ease;
+}
+.dir-c .btn-row { display: flex; justify-content: space-between; align-items: center; }
+.dir-c .back-btn {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid rgba(212,117,138,0.3); background: rgba(255,255,255,0.06);
+  color: rgba(212,117,138,0.6); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.dir-c .back-btn .material-icons { font-size: 20px; }
+.dir-c .next-btn {
+  flex: 1; margin-left: 10px;
+  background: linear-gradient(135deg, #6B1E3A, #8B2E50);
+  color: #fff; border: none; border-radius: 14px;
+  padding: 13px; font-size: 13px; font-weight: 600;
+  font-family: 'Jost', sans-serif; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  box-shadow: 0 6px 20px rgba(107,30,58,0.5);
+}
+.dir-c .next-btn .material-icons { font-size: 17px; }
+</style>
+</head>
+<body>
+
+<h1>Onboarding Redesign — 3 Directions</h1>
+<p class="subtitle">Tap a phone to select · All animations are live</p>
+
+<div class="showcase">
+
+  <!-- DIRECTION A -->
+  <div>
+    <div class="phone" id="opt-a" onclick="selectPhone('a')">
+      <div class="dir-a">
+        <!-- Particles -->
+        <div class="particles" id="particles-a"></div>
+        <!-- Hero -->
+        <div class="hero-content">
+          <div class="slide-num">01 / 04</div>
+          <div class="big-icon"><span class="material-icons-outlined">self_improvement</span></div>
+          <div class="title">Know Your<br>Dosha</div>
+          <div class="tagline">Discover your unique Vata, Pitta or Kapha constitution</div>
+        </div>
+        <!-- Bottom glass card -->
+        <div class="bottom-card">
+          <div class="pill-row">
+            <div class="pill"><span class="material-icons-outlined">quiz</span>20-Q Quiz</div>
+            <div class="pill"><span class="material-icons-outlined">insights</span>AI Insights</div>
+            <div class="pill"><span class="material-icons-outlined">psychology</span>Personalised</div>
+          </div>
+          <div class="dots-row">
+            <div class="dot on"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          <div class="btn-row">
+            <button class="skip">Skip</button>
+            <button class="next-btn">Next <span class="material-icons">arrow_forward</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">Direction A</div>
+    <div class="phone-sublabel">Immersive · Glass · Particles</div>
+  </div>
+
+  <!-- DIRECTION B -->
+  <div>
+    <div class="phone" id="opt-b" onclick="selectPhone('b')">
+      <div class="dir-b">
+        <div class="wave-hero">
+          <div class="accent-ring">
+            <div class="inner"><span class="material-icons-outlined">self_improvement</span></div>
+          </div>
+          <div class="wave-title">Know Your Dosha</div>
+          <div class="wave-tag">Your unique mind-body blueprint</div>
+        </div>
+        <div class="content">
+          <div class="feat-item">
+            <div class="feat-num">1</div>
+            <div class="feat-text"><strong>20-question quiz</strong><span>Discover your primary dosha in minutes</span></div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-num">2</div>
+            <div class="feat-text"><strong>AI-powered insights</strong><span>Tailored food, routine & herb recommendations</span></div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-num">3</div>
+            <div class="feat-text"><strong>Dosha balance tips</strong><span>Learn what keeps your constitution in harmony</span></div>
+          </div>
+        </div>
+        <div class="foot">
+          <div class="dots-row">
+            <div class="dot on"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          </div>
+          <button class="next-btn">Next <span class="material-icons">arrow_forward</span></button>
+          <div class="skip-row"><button class="skip">Skip intro</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">Direction B</div>
+    <div class="phone-sublabel">Wave · Numbered list · Clean</div>
+  </div>
+
+  <!-- DIRECTION C -->
+  <div>
+    <div class="phone" id="opt-c" onclick="selectPhone('c')">
+      <div class="dir-c">
+        <div class="bg-glow"></div>
+        <button class="skip-top">Skip</button>
+        <div class="hero">
+          <span class="material-icons lotus-icon">spa</span>
+          <div class="slide-label">SLIDE 01</div>
+          <div class="title">Know Your<br>Dosha</div>
+          <div class="tagline">Discover your Vata, Pitta or Kapha constitution</div>
+        </div>
+        <div class="cards-area">
+          <div class="feat-card">
+            <div class="icon-wrap"><span class="material-icons-outlined">quiz</span></div>
+            <div><strong>20-Question Quiz</strong><p>Tailored questions to reveal your mind-body type</p></div>
+          </div>
+          <div class="feat-card">
+            <div class="icon-wrap"><span class="material-icons-outlined">insights</span></div>
+            <div><strong>AI-Powered Insights</strong><p>Foods, herbs & routines personalised to your dosha</p></div>
+          </div>
+        </div>
+        <div class="foot">
+          <div class="progress-bar"><div class="progress-fill"></div></div>
+          <div class="btn-row">
+            <button class="back-btn"><span class="material-icons">arrow_back</span></button>
+            <button class="next-btn">Next <span class="material-icons">arrow_forward</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="phone-label">Direction C</div>
+    <div class="phone-sublabel">Dark · Premium · Progress bar</div>
+  </div>
+
+</div>
+
+<script>
+// ── Particles for Direction A ──
+const pContainer = document.getElementById('particles-a');
+for (let i = 0; i < 18; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  const size = Math.random() * 12 + 4;
+  p.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random() * 100}%;
+    bottom:${Math.random() * 60}%;
+    animation-duration:${4 + Math.random() * 6}s;
+    animation-delay:${Math.random() * 5}s;
+  `;
+  pContainer.appendChild(p);
+}
+
+// ── Selection ──
+function selectPhone(choice) {
+  ['a','b','c'].forEach(c => document.getElementById('opt-'+c).classList.remove('selected'));
+  document.getElementById('opt-'+choice).classList.add('selected');
+  if (window.recordChoice) recordChoice(choice, 'Direction ' + choice.toUpperCase());
+}
+</script>
+</body>
+</html>
