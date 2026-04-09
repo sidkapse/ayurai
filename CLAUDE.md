@@ -4,12 +4,12 @@ This file gives Claude Code the context it needs to work effectively on this pro
 
 ## What This Project Is
 
-AyurAI is a single-file Ayurvedic wellness web app. It runs entirely client-side — no backend, no build step, no npm install. The deployable artifact is `public/index.html`.
+AyurAI is a single-file Ayurvedic wellness web app. It runs entirely client-side — no backend, no build step, no npm install. The deployable artifact is `docs/index.html`.
 
 ## Project Layout
 
 ```
-public/index.html     ← THE APP. Deploy this. Edit this for quick fixes.
+docs/index.html     ← THE APP. Deploy this. Edit this for quick fixes.
 src/js/               ← JS split by feature for readability
 src/css/main.css      ← All CSS
 src/html/app.html     ← HTML markup only (no CSS/JS)
@@ -18,12 +18,12 @@ docs/DATA_MODEL.md    ← localStorage schema
 
 ## Critical Rules When Editing
 
-1. **`public/index.html` is the source of truth for deployment.** It is a self-contained monolithic file. When making changes, edit it directly.
-2. **`src/` files mirror `public/index.html`** — they are the same code split for readability. Keep them in sync.
+1. **`docs/index.html` is the source of truth for deployment.** It is a self-contained monolithic file. When making changes, edit it directly.
+2. **`src/` files mirror `docs/index.html`** — they are the same code split for readability. Keep them in sync.
 3. **Never add npm packages or build tools** unless explicitly asked. The app has zero dependencies beyond Google Fonts CDN.
 4. **Always run the syntax checker after editing JS:**
    ```bash
-   node -e "const fs=require('fs'),h=fs.readFileSync('public/index.html','utf8'),m=h.match(/<script>([\S\s]*?)<\/script>/);fs.writeFileSync('/tmp/ayurai_test.js',m[1]);" && node --check /tmp/ayurai_test.js && echo "✅ Syntax OK"
+   node -e "const fs=require('fs'),h=fs.readFileSync('docs/index.html','utf8'),m=h.match(/<script>([\S\s]*?)<\/script>/);fs.writeFileSync('/tmp/ayurai_test.js',m[1]);" && node --check /tmp/ayurai_test.js && echo "✅ Syntax OK"
    ```
 5. **All icons use Material Icons** — `<span class="mi">icon_name</span>` (filled) or `<span class="mio">icon_name</span>` (outlined). Never use emoji for UI icons.
 6. **Never use `text-transform:uppercase` or `letter-spacing` on a parent that contains Material Icon spans** — it breaks glyph rendering.
@@ -51,7 +51,7 @@ OpenAI API (gpt-4o-mini)
 - [ ] Add `if(name==='feature') initFeature();` in `switchTab()` in `core.js`
 - [ ] All async functions must call `logError(context, e)` in catch blocks
 - [ ] Use `callOpenAI()` for ≤1k token responses, `callOpenAILarge(prompt, key, tokens)` for larger
-- [ ] Mirror all changes into `public/index.html`
+- [ ] Mirror all changes into `docs/index.html`
 
 ## Common Patterns
 
@@ -128,27 +128,27 @@ setHTML('id', '<b>html</b>') // safe innerHTML setter
 ## Deployment
 
 ```bash
-# Any static host — just upload public/index.html
+# Any static host — just upload docs/index.html
 # No build step required
 
 # Quick local test
-python3 -m http.server 8080 --directory public
+python3 -m http.server 8080 --directory docs
 ```
 
 ## GitHub Pages Deployment
 
-The `public/` folder is the deployment root.
+The `docs/` folder is the deployment root.
 
 ```bash
 # Option 1 — Manual (recommended)
-# Push repo to GitHub → Settings → Pages → Source: Deploy from branch → Branch: main → Folder: /public
+# Push repo to GitHub → Settings → Pages → Source: Deploy from branch → Branch: main → Folder: /docs
 
 # Option 2 — gh-pages CLI
 npm install
-npm run deploy   # uses gh-pages package to push public/ to gh-pages branch
+npm run deploy   # uses gh-pages package to push docs/ to gh-pages branch
 ```
 
-Files in `public/` for GitHub Pages:
+Files in `docs/` for GitHub Pages:
 - `index.html`  — the app
 - `.nojekyll`   — prevents Jekyll from processing (required)
 - `404.html`    — redirects all unknown paths back to / (SPA support)
