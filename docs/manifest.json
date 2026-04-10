@@ -2,13 +2,13 @@
   "name": "AyurAI — Ancient Wisdom, Modern Intelligence",
   "short_name": "AyurAI",
   "description": "AI-powered Ayurvedic wellness — dosha quiz, food checker, herb advisor, daily routines.",
-  "start_url": "/ayurai/",
-  "scope": "/ayurai/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#3D0B1E",
   "theme_color": "#6B1E3A",
   "orientation": "portrait",
   "icons": [
-    { "src": "/ayurai/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
 }

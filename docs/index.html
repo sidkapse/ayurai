@@ -2025,6 +2025,10 @@ body::before{
   transition:opacity 0.2s;
 }
 .settings-tour-btn:hover{opacity:0.9;}
+.pwa-default-hint{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 4px 8px;
+}
 .pwa-ios-hint{
   display:flex;align-items:center;gap:12px;margin-top:12px;
   background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);
@@ -2634,9 +2638,16 @@ body::before{
         </div>
 
         <!-- Install App -->
-        <div class="settings-group" id="pwa-install-section" style="display:none;">
+        <div class="settings-group" id="pwa-install-section">
           <div class="settings-group-title"><span class="mio">install_mobile</span><span class="settings-group-title-text">Install App</span></div>
           <div class="settings-group-body">
+            <div id="pwa-default-hint" class="pwa-default-hint">
+              <span class="mio" style="font-size:20px;color:var(--burgundy);flex-shrink:0;">install_mobile</span>
+              <div>
+                <div style="font-weight:600;font-size:13px;color:var(--charcoal);">Install AyurAI as an App</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Add to your home screen for a full-screen native experience</div>
+              </div>
+            </div>
             <button class="settings-tour-btn" id="pwa-install-btn" onclick="triggerPWAInstall()" style="display:none;">
               <span class="mio" style="font-size:20px;">install_mobile</span>
               <div style="flex:1;text-align:left;">
@@ -6269,6 +6280,11 @@ function renderDinacharya(data, targetDate, wakeDisplay, sleepDisplay, generated
 let _deferredInstallPrompt = null;
 
 function initPWA() {
+  // If already running as installed PWA — hide install section
+  if(window.matchMedia('(display-mode: standalone)').matches) {
+    const sec = el('pwa-install-section');
+    if(sec) sec.style.display = 'none';
+  }
   if('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(e => logError('sw', e));
   }
@@ -6276,17 +6292,13 @@ function initPWA() {
     e.preventDefault();
     _deferredInstallPrompt = e;
     const btn = el('pwa-install-btn');
-    const sec = el('pwa-install-section');
     if(btn) btn.style.display = 'flex';
-    if(sec) sec.style.display = 'block';
   });
   window.addEventListener('appinstalled', () => {
     _deferredInstallPrompt = null;
-    const btn = el('pwa-install-btn');
     const sec = el('pwa-install-section');
-    if(btn) btn.style.display = 'none';
     if(sec) sec.style.display = 'none';
-    showToast('AyurAI installed!');
+    showToast('AyurAI installed! 🎉');
   });
   window.addEventListener('offline', () => showToast('You\'re offline — AI features unavailable'));
   window.addEventListener('online',  () => showToast('Back online'));
@@ -6294,9 +6306,7 @@ function initPWA() {
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
   if(isIOS && !isStandalone) {
     const hint = el('pwa-ios-hint');
-    const sec = el('pwa-install-section');
     if(hint) hint.style.display = 'flex';
-    if(sec) sec.style.display = 'block';
   }
 }
 
