@@ -44,7 +44,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.5',
+    app_version: '1.8',
     error_count: logs.length,
     errors: logs
   };
@@ -324,9 +324,12 @@ function _refreshCurrentTab() {
 }
 
 function initPullToRefresh() {
-  const scroller = el('app-content');
   const indicator = el('ptr-indicator');
-  if(!scroller || !indicator) return;
+  if(!indicator) return;
+  // Two #app-content elements exist (login + main app). Use the indicator's
+  // parent to guarantee we attach to the correct visible scroller.
+  const scroller = indicator.parentElement;
+  if(!scroller) return;
   const THRESHOLD = 65;
   let _ptrStartY = 0;
   let _ptrActive = false;
