@@ -42,7 +42,7 @@ console.log('\n3. Required HTML IDs:');
  'settings-name','settings-email','settings-city','settings-apikey',
  'settings-error-log','import-file-input',
  'home-greeting','home-name','home-dosha-val','home-dosha-pills','home-dosha-insights','home-recent-checks',
- 'pwa-install-btn','pwa-ios-hint','pwa-install-section'
+ 'pwa-install-btn','pwa-ios-hint','pwa-install-section','pwa-default-hint'
 ].forEach(function(id){check('id="'+id+'"',html.includes('id="'+id+'"'));});
 // 4. el() refs
 console.log('\n4. el() Reference Check:');

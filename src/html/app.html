@@ -473,9 +473,16 @@
         </div>
 
         <!-- Install App -->
-        <div class="settings-group" id="pwa-install-section" style="display:none;">
+        <div class="settings-group" id="pwa-install-section">
           <div class="settings-group-title"><span class="mio">install_mobile</span><span class="settings-group-title-text">Install App</span></div>
           <div class="settings-group-body">
+            <div id="pwa-default-hint" class="pwa-default-hint">
+              <span class="mio" style="font-size:20px;color:var(--burgundy);flex-shrink:0;">install_mobile</span>
+              <div>
+                <div style="font-weight:600;font-size:13px;color:var(--charcoal);">Install AyurAI as an App</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Add to your home screen for a full-screen native experience</div>
+              </div>
+            </div>
             <button class="settings-tour-btn" id="pwa-install-btn" onclick="triggerPWAInstall()" style="display:none;">
               <span class="mio" style="font-size:20px;">install_mobile</span>
               <div style="flex:1;text-align:left;">
