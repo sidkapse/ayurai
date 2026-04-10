@@ -8,7 +8,8 @@
     "validate": "node scripts/validate.js",
     "dev": "python3 -m http.server 8080 --directory public",
     "dev:node": "npx serve public -p 8080",
-    "deploy": "gh-pages -d public"
+    "predeploy": "node scripts/stamp-version.js",
+    "deploy": "gh-pages -d docs"
   },
   "keywords": ["ayurveda", "wellness", "dosha", "ai", "openai"],
   "author": "Sidd",
