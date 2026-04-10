@@ -289,6 +289,66 @@ function nextOnboardingSlide() {
   if(_obSlide < 5) goToOnboardingSlide(_obSlide + 1);
 }
 
+function initOnboardingSwipe() {
+  const screen = el('screen-onboarding');
+  if(!screen) return;
+  let _touchStartX = 0;
+  let _touchStartY = 0;
+  screen.addEventListener('touchstart', e => {
+    _touchStartX = e.touches[0].clientX;
+    _touchStartY = e.touches[0].clientY;
+  }, {passive:true});
+  screen.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - _touchStartX;
+    const dy = e.changedTouches[0].clientY - _touchStartY;
+    if(Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+    if(dx < 0 && _obSlide < 5) goToOnboardingSlide(_obSlide + 1);
+    else if(dx > 0 && _obSlide > 1) goToOnboardingSlide(_obSlide - 1);
+  }, {passive:true});
+}
+
+// ── PWA ──
+let _deferredInstallPrompt = null;
+
+function initPWA() {
+  if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(e => logError('sw', e));
+  }
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _deferredInstallPrompt = e;
+    const btn = el('pwa-install-btn');
+    const sec = el('pwa-install-section');
+    if(btn) btn.style.display = 'flex';
+    if(sec) sec.style.display = 'block';
+  });
+  window.addEventListener('appinstalled', () => {
+    _deferredInstallPrompt = null;
+    const btn = el('pwa-install-btn');
+    const sec = el('pwa-install-section');
+    if(btn) btn.style.display = 'none';
+    if(sec) sec.style.display = 'none';
+    showToast('AyurAI installed!');
+  });
+  window.addEventListener('offline', () => showToast('You\'re offline — AI features unavailable'));
+  window.addEventListener('online',  () => showToast('Back online'));
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  if(isIOS && !isStandalone) {
+    const hint = el('pwa-ios-hint');
+    const sec = el('pwa-install-section');
+    if(hint) hint.style.display = 'flex';
+    if(sec) sec.style.display = 'block';
+  }
+}
+
+function triggerPWAInstall() {
+  if(_deferredInstallPrompt) {
+    _deferredInstallPrompt.prompt();
+    _deferredInstallPrompt.userChoice.then(() => { _deferredInstallPrompt = null; });
+  }
+}
+
 // ── TOAST ──
 let toastTimer;
 function showToast(msg) {
