@@ -236,6 +236,59 @@ function switchTab(name) {
   if(name==='settings') { renderErrorLogs(); setApiErrorState(false); }
 }
 
+// ── ONBOARDING ──
+let _obSlide = 1;
+let _obParticlesInit = false;
+
+function isFirstTimeUser() {
+  const d = loadData();
+  return !d.user;
+}
+
+function initOnboardingParticles() {
+  if(_obParticlesInit) return;
+  _obParticlesInit = true;
+  for(let s = 1; s <= 5; s++) {
+    const container = el('ob-particles-' + s);
+    if(!container) continue;
+    for(let i = 0; i < 18; i++) {
+      const p = document.createElement('div');
+      p.className = 'ob-particle';
+      const size = Math.random() * 14 + 4;
+      p.style.cssText =
+        'width:' + size + 'px;' +
+        'height:' + size + 'px;' +
+        'left:' + (Math.random() * 100) + '%;' +
+        'bottom:' + (Math.random() * 70) + '%;' +
+        'animation-duration:' + (4 + Math.random() * 7) + 's;' +
+        'animation-delay:' + (Math.random() * 6) + 's;';
+      container.appendChild(p);
+    }
+  }
+}
+
+function goToOnboardingSlide(n) {
+  const prev = el('onboarding-slide-' + _obSlide);
+  if(prev) prev.classList.remove('active');
+  _obSlide = n;
+  const next = el('onboarding-slide-' + _obSlide);
+  if(next) next.classList.add('active');
+}
+
+function skipOnboarding() { goToOnboardingSlide(5); }
+
+function replayOnboarding() {
+  _obSlide = 1;
+  _obParticlesInit = false;
+  showScreen('screen-onboarding');
+  goToOnboardingSlide(1);
+  setTimeout(initOnboardingParticles, 50);
+}
+
+function nextOnboardingSlide() {
+  if(_obSlide < 5) goToOnboardingSlide(_obSlide + 1);
+}
+
 // ── TOAST ──
 let toastTimer;
 function showToast(msg) {

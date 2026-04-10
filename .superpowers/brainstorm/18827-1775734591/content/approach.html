@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AyurAI – Landing Page Approach</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #f5f0eb;
+    color: #2C1810;
+    padding: 24px 16px 48px;
+  }
+  h1 { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 6px; color: #6B1E3A; }
+  .subtitle { text-align: center; color: #8B6F5E; font-size: 14px; margin-bottom: 28px; }
+
+  .options { display: flex; flex-direction: column; gap: 20px; max-width: 640px; margin: 0 auto; }
+
+  .option {
+    background: #fff;
+    border: 2.5px solid #e8ddd6;
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .option:hover { border-color: #6B1E3A; box-shadow: 0 4px 20px rgba(107,30,58,0.12); }
+  .option.selected { border-color: #6B1E3A; box-shadow: 0 4px 20px rgba(107,30,58,0.18); }
+
+  .option-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .letter {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #6B1E3A; color: #fff;
+    font-size: 16px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .option-title { font-size: 16px; font-weight: 700; color: #2C1810; }
+  .option-tag {
+    margin-left: auto; font-size: 11px; font-weight: 600;
+    padding: 3px 8px; border-radius: 20px;
+    background: #FDF6EE; color: #6B1E3A; border: 1px solid #D4758A;
+  }
+
+  /* ── MOCKUP STYLES ── */
+  .phone-frame {
+    width: 100%;
+    border-radius: 12px;
+    background: #FDF6EE;
+    border: 1px solid #e0d5cc;
+    overflow: hidden;
+    margin-bottom: 14px;
+    position: relative;
+  }
+
+  /* Option A – Splash */
+  .splash {
+    background: linear-gradient(160deg, #6B1E3A 0%, #8B2E50 60%, #D4758A 100%);
+    padding: 32px 20px 28px;
+    text-align: center;
+    color: #fff;
+  }
+  .splash-logo { font-size: 36px; margin-bottom: 4px; }
+  .splash-name { font-size: 22px; font-weight: 700; letter-spacing: 1px; margin-bottom: 2px; }
+  .splash-tagline { font-size: 11px; letter-spacing: 2px; opacity: 0.75; margin-bottom: 16px; }
+  .splash-desc { font-size: 12px; opacity: 0.9; line-height: 1.6; margin-bottom: 20px; max-width: 240px; margin-left: auto; margin-right: auto; }
+  .splash-features { display: flex; justify-content: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .splash-feat { font-size: 10px; opacity: 0.85; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .splash-feat-icon { width: 32px; height: 32px; background: rgba(255,255,255,0.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .splash-btn { background: #C9A84C; color: #fff; border: none; padding: 13px 32px; border-radius: 30px; font-size: 14px; font-weight: 600; cursor: pointer; display: block; width: 85%; margin: 0 auto 10px; }
+  .splash-login { color: rgba(255,255,255,0.7); font-size: 11px; }
+
+  /* Option B – Scrollable Landing */
+  .landing { background: #FDF6EE; }
+  .landing-hero {
+    background: linear-gradient(160deg, #6B1E3A, #8B2E50);
+    color: #fff; padding: 24px 16px; text-align: center;
+  }
+  .landing-hero-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .landing-hero-sub { font-size: 11px; opacity: 0.8; margin-bottom: 14px; }
+  .landing-hero-btn { background: #C9A84C; color: #fff; border: none; padding: 10px 24px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .landing-section { padding: 16px; border-bottom: 1px solid #e8ddd6; }
+  .landing-section-title { font-size: 13px; font-weight: 700; color: #6B1E3A; margin-bottom: 10px; }
+  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .feature-cell { background: #fff; border-radius: 8px; padding: 10px; text-align: center; }
+  .feature-cell-icon { font-size: 18px; margin-bottom: 4px; }
+  .feature-cell-label { font-size: 10px; color: #2C1810; font-weight: 600; }
+  .landing-scroll-hint { text-align: center; padding: 8px; font-size: 10px; color: #8B6F5E; }
+
+  /* Option C – Onboarding Slides */
+  .slides { background: #FDF6EE; }
+  .slide { padding: 24px 16px; text-align: center; }
+  .slide-icon { font-size: 48px; margin-bottom: 10px; }
+  .slide-title { font-size: 17px; font-weight: 700; color: #6B1E3A; margin-bottom: 6px; }
+  .slide-body { font-size: 11px; color: #8B6F5E; line-height: 1.6; margin-bottom: 16px; max-width: 220px; margin-left: auto; margin-right: auto; }
+  .slide-dots { display: flex; justify-content: center; gap: 6px; margin-bottom: 16px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: #e0d5cc; }
+  .dot.active { background: #6B1E3A; width: 20px; border-radius: 4px; }
+  .slide-actions { display: flex; justify-content: space-between; align-items: center; padding: 0 8px; }
+  .slide-skip { font-size: 11px; color: #8B6F5E; }
+  .slide-next { background: #6B1E3A; color: #fff; border: none; padding: 10px 24px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+
+  /* Description */
+  .desc-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .desc-chip {
+    font-size: 11px; padding: 4px 10px; border-radius: 20px;
+    background: #FDF6EE; border: 1px solid #d4c0b5; color: #6B1E3A;
+  }
+  .desc-chip.pro { border-color: #4CAF50; color: #2e7d32; background: #f1fdf2; }
+  .desc-chip.con { border-color: #e57373; color: #c62828; background: #fff5f5; }
+  .desc-text { font-size: 12px; color: #8B6F5E; line-height: 1.6; margin-bottom: 10px; }
+
+  .rec-badge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px;
+    background: #C9A84C; color: #fff; margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<h1>How should new users discover AyurAI?</h1>
+<p class="subtitle">Pick the approach that feels right for your app experience</p>
+
+<div class="options">
+
+  <!-- OPTION A -->
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="option-header">
+      <div class="letter">A</div>
+      <div class="option-title">Single Splash Screen</div>
+    </div>
+
+    <div class="phone-frame">
+      <div class="splash">
+        <div class="splash-logo">🪷</div>
+        <div class="splash-name">AyurAI</div>
+        <div class="splash-tagline">ANCIENT WISDOM · MODERN INTELLIGENCE</div>
+        <div class="splash-desc">Your personal Ayurvedic companion — know your dosha, eat right, live well.</div>
+        <div class="splash-features">
+          <div class="splash-feat"><div class="splash-feat-icon">🌿</div>Food Check</div>
+          <div class="splash-feat"><div class="splash-feat-icon">🌱</div>Herbs</div>
+          <div class="splash-feat"><div class="splash-feat-icon">🩺</div>Symptoms</div>
+          <div class="splash-feat"><div class="splash-feat-icon">☀️</div>Daily Routine</div>
+        </div>
+        <button class="splash-btn">Get Started</button>
+        <div class="splash-login">Already have an account? Sign in</div>
+      </div>
+    </div>
+
+    <p class="desc-text">One beautiful full-screen page before login. Shows logo, tagline, 4 key features, and a prominent CTA button. Fast, non-intrusive, sets the brand tone.</p>
+    <div class="desc-row">
+      <span class="desc-chip pro">✓ Instant impact</span>
+      <span class="desc-chip pro">✓ Fast to implement</span>
+      <span class="desc-chip pro">✓ Non-intrusive</span>
+      <span class="desc-chip con">✗ Limited info depth</span>
+    </div>
+  </div>
+
+  <!-- OPTION B -->
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="option-header">
+      <div class="letter">B</div>
+      <div class="option-title">Scrollable Landing Page</div>
+      <span class="option-tag">⭐ Recommended</span>
+    </div>
+
+    <div class="phone-frame">
+      <div class="landing">
+        <div class="landing-hero">
+          <div style="font-size:28px;margin-bottom:6px;">🪷</div>
+          <div class="landing-hero-title">Your Ayurvedic AI Guide</div>
+          <div class="landing-hero-sub">Ancient wisdom, personalised for you</div>
+          <button class="landing-hero-btn">Start Your Journey</button>
+        </div>
+        <div class="landing-section">
+          <div class="landing-section-title">What You Get</div>
+          <div class="feature-grid">
+            <div class="feature-cell"><div class="feature-cell-icon">🧬</div><div class="feature-cell-label">Dosha Quiz</div></div>
+            <div class="feature-cell"><div class="feature-cell-icon">🥗</div><div class="feature-cell-label">Food Check</div></div>
+            <div class="feature-cell"><div class="feature-cell-icon">🌿</div><div class="feature-cell-label">Herb Advisor</div></div>
+            <div class="feature-cell"><div class="feature-cell-icon">☀️</div><div class="feature-cell-label">Daily Routine</div></div>
+          </div>
+        </div>
+        <div class="landing-scroll-hint">↓ scroll to learn more</div>
+      </div>
+    </div>
+
+    <p class="desc-text">A scrollable page with hero section, feature highlights, a "how it works" flow, and sign-up CTA at the bottom. Like a proper marketing page inside the app.</p>
+    <div class="desc-row">
+      <span class="desc-chip pro">✓ Full context</span>
+      <span class="desc-chip pro">✓ Educates users</span>
+      <span class="desc-chip pro">✓ Builds trust</span>
+      <span class="desc-chip con">✗ Longer to scroll through</span>
+    </div>
+  </div>
+
+  <!-- OPTION C -->
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="option-header">
+      <div class="letter">C</div>
+      <div class="option-title">Swipeable Onboarding Cards</div>
+    </div>
+
+    <div class="phone-frame">
+      <div class="slides">
+        <div class="slide">
+          <div class="slide-icon">🧬</div>
+          <div class="slide-title">Discover Your Dosha</div>
+          <div class="slide-body">Take a personalised quiz to understand your unique mind-body type — Vata, Pitta, or Kapha.</div>
+          <div class="slide-dots">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+          </div>
+          <div class="slide-actions">
+            <span class="slide-skip">Skip</span>
+            <button class="slide-next">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="desc-text">4 swipeable slides, each introducing one feature (Dosha, Food, Herbs, Routine). Ends with sign-up screen. Interactive and step-by-step.</p>
+    <div class="desc-row">
+      <span class="desc-chip pro">✓ Interactive & engaging</span>
+      <span class="desc-chip pro">✓ One concept at a time</span>
+      <span class="desc-chip con">✗ Users may skip</span>
+      <span class="desc-chip con">✗ More complex to build</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleSelect(el) {
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  if (window.recordChoice) recordChoice(el.dataset.choice, el.querySelector('.option-title').textContent);
+}
+</script>
+</body>
+</html>

@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>AyurAI — Ancient Wisdom, Modern Intelligence</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
@@ -1987,9 +1988,333 @@ body::before{
   body{border-radius:0;min-height:100vh;}
   #tab-bar{border-radius:0;}
 }
+
+/* ── HOME TOUR BUTTON ── */
+.home-tour-btn{
+  position:absolute;top:16px;right:16px;
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,0.18);
+  border:1px solid rgba(255,255,255,0.28);
+  border-radius:20px;padding:7px 13px;
+  font-family:'Jost',sans-serif;font-size:12px;font-weight:500;
+  color:#fff;cursor:pointer;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:background 0.2s;
+}
+.home-tour-btn:hover{background:rgba(255,255,255,0.26);}
+
+/* ── SETTINGS TOUR BUTTON ── */
+.settings-tour-btn{
+  width:100%;margin-top:12px;
+  display:flex;align-items:center;gap:10px;
+  background:linear-gradient(135deg,var(--burgundy),#8B2E50);
+  color:#fff;border:none;border-radius:12px;
+  padding:14px 16px;
+  font-family:'Jost',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;
+  box-shadow:0 4px 16px rgba(107,30,58,0.25);
+  transition:opacity 0.2s;
+}
+.settings-tour-btn:hover{opacity:0.9;}
+
+/* ── ONBOARDING ── */
+#screen-onboarding{height:100vh;overflow:hidden;position:relative;}
+
+.onboarding-slide{
+  display:none;flex-direction:column;
+  height:100vh;position:relative;overflow:hidden;
+}
+.onboarding-slide.active{
+  display:flex;
+  animation:obSlideIn 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+@keyframes obSlideIn{
+  from{opacity:0;transform:translateX(28px);}
+  to{opacity:1;transform:translateX(0);}
+}
+
+.ob-s1{background:linear-gradient(160deg,#3D0B1E 0%,#6B1E3A 45%,#8B2E50 75%,#D4758A 100%);}
+.ob-s2{background:linear-gradient(160deg,#0D2B1D 0%,#1E5C3A 45%,#2d8a5e 75%,#52b788 100%);}
+.ob-s3{background:linear-gradient(160deg,#1E0D07 0%,#3d2215 45%,#6b3d28 75%,#9c6b50 100%);}
+.ob-s4{background:linear-gradient(160deg,#2A1800 0%,#5c3800 45%,#9b6200 75%,#C9A84C 100%);}
+.ob-s5{background:linear-gradient(160deg,#3D0B1E 0%,#6B1E3A 40%,#a83060 75%,#D4758A 100%);}
+
+.ob-particles{position:absolute;inset:0;pointer-events:none;z-index:0;}
+.ob-particle{
+  position:absolute;border-radius:50%;
+  background:rgba(255,255,255,0.12);
+  animation:obFloat linear infinite;
+}
+@keyframes obFloat{
+  0%  {transform:translateY(0) scale(1);opacity:0.7;}
+  50% {opacity:0.3;}
+  100%{transform:translateY(-110vh) scale(0.4);opacity:0;}
+}
+
+.ob-skip{
+  position:absolute;top:18px;right:20px;z-index:20;
+  font-size:12px;font-weight:400;font-family:'Jost',sans-serif;
+  color:rgba(255,255,255,0.6);background:none;border:none;cursor:pointer;
+}
+
+.ob-hero-content{
+  flex:1;position:relative;z-index:2;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:52px 28px 24px;text-align:center;
+}
+.ob-hero-cta{padding-top:64px;}
+
+.ob-slide-num{
+  font-size:11px;font-weight:500;
+  color:rgba(255,255,255,0.4);
+  margin-bottom:18px;
+  font-family:'Jost',sans-serif;
+}
+
+.ob-big-icon{
+  width:110px;height:110px;border-radius:50%;
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border:1.5px solid rgba(255,255,255,0.28);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 22px;
+  box-shadow:0 0 40px rgba(255,255,255,0.1);
+  animation:obPulse 3s ease-in-out infinite;
+}
+.ob-icon-cta{width:120px;height:120px;margin-bottom:24px;}
+@keyframes obPulse{
+  0%,100%{box-shadow:0 0 30px rgba(255,255,255,0.1);transform:scale(1);}
+  50%     {box-shadow:0 0 60px rgba(255,255,255,0.22);transform:scale(1.05);}
+}
+
+.ob-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:32px;font-weight:600;
+  color:#fff;line-height:1.1;margin-bottom:10px;
+}
+.ob-title-cta{font-size:34px;}
+.ob-tagline{
+  font-family:'Jost',sans-serif;font-size:13px;font-weight:300;
+  color:rgba(255,255,255,0.65);line-height:1.55;
+  max-width:230px;
+}
+
+.ob-bottom-card{
+  position:relative;z-index:2;
+  background:rgba(255,255,255,0.13);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-top:1px solid rgba(255,255,255,0.2);
+  border-radius:28px 28px 0 0;
+  padding:20px 22px 32px;
+}
+.ob-bottom-cta{padding-top:24px;}
+
+.ob-pill-row{
+  display:flex;gap:8px;flex-wrap:wrap;
+  justify-content:center;margin-bottom:18px;
+}
+.ob-pill{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,0.18);
+  border:1px solid rgba(255,255,255,0.25);
+  border-radius:20px;padding:7px 13px;
+  font-size:11.5px;font-weight:500;color:#fff;
+  font-family:'Jost',sans-serif;
+}
+.ob-pill-icon{font-size:15px;line-height:1;}
+
+.ob-dots{
+  display:flex;justify-content:center;gap:7px;
+  align-items:center;margin-bottom:16px;
+}
+.ob-dot{
+  height:5px;border-radius:3px;
+  background:rgba(255,255,255,0.28);
+  cursor:pointer;transition:all 0.35s ease;
+}
+.ob-dot.active{width:22px;background:#C9A84C;}
+.ob-dot:not(.active){width:5px;}
+
+.ob-btn-row{display:flex;align-items:center;justify-content:center;gap:12px;}
+.ob-skip-btn{
+  font-size:12px;font-weight:400;font-family:'Jost',sans-serif;
+  color:rgba(255,255,255,0.55);background:none;border:none;cursor:pointer;
+  padding:4px 0;
+}
+.ob-btn-next{
+  flex:1;
+  background:var(--gold);color:#fff;
+  border:none;border-radius:14px;
+  padding:13px 18px;
+  font-family:'Jost',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  box-shadow:0 4px 20px rgba(201,168,76,0.4);
+}
+.ob-next-icon{font-size:18px;line-height:1;}
+
+.ob-cta-desc{
+  font-size:13px;color:rgba(255,255,255,0.75);
+  line-height:1.65;text-align:center;
+  margin-bottom:20px;
+}
+.ob-cta-primary{
+  width:100%;background:rgba(255,255,255,0.95);color:var(--burgundy);
+  border:none;border-radius:14px;padding:14px;
+  font-family:'Jost',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;margin-bottom:10px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.15);
+}
+.ob-cta-secondary{
+  width:100%;background:rgba(255,255,255,0.12);color:#fff;
+  border:1.5px solid rgba(255,255,255,0.3);border-radius:14px;padding:13px;
+  font-family:'Jost',sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;
+}
 </style>
 </head>
 <body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  ONBOARDING SCREEN (first-time users only)  -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-onboarding" class="screen">
+
+  <!-- SLIDE 1 – Know Your Dosha -->
+  <div id="onboarding-slide-1" class="onboarding-slide ob-s1 active">
+    <div class="ob-particles" id="ob-particles-1"></div>
+    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <div class="ob-hero-content">
+      <div class="ob-slide-num">01 &nbsp;/&nbsp; 04</div>
+      <div class="ob-big-icon"><span class="mio" style="font-size:52px;color:#fff;">self_improvement</span></div>
+      <div class="ob-title">Know Your<br>Dosha</div>
+      <div class="ob-tagline">Discover your unique Vata, Pitta or Kapha constitution</div>
+    </div>
+    <div class="ob-bottom-card">
+      <div class="ob-pill-row">
+        <div class="ob-pill"><span class="mio ob-pill-icon">quiz</span><span>20-Q Quiz</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">insights</span><span>AI Insights</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">psychology</span><span>Personalised</span></div>
+      </div>
+      <div class="ob-dots">
+        <div class="ob-dot active" onclick="goToOnboardingSlide(1)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(2)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(3)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(4)"></div>
+      </div>
+      <div class="ob-btn-row">
+        
+        <button class="ob-btn-next" onclick="nextOnboardingSlide()"><span>Next</span><span class="mi ob-next-icon">arrow_forward</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 – Eat Right for You -->
+  <div id="onboarding-slide-2" class="onboarding-slide ob-s2">
+    <div class="ob-particles" id="ob-particles-2"></div>
+    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <div class="ob-hero-content">
+      <div class="ob-slide-num">02 &nbsp;/&nbsp; 04</div>
+      <div class="ob-big-icon"><span class="mio" style="font-size:52px;color:#fff;">restaurant</span></div>
+      <div class="ob-title">Eat Right<br>for You</div>
+      <div class="ob-tagline">AI-guided food intelligence for your dosha</div>
+    </div>
+    <div class="ob-bottom-card">
+      <div class="ob-pill-row">
+        <div class="ob-pill"><span class="mio ob-pill-icon">check_circle</span><span>Yes/No Verdict</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">schedule</span><span>Meal Timing</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">healing</span><span>Damage Control</span></div>
+      </div>
+      <div class="ob-dots">
+        <div class="ob-dot" onclick="goToOnboardingSlide(1)"></div>
+        <div class="ob-dot active" onclick="goToOnboardingSlide(2)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(3)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(4)"></div>
+      </div>
+      <div class="ob-btn-row">
+        
+        <button class="ob-btn-next" onclick="nextOnboardingSlide()"><span>Next</span><span class="mi ob-next-icon">arrow_forward</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 – Herbs & Symptoms -->
+  <div id="onboarding-slide-3" class="onboarding-slide ob-s3">
+    <div class="ob-particles" id="ob-particles-3"></div>
+    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <div class="ob-hero-content">
+      <div class="ob-slide-num">03 &nbsp;/&nbsp; 04</div>
+      <div class="ob-big-icon"><span class="mio" style="font-size:52px;color:#fff;">eco</span></div>
+      <div class="ob-title">Herbs &amp;<br>Symptoms</div>
+      <div class="ob-tagline">Ancient remedies guided by modern AI</div>
+    </div>
+    <div class="ob-bottom-card">
+      <div class="ob-pill-row">
+        <div class="ob-pill"><span class="mio ob-pill-icon">grass</span><span>Herb Advisor</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">category</span><span>By Concern</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">monitor_heart</span><span>Nidana Check</span></div>
+      </div>
+      <div class="ob-dots">
+        <div class="ob-dot" onclick="goToOnboardingSlide(1)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(2)"></div>
+        <div class="ob-dot active" onclick="goToOnboardingSlide(3)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(4)"></div>
+      </div>
+      <div class="ob-btn-row">
+        
+        <button class="ob-btn-next" onclick="nextOnboardingSlide()"><span>Next</span><span class="mi ob-next-icon">arrow_forward</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 – Live Your Best Day -->
+  <div id="onboarding-slide-4" class="onboarding-slide ob-s4">
+    <div class="ob-particles" id="ob-particles-4"></div>
+    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <div class="ob-hero-content">
+      <div class="ob-slide-num">04 &nbsp;/&nbsp; 04</div>
+      <div class="ob-big-icon"><span class="mio" style="font-size:52px;color:#fff;">wb_sunny</span></div>
+      <div class="ob-title">Live Your<br>Best Day</div>
+      <div class="ob-tagline">Your personalised Dinacharya, every day</div>
+    </div>
+    <div class="ob-bottom-card">
+      <div class="ob-pill-row">
+        <div class="ob-pill"><span class="mio ob-pill-icon">alarm</span><span>8-Block Day</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">today</span><span>Plan Ahead</span></div>
+        <div class="ob-pill"><span class="mio ob-pill-icon">wb_sunny</span><span>Dosha-Crafted</span></div>
+      </div>
+      <div class="ob-dots">
+        <div class="ob-dot" onclick="goToOnboardingSlide(1)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(2)"></div>
+        <div class="ob-dot" onclick="goToOnboardingSlide(3)"></div>
+        <div class="ob-dot active" onclick="goToOnboardingSlide(4)"></div>
+      </div>
+      <div class="ob-btn-row">
+        
+        <button class="ob-btn-next" onclick="nextOnboardingSlide()"><span>Get Started</span><span class="mi ob-next-icon">arrow_forward</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 – CTA -->
+  <div id="onboarding-slide-5" class="onboarding-slide ob-s5">
+    <div class="ob-particles" id="ob-particles-5"></div>
+    <div class="ob-hero-content ob-hero-cta">
+      <div class="ob-big-icon ob-icon-cta"><span class="mi" style="font-size:56px;color:#fff;">spa</span></div>
+      <div class="ob-title ob-title-cta">Begin Your<br>Journey</div>
+      <div class="ob-tagline">Ancient wisdom · Modern intelligence</div>
+    </div>
+    <div class="ob-bottom-card ob-bottom-cta">
+      <p class="ob-cta-desc">Create your free account to unlock your personalised Ayurvedic experience.</p>
+      <button class="ob-cta-primary" onclick="showScreen('screen-signup')">Create Account</button>
+      <button class="ob-cta-secondary" onclick="showScreen('screen-login')">Sign In</button>
+    </div>
+  </div>
+
+</div>
 
 <!-- ═══════════════════════════════════════════ -->
 <!--  AUTH SCREENS                               -->
@@ -2063,6 +2388,10 @@ body::before{
     <!-- HOME TAB -->
     <div id="tab-home" class="tab-panel">
       <div class="home-hero">
+        <button class="home-tour-btn" onclick="replayOnboarding()" title="Explore app features">
+          <span class="mio" style="font-size:16px;vertical-align:-3px;">explore</span>
+          <span>App Tour</span>
+        </button>
         <div class="home-greeting" id="home-greeting">Good Morning</div>
         <div class="home-name" id="home-name">Loading...</div>
         <div class="home-dosha-badge" id="home-dosha-badge"><span class="mio" style="font-size:14px;vertical-align:-2px;">self_improvement</span> Take the Dosha Quiz</div>
@@ -2297,6 +2626,20 @@ body::before{
           <div class="settings-name" id="settings-name">—</div>
           <div class="settings-email" id="settings-email">—</div>
           <div class="settings-hero-chips" id="settings-hero-chips"></div>
+        </div>
+
+        <!-- App Tour -->
+        <div class="settings-group">
+          <div class="settings-group-title"><span class="mio">explore</span><span class="settings-group-title-text">Discover AyurAI</span></div>
+          <div class="settings-group-body">
+            <div class="settings-row-label">App Tour</div>
+            <div class="settings-row-sub">Revisit the feature walkthrough to explore everything AyurAI can do for you</div>
+            <button class="settings-tour-btn" onclick="replayOnboarding()">
+              <span class="mio" style="font-size:18px;">explore</span>
+              <span>Start App Tour</span>
+              <span class="mi" style="font-size:16px;margin-left:auto;">arrow_forward</span>
+            </button>
+          </div>
         </div>
 
         <!-- Location -->
@@ -2685,6 +3028,59 @@ function switchTab(name) {
   if(name==='food') { initFoodCheck(); setTimeout(initMealTiming, 50); }
   if(name==='dina') initDinacharya();
   if(name==='settings') { renderErrorLogs(); setApiErrorState(false); }
+}
+
+// ── ONBOARDING ──
+let _obSlide = 1;
+let _obParticlesInit = false;
+
+function isFirstTimeUser() {
+  const d = loadData();
+  return !d.user;
+}
+
+function initOnboardingParticles() {
+  if(_obParticlesInit) return;
+  _obParticlesInit = true;
+  for(let s = 1; s <= 5; s++) {
+    const container = el('ob-particles-' + s);
+    if(!container) continue;
+    for(let i = 0; i < 18; i++) {
+      const p = document.createElement('div');
+      p.className = 'ob-particle';
+      const size = Math.random() * 14 + 4;
+      p.style.cssText =
+        'width:' + size + 'px;' +
+        'height:' + size + 'px;' +
+        'left:' + (Math.random() * 100) + '%;' +
+        'bottom:' + (Math.random() * 70) + '%;' +
+        'animation-duration:' + (4 + Math.random() * 7) + 's;' +
+        'animation-delay:' + (Math.random() * 6) + 's;';
+      container.appendChild(p);
+    }
+  }
+}
+
+function goToOnboardingSlide(n) {
+  const prev = el('onboarding-slide-' + _obSlide);
+  if(prev) prev.classList.remove('active');
+  _obSlide = n;
+  const next = el('onboarding-slide-' + _obSlide);
+  if(next) next.classList.add('active');
+}
+
+function skipOnboarding() { goToOnboardingSlide(5); }
+
+function replayOnboarding() {
+  _obSlide = 1;
+  _obParticlesInit = false;
+  showScreen('screen-onboarding');
+  goToOnboardingSlide(1);
+  setTimeout(initOnboardingParticles, 50);
+}
+
+function nextOnboardingSlide() {
+  if(_obSlide < 5) goToOnboardingSlide(_obSlide + 1);
 }
 
 // ── TOAST ──
@@ -5847,8 +6243,12 @@ function renderDinacharya(data, targetDate, wakeDisplay, sleepDisplay, generated
     showScreen('screen-app');
     initApp();
     setTimeout(initMealTiming, 100);
-  // Restore food check cache if exists (handles page refresh)
-  if(loadFoodCache()) initFoodCheck();
+    // Restore food check cache if exists (handles page refresh)
+    if(loadFoodCache()) initFoodCheck();
+  } else if(isFirstTimeUser()) {
+    showScreen('screen-onboarding');
+    goToOnboardingSlide(1);
+    setTimeout(initOnboardingParticles, 50);
   } else {
     showScreen('screen-login');
   }

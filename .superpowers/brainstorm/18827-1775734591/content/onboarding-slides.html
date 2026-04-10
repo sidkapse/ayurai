@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AyurAI – Onboarding Slides Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Jost', sans-serif;
+    background: #f0e8df;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+    min-height: 100vh;
+  }
+
+  h1 {
+    font-size: 18px; font-weight: 600; color: #6B1E3A;
+    margin-bottom: 4px; text-align: center;
+  }
+  .subtitle {
+    font-size: 13px; color: #8B6F5E; text-align: center;
+    margin-bottom: 24px;
+  }
+
+  /* Phone shell */
+  .phone {
+    width: 320px;
+    min-height: 580px;
+    background: #FDF6EE;
+    border-radius: 32px;
+    border: 2px solid #e0d5cc;
+    box-shadow: 0 20px 60px rgba(107,30,58,0.15);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Slides container */
+  .slides-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .slide {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    min-height: 580px;
+    padding: 0 0 24px;
+    position: relative;
+    animation: fadeSlide 0.35s ease;
+  }
+  .slide.active { display: flex; }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Slide hero area */
+  .slide-hero {
+    width: 100%;
+    padding: 44px 24px 32px;
+    text-align: center;
+    position: relative;
+  }
+
+  /* Icon circle */
+  .icon-circle {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+  .icon-circle .material-icons,
+  .icon-circle .material-icons-outlined {
+    font-size: 48px;
+    position: relative; z-index: 1;
+  }
+  .icon-circle::after {
+    content: '';
+    position: absolute; inset: -8px;
+    border-radius: 50%;
+    opacity: 0.15;
+  }
+
+  /* Slide 1 – Dosha */
+  .slide-1 .slide-hero { background: linear-gradient(160deg, #6B1E3A 0%, #8B2E50 100%); }
+  .slide-1 .icon-circle { background: rgba(255,255,255,0.18); }
+  .slide-1 .icon-circle .material-icons-outlined { color: #fff; }
+  .slide-1 .slide-title { color: #fff; }
+  .slide-1 .slide-tagline { color: rgba(255,255,255,0.75); }
+
+  /* Slide 2 – Food */
+  .slide-2 .slide-hero { background: linear-gradient(160deg, #2d6a4f 0%, #52b788 100%); }
+  .slide-2 .icon-circle { background: rgba(255,255,255,0.18); }
+  .slide-2 .icon-circle .material-icons-outlined { color: #fff; }
+  .slide-2 .slide-title { color: #fff; }
+  .slide-2 .slide-tagline { color: rgba(255,255,255,0.75); }
+
+  /* Slide 3 – Herbs */
+  .slide-3 .slide-hero { background: linear-gradient(160deg, #5c4033 0%, #8d6e63 100%); }
+  .slide-3 .icon-circle { background: rgba(255,255,255,0.18); }
+  .slide-3 .icon-circle .material-icons-outlined { color: #fff; }
+  .slide-3 .slide-title { color: #fff; }
+  .slide-3 .slide-tagline { color: rgba(255,255,255,0.75); }
+
+  /* Slide 4 – Routine */
+  .slide-4 .slide-hero { background: linear-gradient(160deg, #7b4f00 0%, #C9A84C 100%); }
+  .slide-4 .icon-circle { background: rgba(255,255,255,0.18); }
+  .slide-4 .icon-circle .material-icons-outlined { color: #fff; }
+  .slide-4 .slide-title { color: #fff; }
+  .slide-4 .slide-tagline { color: rgba(255,255,255,0.75); }
+
+  /* Slide 5 – CTA */
+  .slide-5 .slide-hero { background: linear-gradient(160deg, #6B1E3A 0%, #D4758A 100%); }
+  .slide-5 .icon-circle { background: rgba(255,255,255,0.18); }
+  .slide-5 .icon-circle .material-icons { color: #fff; }
+  .slide-5 .slide-title { color: #fff; font-family: 'Cormorant Garamond', serif; font-size: 26px; }
+  .slide-5 .slide-tagline { color: rgba(255,255,255,0.8); }
+
+  .slide-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px; font-weight: 600;
+    margin-bottom: 6px; line-height: 1.2;
+  }
+  .slide-tagline {
+    font-size: 13px; font-weight: 300;
+    letter-spacing: 0.5px; line-height: 1.5;
+  }
+
+  /* Body content */
+  .slide-body {
+    padding: 20px 24px;
+    width: 100%;
+    flex: 1;
+  }
+  .slide-desc {
+    font-size: 13px; color: #5a3e35; line-height: 1.7;
+    margin-bottom: 16px; text-align: center;
+  }
+
+  /* Feature chips */
+  .feat-list { display: flex; flex-direction: column; gap: 10px; }
+  .feat-item {
+    display: flex; align-items: center; gap: 12px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 10px 14px;
+    border: 1px solid #ede3d9;
+  }
+  .feat-item .material-icons,
+  .feat-item .material-icons-outlined {
+    font-size: 20px; color: #6B1E3A; flex-shrink: 0;
+  }
+  .feat-item-text { font-size: 12px; color: #2C1810; line-height: 1.4; }
+  .feat-item-text strong { font-weight: 600; display: block; margin-bottom: 1px; }
+
+  /* Dots */
+  .slide-dots {
+    display: flex; justify-content: center; gap: 6px;
+    padding: 0 24px 12px;
+  }
+  .dot {
+    height: 6px; border-radius: 3px;
+    background: #ddd4cc; transition: all 0.3s;
+    cursor: pointer;
+  }
+  .dot.active { background: #6B1E3A; width: 20px; }
+  .dot:not(.active) { width: 6px; }
+
+  /* Nav buttons */
+  .slide-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 24px 4px;
+  }
+  .btn-skip {
+    font-size: 12px; color: #B89A8A; background: none;
+    border: none; cursor: pointer; font-family: 'Jost', sans-serif;
+  }
+  .btn-next {
+    background: #6B1E3A; color: #fff;
+    border: none; border-radius: 24px;
+    padding: 10px 24px; font-size: 13px; font-weight: 600;
+    font-family: 'Jost', sans-serif;
+    cursor: pointer; display: flex; align-items: center; gap: 4px;
+  }
+  .btn-next .material-icons { font-size: 16px; }
+
+  /* CTA slide buttons */
+  .cta-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .btn-cta-primary {
+    background: #6B1E3A; color: #fff;
+    border: none; border-radius: 12px;
+    padding: 14px; font-size: 14px; font-weight: 600;
+    font-family: 'Jost', sans-serif;
+    cursor: pointer; width: 100%;
+  }
+  .btn-cta-secondary {
+    background: transparent; color: #6B1E3A;
+    border: 1.5px solid #6B1E3A; border-radius: 12px;
+    padding: 13px; font-size: 14px; font-weight: 500;
+    font-family: 'Jost', sans-serif;
+    cursor: pointer; width: 100%;
+  }
+
+  /* Slide counter label */
+  .slide-counter {
+    font-size: 11px; color: #B89A8A; text-align: center;
+    padding-bottom: 4px;
+  }
+
+  /* External navigation */
+  .slide-controls {
+    display: flex; gap: 12px; margin-top: 20px; align-items: center;
+  }
+  .ctrl-btn {
+    background: #6B1E3A; color: #fff; border: none;
+    border-radius: 50%; width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 20px;
+  }
+  .ctrl-btn:disabled { background: #ccc; cursor: default; }
+  .ctrl-label { font-size: 13px; color: #6B1E3A; font-weight: 500; min-width: 80px; text-align: center; }
+</style>
+</head>
+<body>
+
+<h1>Onboarding Flow Mockup</h1>
+<p class="subtitle">Click Next/Back or use the controls below to preview all slides</p>
+
+<div class="phone">
+  <div class="slides-wrapper">
+
+    <!-- SLIDE 1 – Dosha -->
+    <div class="slide slide-1 active" id="slide-1">
+      <div class="slide-hero">
+        <div class="icon-circle">
+          <span class="material-icons-outlined">self_improvement</span>
+        </div>
+        <div class="slide-title">Know Your Dosha</div>
+        <div class="slide-tagline">Your unique mind-body blueprint</div>
+      </div>
+      <div class="slide-body">
+        <p class="slide-desc">Ayurveda recognises three body types — Vata, Pitta, and Kapha. Understanding yours is the first step to personalised wellness.</p>
+        <div class="feat-list">
+          <div class="feat-item">
+            <span class="material-icons-outlined">quiz</span>
+            <div class="feat-item-text"><strong>20-question quiz</strong>Discover your primary dosha in minutes</div>
+          </div>
+          <div class="feat-item">
+            <span class="material-icons-outlined">insights</span>
+            <div class="feat-item-text"><strong>AI-powered insights</strong>Foods, routines & herbs tailored to you</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-dots">
+        <div class="dot active" onclick="goTo(1)"></div>
+        <div class="dot" onclick="goTo(2)"></div>
+        <div class="dot" onclick="goTo(3)"></div>
+        <div class="dot" onclick="goTo(4)"></div>
+      </div>
+      <div class="slide-counter">1 of 4</div>
+      <div class="slide-nav">
+        <button class="btn-skip" onclick="goTo(5)">Skip</button>
+        <button class="btn-next" onclick="goTo(2)">Next <span class="material-icons">arrow_forward</span></button>
+      </div>
+    </div>
+
+    <!-- SLIDE 2 – Food Check -->
+    <div class="slide slide-2" id="slide-2">
+      <div class="slide-hero">
+        <div class="icon-circle">
+          <span class="material-icons-outlined">restaurant</span>
+        </div>
+        <div class="slide-title">Eat Right for You</div>
+        <div class="slide-tagline">AI-guided food intelligence</div>
+      </div>
+      <div class="slide-body">
+        <p class="slide-desc">Not every food suits every body. Check any dish against your dosha and get personalised guidance in seconds.</p>
+        <div class="feat-list">
+          <div class="feat-item">
+            <span class="material-icons-outlined">check_circle</span>
+            <div class="feat-item-text"><strong>Yes / No verdict</strong>Instant dosha-compatibility check for any food</div>
+          </div>
+          <div class="feat-item">
+            <span class="material-icons-outlined">schedule</span>
+            <div class="feat-item-text"><strong>Meal timing</strong>Best times to eat based on your constitution</div>
+          </div>
+          <div class="feat-item">
+            <span class="material-icons-outlined">healing</span>
+            <div class="feat-item-text"><strong>Damage control</strong>Remedies if you've already eaten something unsuitable</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-dots">
+        <div class="dot" onclick="goTo(1)"></div>
+        <div class="dot active" onclick="goTo(2)"></div>
+        <div class="dot" onclick="goTo(3)"></div>
+        <div class="dot" onclick="goTo(4)"></div>
+      </div>
+      <div class="slide-counter">2 of 4</div>
+      <div class="slide-nav">
+        <button class="btn-skip" onclick="goTo(5)">Skip</button>
+        <button class="btn-next" onclick="goTo(3)">Next <span class="material-icons">arrow_forward</span></button>
+      </div>
+    </div>
+
+    <!-- SLIDE 3 – Herbs & Symptoms -->
+    <div class="slide slide-3" id="slide-3">
+      <div class="slide-hero">
+        <div class="icon-circle">
+          <span class="material-icons-outlined">eco</span>
+        </div>
+        <div class="slide-title">Herbs & Symptoms</div>
+        <div class="slide-tagline">Ancient remedies, modern guidance</div>
+      </div>
+      <div class="slide-body">
+        <p class="slide-desc">Get Ayurvedic herb recommendations and symptom analysis tailored to your dosha, concerns, and season.</p>
+        <div class="feat-list">
+          <div class="feat-item">
+            <span class="material-icons-outlined">grass</span>
+            <div class="feat-item-text"><strong>Herb Advisor</strong>By dosha, concern, season, or free-form chat</div>
+          </div>
+          <div class="feat-item">
+            <span class="material-icons-outlined">monitor_heart</span>
+            <div class="feat-item-text"><strong>Symptom Checker</strong>Nidana analysis — root causes & remedies</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-dots">
+        <div class="dot" onclick="goTo(1)"></div>
+        <div class="dot" onclick="goTo(2)"></div>
+        <div class="dot active" onclick="goTo(3)"></div>
+        <div class="dot" onclick="goTo(4)"></div>
+      </div>
+      <div class="slide-counter">3 of 4</div>
+      <div class="slide-nav">
+        <button class="btn-skip" onclick="goTo(5)">Skip</button>
+        <button class="btn-next" onclick="goTo(4)">Next <span class="material-icons">arrow_forward</span></button>
+      </div>
+    </div>
+
+    <!-- SLIDE 4 – Daily Routine -->
+    <div class="slide slide-4" id="slide-4">
+      <div class="slide-hero">
+        <div class="icon-circle">
+          <span class="material-icons-outlined">wb_sunny</span>
+        </div>
+        <div class="slide-title">Live Your Best Day</div>
+        <div class="slide-tagline">Your personalised Dinacharya</div>
+      </div>
+      <div class="slide-body">
+        <p class="slide-desc">Dinacharya — the Ayurvedic daily routine — is one of the most powerful tools for long-term health. Get yours, personalised.</p>
+        <div class="feat-list">
+          <div class="feat-item">
+            <span class="material-icons-outlined">alarm</span>
+            <div class="feat-item-text"><strong>8-block schedule</strong>From wake-up to sleep, crafted for your dosha</div>
+          </div>
+          <div class="feat-item">
+            <span class="material-icons-outlined">today</span>
+            <div class="feat-item-text"><strong>Plan ahead</strong>Generate routines for today, tomorrow, or any day</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-dots">
+        <div class="dot" onclick="goTo(1)"></div>
+        <div class="dot" onclick="goTo(2)"></div>
+        <div class="dot" onclick="goTo(3)"></div>
+        <div class="dot active" onclick="goTo(4)"></div>
+      </div>
+      <div class="slide-counter">4 of 4</div>
+      <div class="slide-nav">
+        <button class="btn-skip" onclick="goTo(5)">Skip</button>
+        <button class="btn-next" onclick="goTo(5)">Get Started <span class="material-icons">arrow_forward</span></button>
+      </div>
+    </div>
+
+    <!-- SLIDE 5 – CTA -->
+    <div class="slide slide-5" id="slide-5">
+      <div class="slide-hero" style="padding-top:52px;padding-bottom:36px;">
+        <div class="icon-circle">
+          <span class="material-icons" style="font-size:52px;">spa</span>
+        </div>
+        <div class="slide-title">Begin Your Journey</div>
+        <div class="slide-tagline">Ancient wisdom · Modern intelligence</div>
+      </div>
+      <div class="slide-body">
+        <p class="slide-desc" style="margin-bottom:24px;">Create your free account to unlock your personalised Ayurvedic experience.</p>
+        <div class="cta-buttons">
+          <button class="btn-cta-primary">Create Account</button>
+          <button class="btn-cta-secondary">I already have an account</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- External controls -->
+<div class="slide-controls">
+  <button class="ctrl-btn" id="prev-btn" onclick="prevSlide()" disabled>
+    <span class="material-icons">chevron_left</span>
+  </button>
+  <div class="ctrl-label" id="ctrl-label">Slide 1 / 5</div>
+  <button class="ctrl-btn" id="next-btn" onclick="nextSlide()">
+    <span class="material-icons">chevron_right</span>
+  </button>
+</div>
+
+<script>
+let current = 1;
+const total = 5;
+
+function goTo(n) {
+  document.getElementById('slide-' + current).classList.remove('active');
+  current = n;
+  document.getElementById('slide-' + current).classList.add('active');
+  document.getElementById('ctrl-label').textContent = 'Slide ' + current + ' / ' + total;
+  document.getElementById('prev-btn').disabled = current === 1;
+  document.getElementById('next-btn').disabled = current === total;
+  if (window.recordChoice) recordChoice('slide-' + current, 'Navigated to slide ' + current);
+}
+
+function nextSlide() { if (current < total) goTo(current + 1); }
+function prevSlide() { if (current > 1) goTo(current - 1); }
+</script>
+
+</body>
+</html>
