@@ -307,6 +307,58 @@ function initOnboardingSwipe() {
   }, {passive:true});
 }
 
+// ── PULL TO REFRESH ──
+function _refreshCurrentTab() {
+  switch(currentTab) {
+    case 'home':     renderHomeHistory(); loadDoshaInsights(); break;
+    case 'dina':     initDinacharya();    break;
+    case 'food':     initFoodCheck(); initMealTiming(); break;
+    case 'herbs':    initHerbAdvisor();   break;
+    case 'symptom':  initSymptomChecker(); break;
+    case 'history':  renderHistory();     break;
+    case 'settings': renderErrorLogs();   break;
+    default: break;
+  }
+}
+
+function initPullToRefresh() {
+  const scroller = el('app-content');
+  const indicator = el('ptr-indicator');
+  if(!scroller || !indicator) return;
+  const THRESHOLD = 65;
+  let _ptrStartY = 0;
+  let _ptrActive = false;
+  let _ptrTriggered = false;
+  scroller.addEventListener('touchstart', e => {
+    if(scroller.scrollTop !== 0) return;
+    _ptrStartY = e.touches[0].clientY;
+    _ptrActive = true;
+    _ptrTriggered = false;
+  }, {passive:true});
+  scroller.addEventListener('touchmove', e => {
+    if(!_ptrActive) return;
+    const dy = e.touches[0].clientY - _ptrStartY;
+    if(dy <= 0) { _ptrActive = false; return; }
+    if(dy > 10) indicator.classList.add('ptr-visible');
+    if(dy >= THRESHOLD && !_ptrTriggered) {
+      _ptrTriggered = true;
+      indicator.classList.add('ptr-spinning');
+    }
+  }, {passive:true});
+  scroller.addEventListener('touchend', () => {
+    if(!_ptrActive) return;
+    _ptrActive = false;
+    if(_ptrTriggered) {
+      _refreshCurrentTab();
+      showToast('Refreshed');
+      setTimeout(() => indicator.classList.remove('ptr-visible','ptr-spinning'), 600);
+    } else {
+      indicator.classList.remove('ptr-visible','ptr-spinning');
+    }
+    _ptrTriggered = false;
+  }, {passive:true});
+}
+
 // ── PWA ──
 let _deferredInstallPrompt = null;
 
