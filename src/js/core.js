@@ -44,7 +44,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.2',
+    app_version: '1.3',
     error_count: logs.length,
     errors: logs
   };
