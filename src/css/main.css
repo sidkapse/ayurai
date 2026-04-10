@@ -2139,7 +2139,7 @@ body::before{
 .ob-dot:not(.active){width:5px;}
 
 /* Skip + Next row */
-.ob-btn-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.ob-btn-row{display:flex;align-items:center;justify-content:center;gap:12px;}
 .ob-skip-btn{
   font-size:12px;font-weight:400;font-family:'Jost',sans-serif;
   color:rgba(255,255,255,0.55);background:none;border:none;cursor:pointer;
