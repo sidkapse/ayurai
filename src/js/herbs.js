@@ -1,7 +1,3 @@
-  window.location.href = `mailto:sid.kapse@gmail.com?subject=${subject}&body=${body}`;
-  showToast('Opening your email app…');
-}
-
 function saveApiKey() {
   const key = el('settings-apikey').value.trim();
   if(!key) { showToast('Please enter your OpenAI API key'); return; }
@@ -175,6 +171,7 @@ function importJSON(evt) {
       herbState.resultsShown = false;
       showToast('Profile imported! Welcome back 🙏');
       initApp();
+      showScreen('screen-app');
       switchTab('home');
     } catch {
       showToast('Could not read file — make sure it is a valid my_info.json');

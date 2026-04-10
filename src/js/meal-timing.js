@@ -55,7 +55,7 @@ function showHerbLoading(msg) {
         <span class="mio" style="font-size:52px;color:var(--burgundy);">spa</span>
       </span>
       <div class="loading-title">${msg}</div>
-      <div class="loading-sub">Drawing from classical Ayurvedic texts…</div>
+      <div class="loading-sub">Consulting from the wisdom of 5,000 years of Ayurveda…</div>
       <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
     </div>`;
 }
