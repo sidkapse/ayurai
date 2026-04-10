@@ -226,12 +226,16 @@
     <!-- HOME TAB -->
     <div id="tab-home" class="tab-panel">
       <div class="home-hero">
-        <button class="home-tour-btn" onclick="replayOnboarding()" title="Explore app features">
-          <span class="mio" style="font-size:16px;vertical-align:-3px;">explore</span>
-          <span>App Tour</span>
-        </button>
-        <div class="home-greeting" id="home-greeting">Good Morning</div>
-        <div class="home-name" id="home-name">Loading...</div>
+        <div class="home-hero-top">
+          <div>
+            <div class="home-greeting" id="home-greeting">Good Morning</div>
+            <div class="home-name" id="home-name">Loading...</div>
+          </div>
+          <button class="home-tour-btn" onclick="replayOnboarding()" title="Explore app features">
+            <span class="mio" style="font-size:16px;vertical-align:-3px;">explore</span>
+            <span>App Tour</span>
+          </button>
+        </div>
         <div class="home-dosha-badge" id="home-dosha-badge"><span class="mio" style="font-size:14px;vertical-align:-2px;">self_improvement</span> Take the Dosha Quiz</div>
       </div>
       <div class="home-cards">
@@ -615,7 +619,7 @@
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.4 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.5 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -702,7 +706,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.4',
+    app_version: '1.5',
     error_count: logs.length,
     errors: logs
   };
@@ -2534,7 +2538,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.4',
+      app_version: '1.5',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
