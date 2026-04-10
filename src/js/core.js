@@ -289,6 +289,24 @@ function nextOnboardingSlide() {
   if(_obSlide < 5) goToOnboardingSlide(_obSlide + 1);
 }
 
+function initOnboardingSwipe() {
+  const screen = el('screen-onboarding');
+  if(!screen) return;
+  let _touchStartX = 0;
+  let _touchStartY = 0;
+  screen.addEventListener('touchstart', e => {
+    _touchStartX = e.touches[0].clientX;
+    _touchStartY = e.touches[0].clientY;
+  }, {passive:true});
+  screen.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - _touchStartX;
+    const dy = e.changedTouches[0].clientY - _touchStartY;
+    if(Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+    if(dx < 0 && _obSlide < 5) goToOnboardingSlide(_obSlide + 1);
+    else if(dx > 0 && _obSlide > 1) goToOnboardingSlide(_obSlide - 1);
+  }, {passive:true});
+}
+
 // ── PWA ──
 let _deferredInstallPrompt = null;
 

@@ -2110,31 +2110,31 @@ body::before{
   backdrop-filter:blur(16px);
   -webkit-backdrop-filter:blur(16px);
   border-top:1px solid rgba(255,255,255,0.2);
-  border-radius:28px 28px 0 0;
-  padding:20px 22px 32px;
+  border-radius:22px 22px 0 0;
+  padding:14px 16px 20px;
 }
-.ob-bottom-cta{padding-top:24px;}
+.ob-bottom-cta{padding-top:18px;}
 
 /* Feature pill chips */
 .ob-pill-row{
-  display:flex;gap:8px;flex-wrap:wrap;
-  justify-content:center;margin-bottom:18px;
+  display:flex;gap:6px;flex-wrap:wrap;
+  justify-content:center;margin-bottom:12px;
 }
 .ob-pill{
-  display:flex;align-items:center;gap:5px;
+  display:flex;align-items:center;gap:4px;
   background:rgba(255,255,255,0.18);
   border:1px solid rgba(255,255,255,0.25);
-  border-radius:20px;padding:7px 13px;
-  font-size:11.5px;font-weight:500;color:#fff;
+  border-radius:16px;padding:5px 10px;
+  font-size:11px;font-weight:500;color:#fff;
   font-family:'Jost',sans-serif;
 }
 /* icon inside pill — keep font-size explicit, no letter-spacing on parent */
-.ob-pill-icon{font-size:15px;line-height:1;}
+.ob-pill-icon{font-size:13px;line-height:1;}
 
 /* Progress dots */
 .ob-dots{
-  display:flex;justify-content:center;gap:7px;
-  align-items:center;margin-bottom:16px;
+  display:flex;justify-content:center;gap:6px;
+  align-items:center;margin-bottom:0;
 }
 .ob-dot{
   height:5px;border-radius:3px;
@@ -2144,13 +2144,14 @@ body::before{
 .ob-dot.active{width:22px;background:#C9A84C;}
 .ob-dot:not(.active){width:5px;}
 
-/* Skip + Next row */
-.ob-btn-row{display:flex;align-items:center;justify-content:center;gap:12px;}
-.ob-skip-btn{
-  font-size:12px;font-weight:400;font-family:'Jost',sans-serif;
-  color:rgba(255,255,255,0.55);background:none;border:none;cursor:pointer;
-  padding:4px 0;
+/* Swipe hint */
+.ob-swipe-hint{
+  font-size:10px;color:rgba(255,255,255,0.4);
+  text-align:center;margin-top:8px;
+  font-family:'Jost',sans-serif;letter-spacing:0.5px;
 }
+
+/* kept for CTA slide compat */
 .ob-btn-next{
   flex:1;
   background:var(--gold);color:#fff;

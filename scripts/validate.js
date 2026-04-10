@@ -29,7 +29,7 @@ console.log('\n2. Required Functions:');
  'callOpenAI','callOpenAILarge','el','setText','setHTML','showToast','switchTab',
  'initAdvAilmentChips','initMealTiming','saveFoodHistory','renderHistory','renderHomeHistory',
  'saveCity','saveApiKey',
- 'isFirstTimeUser','goToOnboardingSlide','skipOnboarding','nextOnboardingSlide','replayOnboarding',
+ 'isFirstTimeUser','goToOnboardingSlide','skipOnboarding','nextOnboardingSlide','replayOnboarding','initOnboardingSwipe',
  'initPWA','triggerPWAInstall'
 ].forEach(function(fn){check(fn+'()',js.includes('function '+fn));});
 // 3. Required HTML IDs
