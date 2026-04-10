@@ -64,7 +64,7 @@ body{
   flex:1;
   overflow-y:auto;
   overflow-x:hidden;
-  height:calc(100vh - var(--tab-h));
+  height:calc(100vh - var(--tab-h) - env(safe-area-inset-bottom));
   padding-bottom:24px;
   scroll-behavior:smooth;
   -webkit-overflow-scrolling:touch;
@@ -102,7 +102,7 @@ body::before{
   flex-direction:column;
   justify-content:center;
   align-items:center;
-  padding:32px 28px;
+  padding:max(32px, calc(env(safe-area-inset-top) + 20px)) 28px max(32px, calc(env(safe-area-inset-bottom) + 20px));
   position:relative;
   z-index:1;
 }
@@ -257,7 +257,7 @@ body::before{
   z-index:100;
   background:rgba(253,246,238,0.92);
   backdrop-filter:blur(12px);
-  padding:16px 20px 12px;
+  padding:max(16px, calc(env(safe-area-inset-top) + 8px)) 20px 12px;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -290,7 +290,8 @@ body::before{
   transform:translateX(-50%);
   width:100%;
   max-width:480px;
-  height:var(--tab-h);
+  height:calc(var(--tab-h) + env(safe-area-inset-bottom));
+  padding-bottom:env(safe-area-inset-bottom);
   background:var(--white);
   border-top:1px solid rgba(201,168,76,0.2);
   display:flex;
@@ -334,7 +335,7 @@ body::before{
 /* ── HOME SCREEN ── */
 .home-hero{
   background:linear-gradient(155deg,var(--burgundy-dark) 0%,var(--burgundy) 50%,var(--burgundy-light) 100%);
-  padding:32px 24px 40px;
+  padding:max(32px, calc(env(safe-area-inset-top) + 24px)) 24px 40px;
   position:relative;
   overflow:hidden;
 }
