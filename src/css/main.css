@@ -2111,7 +2111,7 @@ body::before{
   -webkit-backdrop-filter:blur(16px);
   border-top:1px solid rgba(255,255,255,0.2);
   border-radius:22px 22px 0 0;
-  padding:14px 16px 20px;
+  padding:14px 16px max(28px, calc(env(safe-area-inset-bottom) + 20px));
 }
 .ob-bottom-cta{padding-top:18px;}
 
