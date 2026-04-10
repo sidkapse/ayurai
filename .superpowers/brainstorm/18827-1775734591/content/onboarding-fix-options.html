@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onboarding Layout Fix — Options</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#1a0a0f;font-family:'Jost',sans-serif;color:#fff;padding:24px 16px;min-height:100vh;}
+h1{font-family:'Cormorant Garamond',serif;font-size:26px;color:#D4758A;margin-bottom:4px;}
+.sub{color:rgba(255,255,255,0.45);font-size:13px;margin-bottom:36px;}
+.label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:10px;}
+.rec{color:#C9A84C;}
+
+.options{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;}
+
+/* Phone frame */
+.phone{
+  width:220px;flex-shrink:0;
+  border-radius:36px;overflow:hidden;
+  border:2px solid rgba(255,255,255,0.12);
+  position:relative;height:420px;
+  display:flex;flex-direction:column;
+}
+.phone-label{text-align:center;margin-bottom:8px;}
+.phone-name{font-size:14px;font-weight:600;color:#fff;margin-bottom:2px;}
+.phone-desc{font-size:11px;color:rgba(255,255,255,0.45);line-height:1.5;max-width:200px;margin:0 auto;}
+
+/* Slide background */
+.slide-bg{
+  flex:1;
+  background:linear-gradient(160deg,#3D0B1E 0%,#6B1E3A 45%,#8B2E50 75%,#D4758A 100%);
+  position:relative;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+
+/* Skip top right */
+.ob-skip-top{
+  position:absolute;top:10px;right:14px;
+  font-size:11px;color:rgba(255,255,255,0.6);
+  font-family:'Jost',sans-serif;
+}
+
+/* Hero area */
+.hero{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:0 16px;text-align:center;gap:8px;
+}
+.slide-num{font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;}
+.icon-circle{
+  width:70px;height:70px;border-radius:50%;
+  background:rgba(255,255,255,0.15);
+  border:1px solid rgba(255,255,255,0.25);
+  display:flex;align-items:center;justify-content:center;
+  margin:4px 0;
+}
+.title{font-family:'Cormorant Garamond',serif;font-size:22px;color:#fff;line-height:1.2;}
+.tagline{font-size:10px;color:rgba(255,255,255,0.65);line-height:1.4;}
+
+/* OPTION A: Compact bottom card */
+.card-a{
+  background:rgba(255,255,255,0.13);
+  backdrop-filter:blur(12px);
+  border-top:1px solid rgba(255,255,255,0.2);
+  border-radius:20px 20px 0 0;
+  padding:12px 14px 14px;
+}
+.pills-a{display:flex;gap:5px;justify-content:center;margin-bottom:10px;flex-wrap:wrap;}
+.pill-a{
+  display:flex;align-items:center;gap:3px;
+  background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.22);
+  border-radius:16px;padding:4px 9px;
+  font-size:9px;font-weight:500;color:#fff;font-family:'Jost',sans-serif;
+}
+.dots-a{display:flex;justify-content:center;gap:5px;align-items:center;margin-bottom:8px;}
+.dot-a{height:4px;border-radius:2px;background:rgba(255,255,255,0.28);}
+.dot-a.act{width:18px;background:#C9A84C;}
+.dot-a:not(.act){width:4px;}
+.next-a{
+  width:100%;background:#C9A84C;color:#fff;border:none;border-radius:10px;
+  padding:10px;font-size:12px;font-weight:600;font-family:'Jost',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;
+}
+
+/* OPTION B: Fixed bottom bar (always visible) */
+.slide-b{position:relative;flex:1;background:linear-gradient(160deg,#3D0B1E 0%,#6B1E3A 45%,#8B2E50 75%,#D4758A 100%);}
+.hero-b{
+  position:absolute;top:0;left:0;right:0;bottom:110px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:0 14px;text-align:center;gap:7px;
+}
+.bar-b{
+  position:absolute;bottom:0;left:0;right:0;height:110px;
+  background:rgba(255,255,255,0.13);
+  backdrop-filter:blur(12px);
+  border-top:1px solid rgba(255,255,255,0.2);
+  border-radius:20px 20px 0 0;
+  padding:10px 14px 14px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.pills-b{display:flex;gap:4px;justify-content:center;}
+.pill-b{
+  display:flex;align-items:center;gap:3px;
+  background:rgba(255,255,255,0.16);border:1px solid rgba(255,255,255,0.22);
+  border-radius:14px;padding:4px 8px;
+  font-size:9px;font-weight:500;color:#fff;font-family:'Jost',sans-serif;
+}
+.dots-b{display:flex;justify-content:center;gap:5px;align-items:center;}
+.dot-b{height:4px;border-radius:2px;background:rgba(255,255,255,0.28);}
+.dot-b.act{width:18px;background:#C9A84C;}
+.dot-b:not(.act){width:4px;}
+.next-b{
+  flex:1;background:#C9A84C;color:#fff;border:none;border-radius:10px;
+  padding:8px;font-size:12px;font-weight:600;font-family:'Jost',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;
+}
+.row-b{display:flex;gap:8px;align-items:center;}
+
+/* OPTION C: No pills — fullscreen with just dots + Next */
+.card-c{
+  background:rgba(255,255,255,0.13);
+  backdrop-filter:blur(12px);
+  border-top:1px solid rgba(255,255,255,0.2);
+  border-radius:20px 20px 0 0;
+  padding:14px 14px 16px;
+}
+.features-c{
+  display:flex;flex-direction:column;gap:5px;margin-bottom:12px;
+}
+.feat-c{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.1);border-radius:10px;
+  padding:6px 10px;font-size:10px;color:rgba(255,255,255,0.9);
+}
+.dots-c{display:flex;justify-content:center;gap:5px;align-items:center;margin-bottom:10px;}
+.dot-c{height:4px;border-radius:2px;background:rgba(255,255,255,0.28);}
+.dot-c.act{width:18px;background:#C9A84C;}
+.dot-c:not(.act){width:4px;}
+.next-c{
+  width:100%;background:#C9A84C;color:#fff;border:none;border-radius:10px;
+  padding:10px;font-size:12px;font-weight:600;font-family:'Jost',sans-serif;
+  display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;
+}
+
+/* Rec badge */
+.rec-badge{
+  display:inline-block;background:#C9A84C;color:#1a0a0f;
+  font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:2px 7px;border-radius:8px;margin-bottom:6px;
+}
+.card-wrap{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:20px;padding:20px 16px 24px;text-align:center;}
+.card-wrap.rec-card{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.06);}
+</style>
+</head>
+<body>
+<h1>Onboarding — Layout Fix Options</h1>
+<p class="sub">Next button not visible on small screens. Pick a layout fix.</p>
+
+<div class="options">
+
+  <!-- OPTION A -->
+  <div>
+    <div class="phone-label">
+      <div class="label">Option A</div>
+      <div class="phone-name">Compact Card</div>
+      <div class="phone-desc">Same structure, smaller padding/gaps throughout. Fits on most screens.</div>
+    </div>
+    <div class="phone">
+      <div class="slide-bg" style="display:flex;flex-direction:column;">
+        <span class="ob-skip-top">Skip</span>
+        <div class="hero">
+          <div class="slide-num">01 / 04</div>
+          <div class="icon-circle">
+            <span class="material-icons-outlined" style="font-size:30px;color:#fff;">self_improvement</span>
+          </div>
+          <div class="title">Know Your<br>Dosha</div>
+          <div class="tagline">Discover your unique Vata, Pitta or Kapha constitution</div>
+        </div>
+        <div class="card-a">
+          <div class="pills-a">
+            <div class="pill-a"><span class="material-icons-outlined" style="font-size:11px;">quiz</span><span>20-Q Quiz</span></div>
+            <div class="pill-a"><span class="material-icons-outlined" style="font-size:11px;">insights</span><span>AI Insights</span></div>
+            <div class="pill-a"><span class="material-icons-outlined" style="font-size:11px;">psychology</span><span>Personalised</span></div>
+          </div>
+          <div class="dots-a">
+            <div class="dot-a act"></div>
+            <div class="dot-a"></div>
+            <div class="dot-a"></div>
+            <div class="dot-a"></div>
+          </div>
+          <button class="next-a">Next <span class="material-icons" style="font-size:14px;">arrow_forward</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION B -->
+  <div>
+    <div class="phone-label">
+      <div class="label rec">Option B — Recommended</div>
+      <div class="rec-badge">Best</div>
+      <div class="phone-name">Fixed Bottom Bar</div>
+      <div class="phone-desc">Bottom card is always pinned to the viewport. Next button guaranteed visible on any screen size.</div>
+    </div>
+    <div class="phone">
+      <div class="slide-bg" style="position:relative;">
+        <span class="ob-skip-top">Skip</span>
+        <div class="hero-b">
+          <div class="slide-num">01 / 04</div>
+          <div class="icon-circle">
+            <span class="material-icons-outlined" style="font-size:30px;color:#fff;">self_improvement</span>
+          </div>
+          <div class="title">Know Your<br>Dosha</div>
+          <div class="tagline">Discover your unique Vata, Pitta or Kapha constitution</div>
+        </div>
+        <div class="bar-b">
+          <div class="pills-b">
+            <div class="pill-b"><span class="material-icons-outlined" style="font-size:11px;">quiz</span><span>20-Q Quiz</span></div>
+            <div class="pill-b"><span class="material-icons-outlined" style="font-size:11px;">insights</span><span>AI Insights</span></div>
+            <div class="pill-b"><span class="material-icons-outlined" style="font-size:11px;">psychology</span><span>Personalised</span></div>
+          </div>
+          <div class="row-b">
+            <div class="dots-b">
+              <div class="dot-b act"></div>
+              <div class="dot-b"></div>
+              <div class="dot-b"></div>
+              <div class="dot-b"></div>
+            </div>
+            <button class="next-b">Next <span class="material-icons" style="font-size:14px;">arrow_forward</span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION C -->
+  <div>
+    <div class="phone-label">
+      <div class="label">Option C</div>
+      <div class="phone-name">No Pills — Feature Rows</div>
+      <div class="phone-desc">Remove pill chips. Use compact feature list rows instead. More info, same space.</div>
+    </div>
+    <div class="phone">
+      <div class="slide-bg" style="display:flex;flex-direction:column;">
+        <span class="ob-skip-top">Skip</span>
+        <div class="hero" style="flex:none;padding-top:32px;padding-bottom:12px;">
+          <div class="slide-num">01 / 04</div>
+          <div class="icon-circle">
+            <span class="material-icons-outlined" style="font-size:30px;color:#fff;">self_improvement</span>
+          </div>
+          <div class="title">Know Your<br>Dosha</div>
+          <div class="tagline">Discover your unique Vata, Pitta or Kapha constitution</div>
+        </div>
+        <div class="card-c">
+          <div class="features-c">
+            <div class="feat-c"><span class="material-icons-outlined" style="font-size:14px;color:#C9A84C;">quiz</span><span>20-question dosha quiz</span></div>
+            <div class="feat-c"><span class="material-icons-outlined" style="font-size:14px;color:#C9A84C;">insights</span><span>AI-powered insights</span></div>
+            <div class="feat-c"><span class="material-icons-outlined" style="font-size:14px;color:#C9A84C;">psychology</span><span>Personalised to you</span></div>
+          </div>
+          <div class="dots-c">
+            <div class="dot-c act"></div>
+            <div class="dot-c"></div>
+            <div class="dot-c"></div>
+            <div class="dot-c"></div>
+          </div>
+          <button class="next-c">Next <span class="material-icons" style="font-size:14px;">arrow_forward</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:36px;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:18px 20px;max-width:560px;">
+  <div style="font-size:14px;font-weight:600;color:#E8C574;margin-bottom:8px;">Why Option B?</div>
+  <div style="font-size:12px;color:rgba(255,255,255,0.6);line-height:1.8;">
+    Using <code style="background:rgba(255,255,255,0.1);padding:1px 5px;border-radius:4px;">position:fixed;bottom:0</code> on the bottom card guarantees the Next button is always visible — on 375px iPhones, tall Android devices, and everything in between. The hero content adjusts to the remaining space. This is the pattern used by all major onboarding flows (Duolingo, Spotify, Airbnb).
+  </div>
+</div>
+</body>
+</html>
