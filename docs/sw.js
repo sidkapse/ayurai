@@ -1,6 +1,6 @@
 // AyurAI Service Worker — cache-first for app shell, network-only for OpenAI
 const CACHE = 'ayurai-v1';
-const SHELL = ['/', '/index.html', '/favicon.svg', '/manifest.json'];
+const SHELL = ['/ayurai/', '/ayurai/index.html', '/ayurai/favicon.svg', '/ayurai/manifest.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)));
