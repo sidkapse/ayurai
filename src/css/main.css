@@ -1996,17 +1996,21 @@ body::before{
   #tab-bar{border-radius:0;}
 }
 
+/* ── HOME HERO TOP ROW ── */
+.home-hero-top{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  margin-bottom:16px;
+}
 /* ── HOME TOUR BUTTON ── */
 .home-tour-btn{
-  position:absolute;top:16px;right:16px;
-  display:flex;align-items:center;gap:5px;
+  display:flex;align-items:center;gap:5px;flex-shrink:0;
   background:rgba(255,255,255,0.18);
   border:1px solid rgba(255,255,255,0.28);
   border-radius:20px;padding:7px 13px;
   font-family:'Jost',sans-serif;font-size:12px;font-weight:500;
   color:#fff;cursor:pointer;
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  transition:background 0.2s;
+  transition:background 0.2s;margin-left:12px;
 }
 .home-tour-btn:hover{background:rgba(255,255,255,0.26);}
 
