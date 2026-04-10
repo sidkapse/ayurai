@@ -289,6 +289,48 @@ function nextOnboardingSlide() {
   if(_obSlide < 5) goToOnboardingSlide(_obSlide + 1);
 }
 
+// ── PWA ──
+let _deferredInstallPrompt = null;
+
+function initPWA() {
+  if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(e => logError('sw', e));
+  }
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _deferredInstallPrompt = e;
+    const btn = el('pwa-install-btn');
+    const sec = el('pwa-install-section');
+    if(btn) btn.style.display = 'flex';
+    if(sec) sec.style.display = 'block';
+  });
+  window.addEventListener('appinstalled', () => {
+    _deferredInstallPrompt = null;
+    const btn = el('pwa-install-btn');
+    const sec = el('pwa-install-section');
+    if(btn) btn.style.display = 'none';
+    if(sec) sec.style.display = 'none';
+    showToast('AyurAI installed!');
+  });
+  window.addEventListener('offline', () => showToast('You\'re offline — AI features unavailable'));
+  window.addEventListener('online',  () => showToast('Back online'));
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  if(isIOS && !isStandalone) {
+    const hint = el('pwa-ios-hint');
+    const sec = el('pwa-install-section');
+    if(hint) hint.style.display = 'flex';
+    if(sec) sec.style.display = 'block';
+  }
+}
+
+function triggerPWAInstall() {
+  if(_deferredInstallPrompt) {
+    _deferredInstallPrompt.prompt();
+    _deferredInstallPrompt.userChoice.then(() => { _deferredInstallPrompt = null; });
+  }
+}
+
 // ── TOAST ──
 let toastTimer;
 function showToast(msg) {

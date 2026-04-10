@@ -472,6 +472,25 @@
           </div>
         </div>
 
+        <!-- Install App -->
+        <div class="settings-group" id="pwa-install-section" style="display:none;">
+          <div class="settings-group-title"><span class="mio">install_mobile</span><span class="settings-group-title-text">Install App</span></div>
+          <div class="settings-group-body">
+            <button class="settings-tour-btn" id="pwa-install-btn" onclick="triggerPWAInstall()" style="display:none;">
+              <span class="mio" style="font-size:20px;">install_mobile</span>
+              <div style="flex:1;text-align:left;">
+                <div>Add to Home Screen</div>
+                <div style="font-size:11px;font-weight:400;opacity:0.75;margin-top:2px;">Install AyurAI as an app on your device</div>
+              </div>
+              <span class="mi" style="font-size:16px;">arrow_forward</span>
+            </button>
+            <div class="pwa-ios-hint" id="pwa-ios-hint" style="display:none;">
+              <span class="mio" style="font-size:22px;color:var(--gold);flex-shrink:0;">ios_share</span>
+              <div>Tap <b>Share</b> <span class="mio" style="font-size:14px;vertical-align:middle;">ios_share</span> then <b>"Add to Home Screen"</b> to install AyurAI</div>
+            </div>
+          </div>
+        </div>
+
         <!-- Location -->
         <div class="settings-group">
           <div class="settings-group-title"><span class="mi">location_on</span><span class="settings-group-title-text">Location</span></div>

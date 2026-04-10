@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>AyurAI — Ancient Wisdom, Modern Intelligence</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#6B1E3A"/>
+<meta name="description" content="AI-powered Ayurvedic wellness — know your dosha, check foods, discover herbs, plan your day."/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="AyurAI"/>
+<link rel="apple-touch-icon" href="favicon.svg"/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
@@ -2016,6 +2024,12 @@ body::before{
   transition:opacity 0.2s;
 }
 .settings-tour-btn:hover{opacity:0.9;}
+.pwa-ios-hint{
+  display:flex;align-items:center;gap:12px;margin-top:12px;
+  background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);
+  border-radius:12px;padding:14px 16px;
+  font-size:13px;color:var(--charcoal);line-height:1.6;
+}
 
 /* ── ONBOARDING ── */
 #screen-onboarding{height:100vh;overflow:hidden;position:relative;}
@@ -2639,6 +2653,25 @@ body::before{
               <span>Start App Tour</span>
               <span class="mi" style="font-size:16px;margin-left:auto;">arrow_forward</span>
             </button>
+          </div>
+        </div>
+
+        <!-- Install App -->
+        <div class="settings-group" id="pwa-install-section" style="display:none;">
+          <div class="settings-group-title"><span class="mio">install_mobile</span><span class="settings-group-title-text">Install App</span></div>
+          <div class="settings-group-body">
+            <button class="settings-tour-btn" id="pwa-install-btn" onclick="triggerPWAInstall()" style="display:none;">
+              <span class="mio" style="font-size:20px;">install_mobile</span>
+              <div style="flex:1;text-align:left;">
+                <div>Add to Home Screen</div>
+                <div style="font-size:11px;font-weight:400;opacity:0.75;margin-top:2px;">Install AyurAI as an app on your device</div>
+              </div>
+              <span class="mi" style="font-size:16px;">arrow_forward</span>
+            </button>
+            <div class="pwa-ios-hint" id="pwa-ios-hint" style="display:none;">
+              <span class="mio" style="font-size:22px;color:var(--gold);flex-shrink:0;">ios_share</span>
+              <div>Tap <b>Share</b> <span class="mio" style="font-size:14px;vertical-align:middle;">ios_share</span> then <b>"Add to Home Screen"</b> to install AyurAI</div>
+            </div>
           </div>
         </div>
 
@@ -6236,6 +6269,48 @@ function renderDinacharya(data, targetDate, wakeDisplay, sleepDisplay, generated
   el('dina-refresh-btn').style.display = 'flex';
 }
 
+// ── PWA ──
+let _deferredInstallPrompt = null;
+
+function initPWA() {
+  if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(e => logError('sw', e));
+  }
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _deferredInstallPrompt = e;
+    const btn = el('pwa-install-btn');
+    const sec = el('pwa-install-section');
+    if(btn) btn.style.display = 'flex';
+    if(sec) sec.style.display = 'block';
+  });
+  window.addEventListener('appinstalled', () => {
+    _deferredInstallPrompt = null;
+    const btn = el('pwa-install-btn');
+    const sec = el('pwa-install-section');
+    if(btn) btn.style.display = 'none';
+    if(sec) sec.style.display = 'none';
+    showToast('AyurAI installed!');
+  });
+  window.addEventListener('offline', () => showToast('You\'re offline — AI features unavailable'));
+  window.addEventListener('online',  () => showToast('Back online'));
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  if(isIOS && !isStandalone) {
+    const hint = el('pwa-ios-hint');
+    const sec = el('pwa-install-section');
+    if(hint) hint.style.display = 'flex';
+    if(sec) sec.style.display = 'block';
+  }
+}
+
+function triggerPWAInstall() {
+  if(_deferredInstallPrompt) {
+    _deferredInstallPrompt.prompt();
+    _deferredInstallPrompt.userChoice.then(() => { _deferredInstallPrompt = null; });
+  }
+}
+
 // ── STARTUP ──
 (function(){
   const d = loadData();
@@ -6252,6 +6327,7 @@ function renderDinacharya(data, targetDate, wakeDisplay, sleepDisplay, generated
   } else {
     showScreen('screen-login');
   }
+  initPWA();
 })();
 </script>
 </body>

@@ -29,7 +29,8 @@ console.log('\n2. Required Functions:');
  'callOpenAI','callOpenAILarge','el','setText','setHTML','showToast','switchTab',
  'initAdvAilmentChips','initMealTiming','saveFoodHistory','renderHistory','renderHomeHistory',
  'saveCity','saveApiKey',
- 'isFirstTimeUser','goToOnboardingSlide','skipOnboarding','nextOnboardingSlide','replayOnboarding'
+ 'isFirstTimeUser','goToOnboardingSlide','skipOnboarding','nextOnboardingSlide','replayOnboarding',
+ 'initPWA','triggerPWAInstall'
 ].forEach(function(fn){check(fn+'()',js.includes('function '+fn));});
 // 3. Required HTML IDs
 console.log('\n3. Required HTML IDs:');
@@ -40,7 +41,8 @@ console.log('\n3. Required HTML IDs:');
  'quiz-container','herbs-wrap','dina-wrap','symptom-wrap',
  'settings-name','settings-email','settings-city','settings-apikey',
  'settings-error-log','import-file-input',
- 'home-greeting','home-name','home-dosha-val','home-dosha-pills','home-dosha-insights','home-recent-checks'
+ 'home-greeting','home-name','home-dosha-val','home-dosha-pills','home-dosha-insights','home-recent-checks',
+ 'pwa-install-btn','pwa-ios-hint','pwa-install-section'
 ].forEach(function(id){check('id="'+id+'"',html.includes('id="'+id+'"'));});
 // 4. el() refs
 console.log('\n4. el() Reference Check:');

@@ -2005,6 +2005,12 @@ body::before{
   transition:opacity 0.2s;
 }
 .settings-tour-btn:hover{opacity:0.9;}
+.pwa-ios-hint{
+  display:flex;align-items:center;gap:12px;margin-top:12px;
+  background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.25);
+  border-radius:12px;padding:14px 16px;
+  font-size:13px;color:var(--charcoal);line-height:1.6;
+}
 
 /* ── ONBOARDING ── */
 #screen-onboarding{height:100vh;overflow:hidden;position:relative;}
