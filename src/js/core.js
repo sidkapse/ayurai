@@ -139,6 +139,8 @@ function doLogout() {
   showScreen('screen-login');
   document.getElementById('login-email').value='';
   document.getElementById('login-password').value='';
+  const err = document.getElementById('login-error');
+  if(err) { err.style.display='none'; err.textContent=''; }
   showToast('Signed out. Namaste 🙏');
 }
 

@@ -2314,6 +2314,9 @@ body::before{
   <!-- SLIDE 5 – CTA -->
   <div id="onboarding-slide-5" class="onboarding-slide ob-s5">
     <div class="ob-particles" id="ob-particles-5"></div>
+    <button class="ob-skip" onclick="document.getElementById('import-file-input').click()" title="Import your my_info.json backup">
+      <span class="mio" style="font-size:12px;vertical-align:middle;margin-right:3px;">upload_file</span>Import
+    </button>
     <div class="ob-hero-content ob-hero-cta">
       <div class="ob-big-icon ob-icon-cta"><span class="mi" style="font-size:56px;color:#fff;">spa</span></div>
       <div class="ob-title ob-title-cta">Begin Your<br>Journey</div>
@@ -2976,6 +2979,8 @@ function doLogout() {
   showScreen('screen-login');
   document.getElementById('login-email').value='';
   document.getElementById('login-password').value='';
+  const err = document.getElementById('login-error');
+  if(err) { err.style.display='none'; err.textContent=''; }
   showToast('Signed out. Namaste 🙏');
 }
 
@@ -3364,7 +3369,7 @@ const COMMON_AILMENTS = [
   // Digestive
   "Acidity","Acid Reflux","Heartburn","Poor Digestion","Bloating","Constipation",
   // Skin
-  "Skin issues / Rashes","Inner thigh Boils",
+  "Skin issues / Rashes","Skin Boils",
   // Head & Pain
   "Headache","Migraines / Headaches","Backache","Joint Pain",
   // Energy & Mind
@@ -3372,7 +3377,7 @@ const COMMON_AILMENTS = [
   // Respiratory & Immunity
   "Common Cold / Allergies","Fever",
   // Metabolic / Chronic
-  "High BP","Diabetes (Type 2)"
+  "High BP","Diabetes (Type 2)", "Kidney Stones", "Gallbladder Stones", "Gallbladder Polyps", "Fatty liver"
 ];
 
 let quizState = { phase:'quick', qIdx:0, answers:[], scores:{V:0,P:0,K:0}, ailments:[], city:'' };
@@ -4815,6 +4820,7 @@ function importJSON(evt) {
       herbState.resultsShown = false;
       showToast('Profile imported! Welcome back 🙏');
       initApp();
+      showScreen('screen-app');
       switchTab('home');
     } catch {
       showToast('Could not read file — make sure it is a valid my_info.json');
@@ -4832,8 +4838,9 @@ function importJSON(evt) {
 const HERB_CONCERNS = [
   'Digestive issues','Acidity / Reflux','Bloating','Constipation',
   'Low immunity','Stress / Anxiety','Poor sleep','Low energy / Fatigue',
-  'Skin health','Weight management','Joint pain','Respiratory health',
-  'Memory / Focus','Hormonal balance','Liver health','Heart health'
+  'Skin health','Skin Boils','Weight management','Joint pain','Respiratory health',
+  'Memory / Focus','Hormonal balance','Liver health', 'Fatty liver', 'Heart health',
+  'Kidney Stones', 'Gallbladder Stones', 'Gallbladder Polyps'
 ];
 
 let herbState = {
@@ -5152,7 +5159,7 @@ function showHerbLoading(msg) {
         <span class="mio" style="font-size:52px;color:var(--burgundy);">spa</span>
       </span>
       <div class="loading-title">${msg}</div>
-      <div class="loading-sub">Drawing from classical Ayurvedic texts…</div>
+      <div class="loading-sub">Consulting from the wisdom of 5,000 years of Ayurveda…</div>
       <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
     </div>`;
 }
