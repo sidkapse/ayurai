@@ -30,7 +30,8 @@ console.log('\n2. Required Functions:');
  'initAdvAilmentChips','initMealTiming','saveFoodHistory','renderHistory','renderHomeHistory',
  'saveCity','saveApiKey',
  'isFirstTimeUser','goToOnboardingSlide','skipOnboarding','nextOnboardingSlide','replayOnboarding','initOnboardingSwipe',
- 'initPWA','triggerPWAInstall'
+ 'initPWA','triggerPWAInstall',
+ 'initPullToRefresh'
 ].forEach(function(fn){check(fn+'()',js.includes('function '+fn));});
 // 3. Required HTML IDs
 console.log('\n3. Required HTML IDs:');
@@ -42,7 +43,8 @@ console.log('\n3. Required HTML IDs:');
  'settings-name','settings-email','settings-city','settings-apikey',
  'settings-error-log','import-file-input',
  'home-greeting','home-name','home-dosha-val','home-dosha-pills','home-dosha-insights','home-recent-checks',
- 'pwa-install-btn','pwa-ios-hint','pwa-install-section','pwa-default-hint'
+ 'pwa-install-btn','pwa-ios-hint','pwa-install-section','pwa-default-hint',
+ 'ptr-indicator'
 ].forEach(function(id){check('id="'+id+'"',html.includes('id="'+id+'"'));});
 // 4. el() refs
 console.log('\n4. el() Reference Check:');

@@ -49,8 +49,25 @@ body{
   padding-bottom:24px;
   scroll-behavior:smooth;
   -webkit-overflow-scrolling:touch;
+  position:relative;
 }
 #app-content::-webkit-scrollbar{display:none;}
+
+/* ── PULL TO REFRESH ── */
+.ptr-indicator{
+  position:absolute;top:0;left:0;right:0;
+  display:flex;align-items:center;justify-content:center;
+  height:52px;
+  background:var(--burgundy);
+  transform:translateY(-52px);
+  transition:transform 0.2s ease;
+  z-index:10;
+  border-radius:0 0 16px 16px;
+}
+.ptr-indicator.ptr-visible{transform:translateY(0);}
+.ptr-icon{font-size:22px;color:var(--cream);transition:transform 0.3s ease;}
+.ptr-indicator.ptr-spinning .ptr-icon{animation:ptrSpin 0.7s linear infinite;}
+@keyframes ptrSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 
 /* Tab panels must allow full content height */
 .tab-panel{
