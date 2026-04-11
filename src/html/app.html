@@ -510,15 +510,30 @@
           </div>
         </div>
 
-        <!-- Location -->
+        <!-- Location & Profile -->
         <div class="settings-group">
-          <div class="settings-group-title"><span class="mi">location_on</span><span class="settings-group-title-text">Location</span></div>
+          <div class="settings-group-title"><span class="mi">person_pin</span><span class="settings-group-title-text">Location &amp; Profile</span></div>
           <div class="settings-group-body">
             <div class="settings-row-label">Your City</div>
-            <div class="settings-row-sub">Used for seasonal food & routine analysis</div>
+            <div class="settings-row-sub">Used for seasonal food &amp; routine analysis</div>
             <div style="display:flex;gap:8px;margin-top:10px;">
               <input type="text" id="settings-city" class="settings-input" placeholder="e.g. Mumbai, Singapore, Delhi" style="flex:1;"/>
               <button class="settings-save-btn" onclick="saveCity()"><span class="mi" style="font-size:15px;">check</span> Save</button>
+            </div>
+            <div class="settings-row-label" style="margin-top:18px;">Birth Month &amp; Year</div>
+            <div class="settings-row-sub">Used to personalise recommendations by age</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <select id="settings-birth-month" class="settings-input" style="flex:1;">
+                <option value="">Month</option>
+                <option value="1">January</option><option value="2">February</option>
+                <option value="3">March</option><option value="4">April</option>
+                <option value="5">May</option><option value="6">June</option>
+                <option value="7">July</option><option value="8">August</option>
+                <option value="9">September</option><option value="10">October</option>
+                <option value="11">November</option><option value="12">December</option>
+              </select>
+              <input type="number" id="settings-birth-year" class="settings-input" placeholder="Year e.g. 1990" min="1930" max="2010" style="flex:1;"/>
+              <button class="settings-save-btn" onclick="saveBirthDate()"><span class="mi" style="font-size:15px;">check</span> Save</button>
             </div>
           </div>
         </div>

@@ -32,11 +32,13 @@
   const now = new Date();
   const month = now.toLocaleString('default',{month:'long'});
   const time = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const age = getUserAge();
 
   const prompt = `You are a senior Ayurvedic physician (Vaidya) with 30 years of clinical experience. Perform a thorough Ayurvedic Nidana (diagnostic) analysis.
 
 Patient Profile:
 - Primary Dosha: ${d.dosha?.primary||'Unknown'} (Vata ${d.dosha?.scores?.Vata||0}%, Pitta ${d.dosha?.scores?.Pitta||0}%, Kapha ${d.dosha?.scores?.Kapha||0}%)
+- Age: ${age ? age + ' years' : 'unknown'}
 - Known ailments: ${d.ailments?.join(', ')||'None'}
 - City: ${d.city||'Unknown'}, Month: ${month}, Time: ${time}
 
@@ -576,10 +578,12 @@ async function generateDinacharya(forceRefresh=false) {
   if(dinaFilterState.diets.includes('dash'))          fastingRules.push('User follows DASH diet — low sodium, high potassium, emphasise fruits/vegetables/whole grains');
   if(dinaFilterState.diets.includes('lowcarb'))       fastingRules.push('User follows Low-Carb/High-Protein — reduce grains/sugar, emphasise protein-rich foods');
 
+  const age = getUserAge();
   const prompt = `You are a master Ayurvedic physician. Create a personalised Dinacharya (daily routine) for this person.
 
 Profile:
 - Dosha: ${d.dosha.primary} (V${d.dosha.scores?.Vata||0}% P${d.dosha.scores?.Pitta||0}% K${d.dosha.scores?.Kapha||0}%)
+- Age: ${age ? age + ' years' : 'unknown'}
 - Chronic ailments: ${baseAilments.join(', ')||'None'}
 - Active symptoms today: ${activeSymptoms.join(', ')||'None'}
 - Dietary preferences: ${dietContext}

@@ -391,6 +391,23 @@ function renderAilmentSelection() {
         style="padding:14px 16px;border:1.5px solid var(--cream-dark);border-radius:10px;font-size:15px;width:100%;outline:none;font-family:Jost,sans-serif;background:var(--cream);color:var(--text-main);"
         oninput="quizState.city=this.value"/>
     </div>
+    <div class="form-group" style="margin-top:16px;">
+      <label>Birth Month &amp; Year</label>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <select id="quiz-birth-month" style="flex:1;padding:14px 12px;border:1.5px solid var(--cream-dark);border-radius:10px;font-size:15px;font-family:Jost,sans-serif;background:var(--cream);color:var(--text-main);outline:none;">
+          <option value="">Month</option>
+          <option value="1">January</option><option value="2">February</option>
+          <option value="3">March</option><option value="4">April</option>
+          <option value="5">May</option><option value="6">June</option>
+          <option value="7">July</option><option value="8">August</option>
+          <option value="9">September</option><option value="10">October</option>
+          <option value="11">November</option><option value="12">December</option>
+        </select>
+        <input type="number" id="quiz-birth-year" placeholder="Year e.g. 1990" min="1930" max="2010"
+          style="flex:1;padding:14px 12px;border:1.5px solid var(--cream-dark);border-radius:10px;font-size:15px;font-family:Jost,sans-serif;background:var(--cream);color:var(--text-main);outline:none;"/>
+      </div>
+      <div style="font-size:11px;color:var(--text-light);margin-top:5px;">Helps personalise recommendations by age</div>
+    </div>
     <button class="btn-primary" onclick="saveStage1()" style="margin-top:16px;margin-bottom:12px;">
       Save &amp; See My Stage 1 Result →
     </button>
@@ -436,6 +453,10 @@ function saveStage1() {
   };
   data.ailments = quizState.ailments;
   if(city) { data.city = city; quizState.city = city; }
+  const birthMonth = parseInt(el('quiz-birth-month')?.value || '0', 10) || null;
+  const birthYear  = parseInt(el('quiz-birth-year')?.value  || '0', 10) || null;
+  if(birthMonth) data.birth_month = birthMonth;
+  if(birthYear && birthYear >= 1930 && birthYear <= 2010) data.birth_year = birthYear;
   saveData(data);
   initApp();
   showToast('Stage 1 saved! 🌿');
