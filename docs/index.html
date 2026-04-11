@@ -2696,15 +2696,30 @@ body::before{
           </div>
         </div>
 
-        <!-- Location -->
+        <!-- Location & Profile -->
         <div class="settings-group">
-          <div class="settings-group-title"><span class="mi">location_on</span><span class="settings-group-title-text">Location</span></div>
+          <div class="settings-group-title"><span class="mi">person_pin</span><span class="settings-group-title-text">Location &amp; Profile</span></div>
           <div class="settings-group-body">
             <div class="settings-row-label">Your City</div>
-            <div class="settings-row-sub">Used for seasonal food & routine analysis</div>
+            <div class="settings-row-sub">Used for seasonal food &amp; routine analysis</div>
             <div style="display:flex;gap:8px;margin-top:10px;">
               <input type="text" id="settings-city" class="settings-input" placeholder="e.g. Mumbai, Singapore, Delhi" style="flex:1;"/>
               <button class="settings-save-btn" onclick="saveCity()"><span class="mi" style="font-size:15px;">check</span> Save</button>
+            </div>
+            <div class="settings-row-label" style="margin-top:18px;">Birth Month &amp; Year</div>
+            <div class="settings-row-sub">Used to personalise recommendations by age</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <select id="settings-birth-month" class="settings-input" style="flex:1;">
+                <option value="">Month</option>
+                <option value="1">January</option><option value="2">February</option>
+                <option value="3">March</option><option value="4">April</option>
+                <option value="5">May</option><option value="6">June</option>
+                <option value="7">July</option><option value="8">August</option>
+                <option value="9">September</option><option value="10">October</option>
+                <option value="11">November</option><option value="12">December</option>
+              </select>
+              <input type="number" id="settings-birth-year" class="settings-input" placeholder="Year e.g. 1990" min="1930" max="2010" style="flex:1;"/>
+              <button class="settings-save-btn" onclick="saveBirthDate()"><span class="mi" style="font-size:15px;">check</span> Save</button>
             </div>
           </div>
         </div>
@@ -2937,6 +2952,15 @@ function setData(path, value) {
   saveData(d);
 }
 
+function getUserAge() {
+  const d = loadData();
+  if(!d.birth_year) return null;
+  const now = new Date();
+  let age = now.getFullYear() - d.birth_year;
+  if(d.birth_month && (now.getMonth() + 1) < d.birth_month) age--;
+  return age;
+}
+
 // ── SCREENS ──
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -3005,6 +3029,8 @@ function initApp() {
   el('settings-name').textContent = d.user.name;
   el('settings-email').textContent = d.user.email;
   el('settings-city').value = d.city || '';
+  if(el('settings-birth-month')) el('settings-birth-month').value = d.birth_month || '';
+  if(el('settings-birth-year'))  el('settings-birth-year').value  = d.birth_year  || '';
   el('settings-apikey').value = d.settings?.openaiApiKey || '';
   // Dosha badge + card
   if(d.dosha) {
@@ -3556,6 +3582,23 @@ function renderAilmentSelection() {
         style="padding:14px 16px;border:1.5px solid var(--cream-dark);border-radius:10px;font-size:15px;width:100%;outline:none;font-family:Jost,sans-serif;background:var(--cream);color:var(--text-main);"
         oninput="quizState.city=this.value"/>
     </div>
+    <div class="form-group" style="margin-top:16px;">
+      <label>Birth Month &amp; Year</label>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <select id="quiz-birth-month" style="flex:1;padding:14px 12px;border:1.5px solid var(--cream-dark);border-radius:10px;font-size:15px;font-family:Jost,sans-serif;background:var(--cream);color:var(--text-main);outline:none;">
+          <option value="">Month</option>
+          <option value="1">January</option><option value="2">February</option>
+          <option value="3">March</option><option value="4">April</option>
+          <option value="5">May</option><option value="6">June</option>
+          <option value="7">July</option><option value="8">August</option>
+          <option value="9">September</option><option value="10">October</option>
+          <option value="11">November</option><option value="12">December</option>
+        </select>
+        <input type="number" id="quiz-birth-year" placeholder="Year e.g. 1990" min="1930" max="2010"
+          style="flex:1;padding:14px 12px;border:1.5px solid var(--cream-dark);border-radius:10px;font-size:15px;font-family:Jost,sans-serif;background:var(--cream);color:var(--text-main);outline:none;"/>
+      </div>
+      <div style="font-size:11px;color:var(--text-light);margin-top:5px;">Helps personalise recommendations by age</div>
+    </div>
     <button class="btn-primary" onclick="saveStage1()" style="margin-top:16px;margin-bottom:12px;">
       Save &amp; See My Stage 1 Result →
     </button>
@@ -3601,6 +3644,10 @@ function saveStage1() {
   };
   data.ailments = quizState.ailments;
   if(city) { data.city = city; quizState.city = city; }
+  const birthMonth = parseInt(el('quiz-birth-month')?.value || '0', 10) || null;
+  const birthYear  = parseInt(el('quiz-birth-year')?.value  || '0', 10) || null;
+  if(birthMonth) data.birth_month = birthMonth;
+  if(birthYear && birthYear >= 1930 && birthYear <= 2010) data.birth_year = birthYear;
   saveData(data);
   initApp();
   showToast('Stage 1 saved! 🌿');
@@ -3826,11 +3873,13 @@ async function checkFood() {
   const allAilments = [...new Set([...baseAilments, ...activeAilments])];
   const ailments = allAilments.length ? allAilments.join(', ') : 'None';
   const city = d.city||'unknown location';
+  const age = getUserAge();
 
   const prompt = `You are an expert Ayurvedic nutritionist. The user wants to know if a food or drink is suitable for a specific meal time.
 
 User Profile:
 - Primary Dosha: ${dosha} (Scores: Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
+- Age: ${age ? age + ' years' : 'unknown'}
 - Ailments (chronic + currently active): ${ailments}
 - City: ${city}
 - Meal context: ${timeContext}
@@ -4181,6 +4230,7 @@ async function getRemedy() {
   const dosha = d.dosha.primary;
   const ailments = d.ailments?.join(', ')||'None';
   const city = d.city||'unknown location';
+  const age = getUserAge();
   const itemType = loadFoodCache()?.result?.item_type || 'food';
   const isDrink = itemType === 'drink';
 
@@ -4188,6 +4238,7 @@ async function getRemedy() {
 
 User Profile:
 - Primary Dosha: ${dosha} (Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
+- Age: ${age ? age + ' years' : 'unknown'}
 - Known ailments: ${ailments}
 - City: ${city}
 - Current time: ${time}, Month: ${month}
@@ -4318,10 +4369,12 @@ async function getCuisineAlts() {
   const month = now.toLocaleString('default',{month:'long'});
   const time = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 
+  const age = getUserAge();
   const prompt = `You are an expert Ayurvedic nutritionist. Suggest the best 5 dishes to eat right now.
 
 User Profile:
 - Primary Dosha: ${d.dosha.primary}
+- Age: ${age ? age + ' years' : 'unknown'}
 - Common ailments: ${d.ailments?.join(', ')||'None'}
 - City: ${d.city||'unknown'}
 - Current time: ${time}, Month: ${month}
@@ -4619,6 +4672,20 @@ function saveCity() {
   showToast('City saved: ' + city);
 }
 
+function saveBirthDate() {
+  const month = parseInt(el('settings-birth-month')?.value || '0', 10);
+  const year  = parseInt(el('settings-birth-year')?.value  || '0', 10);
+  if(!month || !year || year < 1930 || year > 2010) {
+    showToast('Please enter a valid birth month and year');
+    return;
+  }
+  const d = loadData();
+  d.birth_month = month;
+  d.birth_year  = year;
+  saveData(d);
+  showToast('Birth date saved');
+}
+
 function renderErrorLogs() {
   const container = el('settings-error-log');
   if(!container) return;
@@ -4715,9 +4782,11 @@ async function loadDoshaInsights(d) {
       </div>
     </div>`;
 
+  const age = getUserAge();
   const prompt = `You are an expert Ayurvedic nutritionist. Based on this person's dosha, provide concise personalised insights.
 
 Dosha: ${d.dosha.primary} (Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
+Age: ${age ? age + ' years' : 'unknown'}
 Known ailments: ${d.ailments?.join(', ')||'None'}
 
 Respond ONLY in this exact JSON (no markdown):
@@ -5056,6 +5125,7 @@ function renderHerbResults(data, titlePrefix) {
 function buildHerbContext() {
   const d = loadData();
   const now = new Date();
+  const age = getUserAge();
   return {
     dosha: d.dosha?.primary||'Unknown',
     scores: d.dosha?.scores||{},
@@ -5063,6 +5133,7 @@ function buildHerbContext() {
     city: d.city||'unknown city',
     month: now.toLocaleString('default',{month:'long'}),
     time: now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),
+    age: age ? age + ' years' : 'unknown',
     apiKey: d.settings?.openaiApiKey||''
   };
 }
@@ -5100,6 +5171,7 @@ async function getHerbsByDosha() {
 
 User Profile:
 - Primary Dosha: ${ctx.dosha} (Vata ${ctx.scores.Vata||0}%, Pitta ${ctx.scores.Pitta||0}%, Kapha ${ctx.scores.Kapha||0}%)
+- Age: ${ctx.age}
 - Known ailments: ${ctx.ailments}
 - City: ${ctx.city}, Month: ${ctx.month}
 - Time: ${ctx.time}
@@ -5125,6 +5197,7 @@ async function getHerbsByConcern() {
 
 User Profile:
 - Primary Dosha: ${ctx.dosha} (Vata ${ctx.scores.Vata||0}%, Pitta ${ctx.scores.Pitta||0}%, Kapha ${ctx.scores.Kapha||0}%)
+- Age: ${ctx.age}
 - Known ailments: ${ctx.ailments}
 - City: ${ctx.city}, Month: ${ctx.month}
 - Target concerns: ${herbState.selectedConcerns.join(', ')}
@@ -5147,6 +5220,7 @@ async function getSeasonalHerbs() {
 
 User Profile:
 - Primary Dosha: ${ctx.dosha}
+- Age: ${ctx.age}
 - Known ailments: ${ctx.ailments}
 - City: ${ctx.city}, Current Month: ${ctx.month}
 
@@ -5579,11 +5653,13 @@ async function runSymptomCheck() {
   const now = new Date();
   const month = now.toLocaleString('default',{month:'long'});
   const time = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const age = getUserAge();
 
   const prompt = `You are a senior Ayurvedic physician (Vaidya) with 30 years of clinical experience. Perform a thorough Ayurvedic Nidana (diagnostic) analysis.
 
 Patient Profile:
 - Primary Dosha: ${d.dosha?.primary||'Unknown'} (Vata ${d.dosha?.scores?.Vata||0}%, Pitta ${d.dosha?.scores?.Pitta||0}%, Kapha ${d.dosha?.scores?.Kapha||0}%)
+- Age: ${age ? age + ' years' : 'unknown'}
 - Known ailments: ${d.ailments?.join(', ')||'None'}
 - City: ${d.city||'Unknown'}, Month: ${month}, Time: ${time}
 
@@ -6123,10 +6199,12 @@ async function generateDinacharya(forceRefresh=false) {
   if(dinaFilterState.diets.includes('dash'))          fastingRules.push('User follows DASH diet — low sodium, high potassium, emphasise fruits/vegetables/whole grains');
   if(dinaFilterState.diets.includes('lowcarb'))       fastingRules.push('User follows Low-Carb/High-Protein — reduce grains/sugar, emphasise protein-rich foods');
 
+  const age = getUserAge();
   const prompt = `You are a master Ayurvedic physician. Create a personalised Dinacharya (daily routine) for this person.
 
 Profile:
 - Dosha: ${d.dosha.primary} (V${d.dosha.scores?.Vata||0}% P${d.dosha.scores?.Pitta||0}% K${d.dosha.scores?.Kapha||0}%)
+- Age: ${age ? age + ' years' : 'unknown'}
 - Chronic ailments: ${baseAilments.join(', ')||'None'}
 - Active symptoms today: ${activeSymptoms.join(', ')||'None'}
 - Dietary preferences: ${dietContext}

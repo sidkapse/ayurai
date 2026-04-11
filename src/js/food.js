@@ -92,11 +92,13 @@ async function checkFood() {
   const allAilments = [...new Set([...baseAilments, ...activeAilments])];
   const ailments = allAilments.length ? allAilments.join(', ') : 'None';
   const city = d.city||'unknown location';
+  const age = getUserAge();
 
   const prompt = `You are an expert Ayurvedic nutritionist. The user wants to know if a food or drink is suitable for a specific meal time.
 
 User Profile:
 - Primary Dosha: ${dosha} (Scores: Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
+- Age: ${age ? age + ' years' : 'unknown'}
 - Ailments (chronic + currently active): ${ailments}
 - City: ${city}
 - Meal context: ${timeContext}
@@ -447,6 +449,7 @@ async function getRemedy() {
   const dosha = d.dosha.primary;
   const ailments = d.ailments?.join(', ')||'None';
   const city = d.city||'unknown location';
+  const age = getUserAge();
   const itemType = loadFoodCache()?.result?.item_type || 'food';
   const isDrink = itemType === 'drink';
 
@@ -454,6 +457,7 @@ async function getRemedy() {
 
 User Profile:
 - Primary Dosha: ${dosha} (Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
+- Age: ${age ? age + ' years' : 'unknown'}
 - Known ailments: ${ailments}
 - City: ${city}
 - Current time: ${time}, Month: ${month}
@@ -584,10 +588,12 @@ async function getCuisineAlts() {
   const month = now.toLocaleString('default',{month:'long'});
   const time = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 
+  const age = getUserAge();
   const prompt = `You are an expert Ayurvedic nutritionist. Suggest the best 5 dishes to eat right now.
 
 User Profile:
 - Primary Dosha: ${d.dosha.primary}
+- Age: ${age ? age + ' years' : 'unknown'}
 - Common ailments: ${d.ailments?.join(', ')||'None'}
 - City: ${d.city||'unknown'}
 - Current time: ${time}, Month: ${month}
@@ -883,6 +889,20 @@ function saveCity() {
   // Refresh food hero chips which show city
   initApp();
   showToast('City saved: ' + city);
+}
+
+function saveBirthDate() {
+  const month = parseInt(el('settings-birth-month')?.value || '0', 10);
+  const year  = parseInt(el('settings-birth-year')?.value  || '0', 10);
+  if(!month || !year || year < 1930 || year > 2010) {
+    showToast('Please enter a valid birth month and year');
+    return;
+  }
+  const d = loadData();
+  d.birth_month = month;
+  d.birth_year  = year;
+  saveData(d);
+  showToast('Birth date saved');
 }
 
 function renderErrorLogs() {

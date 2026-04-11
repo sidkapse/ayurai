@@ -89,6 +89,15 @@ function setData(path, value) {
   saveData(d);
 }
 
+function getUserAge() {
+  const d = loadData();
+  if(!d.birth_year) return null;
+  const now = new Date();
+  let age = now.getFullYear() - d.birth_year;
+  if(d.birth_month && (now.getMonth() + 1) < d.birth_month) age--;
+  return age;
+}
+
 // ── SCREENS ──
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -157,6 +166,8 @@ function initApp() {
   el('settings-name').textContent = d.user.name;
   el('settings-email').textContent = d.user.email;
   el('settings-city').value = d.city || '';
+  if(el('settings-birth-month')) el('settings-birth-month').value = d.birth_month || '';
+  if(el('settings-birth-year'))  el('settings-birth-year').value  = d.birth_year  || '';
   el('settings-apikey').value = d.settings?.openaiApiKey || '';
   // Dosha badge + card
   if(d.dosha) {
