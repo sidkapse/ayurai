@@ -3875,7 +3875,7 @@ async function checkFood() {
   const city = d.city||'unknown location';
   const age = getUserAge();
 
-  const prompt = `You are an expert Ayurvedic nutritionist. The user wants to know if a food is suitable for a specific meal time.
+  const prompt = `You are an expert Ayurvedic nutritionist. The user wants to know if a food or drink is suitable for a specific meal time.
 
 User Profile:
 - Primary Dosha: ${dosha} (Scores: Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
@@ -3885,43 +3885,48 @@ User Profile:
 - Meal context: ${timeContext}
 - Month: ${month} (infer the likely season and weather for this city and month)
 
-Food to analyse: "${food}"
+Item to analyse: "${food}"
 
-If verdict is YES, analyse the food for nutritional gaps (missing protein, fibre, healthy fat, vitamins etc.) and suggest what to ADD to make it a complete, balanced meal. Also provide top 3 do's and top 3 don'ts specific to eating this food.
+First, classify the item:
+- "item_type": "food", "drink", or "snack"
+- "food_category": the specific category e.g. "Herbal Drink", "Grain", "Vegetable", "Dairy", "Fruit", "Snack", "Beverage", "Legume" etc.
 
-If verdict is NO, suggest 5 better alternative dishes AND provide the best time window(s) in the day when this specific food WOULD be suitable for this user's dosha and ailments (give 1-3 time ranges like "7:00 AM – 8:00 AM" or "12:00 PM – 1:00 PM").
+If verdict is YES, analyse the item for nutritional gaps and suggest what to ADD to make it complete. Also provide top 3 do's and top 3 don'ts specific to consuming this item. For do/don't tips: use "sip"/"drink"/"consume" for drinks, "chew"/"eat" for solid foods.
+
+If verdict is NO, suggest exactly 4 alternatives that are of the SAME category as the input item (e.g. if the input is a herbal drink, all 4 alternatives must be drinks or herbal beverages — NOT solid foods). Also provide the best time window(s) in the day when this specific item WOULD be suitable (give 1-3 time ranges like "7:00 AM – 8:00 AM" or "12:00 PM – 1:00 PM").
 
 Respond ONLY in this exact JSON format (no markdown, no extra text):
 {
   "verdict": "YES" or "NO",
+  "item_type": "food" or "drink" or "snack",
+  "food_category": "e.g. Herbal Drink",
   "reason": "One sentence explaining why (mention dosha, time of day, and seasonal factor)",
   "meal_boosters": [
     {
       "nutrient": "Nutrient type e.g. Protein / Fibre / Healthy Fat",
-      "item": "Specific food item to add e.g. A handful of roasted chickpeas",
+      "item": "Specific item to add e.g. A handful of roasted chickpeas",
       "quantity": "Exact bowl/spoon/cup size e.g. 1 small bowl (100g)",
       "why": "One short reason why this addition helps"
     }
   ],
   "dos": [
-    {"action": "Short do tip e.g. Chew slowly and mindfully", "reason": "Why"},
+    {"action": "Short do tip — use sip/consume for drinks, chew/eat for solids", "reason": "Why"},
     {"action": "Short do tip", "reason": "Why"},
     {"action": "Short do tip", "reason": "Why"}
   ],
   "donts": [
-    {"action": "Short don't tip e.g. Do not sleep immediately after", "reason": "Why"},
+    {"action": "Short don't tip — use sip/consume for drinks, chew/eat for solids", "reason": "Why"},
     {"action": "Short don't tip", "reason": "Why"},
     {"action": "Short don't tip", "reason": "Why"}
   ],
   "alternatives": [
-    {"dish": "Dish name", "why": "Short reason why it is safe"},
-    {"dish": "Dish name", "why": "Short reason why it is safe"},
-    {"dish": "Dish name", "why": "Short reason why it is safe"},
-    {"dish": "Dish name", "why": "Short reason why it is safe"},
-    {"dish": "Dish name", "why": "Short reason why it is safe"}
+    {"dish": "Item name (same category as input)", "why": "Short reason why it is safe"},
+    {"dish": "Item name (same category as input)", "why": "Short reason why it is safe"},
+    {"dish": "Item name (same category as input)", "why": "Short reason why it is safe"},
+    {"dish": "Item name (same category as input)", "why": "Short reason why it is safe"}
   ],
   "better_times": [
-    {"range": "e.g. 7:00 AM – 8:00 AM", "reason": "Why this time is better for this food and dosha"}
+    {"range": "e.g. 7:00 AM – 8:00 AM", "reason": "Why this time is better for this item and dosha"}
   ]
 }
 
@@ -4111,7 +4116,7 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
       }
       dosdontsHTML = `
         <div class="alt-table-card">
-          <h4><span class="mi" style="font-size:20px;vertical-align:-4px;margin-right:6px;color:var(--burgundy);">checklist</span>Do's &amp; Don'ts After Eating</h4>
+          <h4><span class="mi" style="font-size:20px;vertical-align:-4px;margin-right:6px;color:var(--burgundy);">checklist</span>Do's &amp; Don'ts After Consuming</h4>
           <p class="alt-table-sub">Follow these for best digestion and dosha balance.</p>
           <table class="alt-table dosdonts-table">
             <thead>
@@ -4140,7 +4145,7 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
         </div>`).join('');
       noHTML += `
         <div class="better-time-card">
-          <h4><span class="mi" style="font-size:20px;">wb_twilight</span> Better Times to Eat This</h4>
+          <h4><span class="mi" style="font-size:20px;">wb_twilight</span> Better Times to Consume This</h4>
           <p>This food suits your dosha better at these times. Plan your meal then for the best results.</p>
           <div class="better-time-slots">${slotsHTML}</div>
         </div>`;
@@ -4226,8 +4231,10 @@ async function getRemedy() {
   const ailments = d.ailments?.join(', ')||'None';
   const city = d.city||'unknown location';
   const age = getUserAge();
+  const itemType = loadFoodCache()?.result?.item_type || 'food';
+  const isDrink = itemType === 'drink';
 
-  const prompt = `You are a senior Ayurvedic physician and nutritionist. The user has already prepared and must eat a food that is not ideal for their dosha and health right now. Your job is to advise them practically on how to minimise the negative impact.
+  const prompt = `You are a senior Ayurvedic physician and nutritionist. The user has already ${isDrink ? 'prepared and must drink a beverage' : 'prepared and must eat a food'} that is not ideal for their dosha and health right now. Your job is to advise them practically on how to minimise the negative impact.
 
 User Profile:
 - Primary Dosha: ${dosha} (Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
@@ -4236,9 +4243,11 @@ User Profile:
 - City: ${city}
 - Current time: ${time}, Month: ${month}
 
-Food they must eat: "${food}"
+${isDrink ? 'Drink' : 'Food'} they must ${isDrink ? 'consume' : 'eat'}: "${food}"
 
-Provide practical Ayurvedic remedies — things to ADD to the food, consume alongside, drink before/after, or spices to mix in — that will neutralise or reduce the negative effects. Be specific and practical.
+${isDrink
+  ? 'Provide practical Ayurvedic remedies that are feasible for a drink — ingredients that can be stirred or mixed directly into it, consumed as a small separate sip, or taken immediately before/after. Do NOT suggest solid food preparations or cooking-style modifications.'
+  : 'Provide practical Ayurvedic remedies — things to ADD to the food, consume alongside, drink before/after, or spices to mix in — that will neutralise or reduce the negative effects. Be specific and practical.'}
 
 Respond ONLY in this exact JSON (no markdown, no extra text):
 {
@@ -4249,7 +4258,7 @@ Respond ONLY in this exact JSON (no markdown, no extra text):
       "icon": "<single emoji>",
       "name": "Remedy name (ingredient or drink)",
       "how": "Exactly how to use it — quantity, preparation, what to mix or add",
-      "timing": "before eating / mix into food / eat alongside / drink after"
+      "timing": "${isDrink ? 'before consuming / stir into drink / consume alongside / drink after' : 'before eating / mix into food / eat alongside / drink after'}"
     }
   ],
   "ayurvedic_note": "One short sentence of ancient Ayurvedic wisdom relevant to this situation"
