@@ -934,7 +934,7 @@ function sendErrorLogs() {
 I am reporting errors from AyurAI app for investigation.
 
 User: ${username}
-App Version: 2.1.0
+App Version: ${APP_VERSION}
 Date: ${new Date().toLocaleString()}
 Error Count: ${logs.length}
 

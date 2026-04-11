@@ -41,8 +41,9 @@ const newVersion = `${major}.${minor + 1}`;
 
 // ── 2. Build replacement pairs ────────────────────────────────────────────
 const replacements = [
-  { pattern: `AyurAI v${oldVersion}`,    replacement: `AyurAI v${newVersion}`    },
-  { pattern: `app_version: '${oldVersion}'`, replacement: `app_version: '${newVersion}'` },
+  { pattern: `AyurAI v${oldVersion}`,          replacement: `AyurAI v${newVersion}`          },
+  { pattern: `app_version: '${oldVersion}'`,   replacement: `app_version: '${newVersion}'`   },
+  { pattern: `APP_VERSION = '${oldVersion}'`,  replacement: `APP_VERSION = '${newVersion}'`  },
 ];
 
 // ── 3. Update all version-bearing files ──────────────────────────────────

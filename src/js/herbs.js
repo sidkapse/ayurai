@@ -20,6 +20,7 @@ function saveApiKey() {
 
 // ── DOSHA INSIGHTS (Home Card) ──
 async function loadDoshaInsights(d) {
+  if(!d) d = loadData();
   const container = el('home-dosha-insights');
   if(!container) return;
 
