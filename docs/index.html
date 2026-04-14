@@ -4257,7 +4257,7 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
       noHTML += `
         <div class="alt-table-card">
           <h4><span class="mio" style="font-size:20px;vertical-align:-4px;margin-right:6px;color:var(--burgundy);">swap_horiz</span>Better Alternatives for You</h4>
-          <p class="alt-table-sub">Similar dishes that are safe to consume right now based on your dosha, ailments and weather.</p>
+          <p class="alt-table-sub">Similar dishes that are safe to consume ${isPlanned ? 'at that time' : 'right now'} based on your dosha, ailments and weather.</p>
           <table class="alt-table">
             <thead><tr><th>Dish</th><th>Why It's Good</th></tr></thead>
             <tbody>
