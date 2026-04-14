@@ -6695,6 +6695,94 @@ function renderAskStarters(d) {
       ${prompts.map(p => `<div class="ask-starter-card" onclick="sendAskMessage(${JSON.stringify(p)});document.getElementById('ask-starters')?.remove();">${p}</div>`).join('')}
     </div>`;
 }
+
+function buildAskSystemPrompt(d) {
+  const name = d.user?.name || 'the user';
+  const age = getUserAge();
+  const city = d.city || null;
+  const dosha = d.dosha;
+  const ailments = (d.ailments?.length) ? d.ailments.join(', ') : 'none listed';
+  const foods = (d.doshaInsights?.foods_to_avoid?.length)
+    ? d.doshaInsights.foods_to_avoid.join(', ')
+    : 'not yet generated';
+  return `You are an Ayurvedic wellness assistant for ${name}${age ? `, age ${age}` : ''}${city ? `, based in ${city}` : ''}.
+
+Their dosha profile: ${dosha.primary} dominant (Vata ${dosha.scores?.Vata||0}%, Pitta ${dosha.scores?.Pitta||0}%, Kapha ${dosha.scores?.Kapha||0}%).
+Current ailments: ${ailments}.
+Foods they should avoid: ${foods}.
+
+Answer ONLY Ayurvedic wellness questions — diet, dosha, herbs, lifestyle, and seasonal routines.
+If asked anything outside this scope, respond with a brief, warm decline and suggest 2 relevant Ayurvedic questions the user might actually want to ask. Format the suggestions as a JSON block at the end of your response in this exact format:
+{"suggestions":["suggestion 1","suggestion 2"]}
+
+Keep answers warm, practical, and concise. Reference their specific dosha and profile where relevant.`;
+}
+
+function askAddMessage(role, text, suggestions) {
+  const chat = el('ask-chat');
+  const bubble = document.createElement('div');
+  bubble.className = 'ask-bubble ' + (role === 'user' ? 'user' : 'ai');
+  bubble.textContent = text;
+  chat.appendChild(bubble);
+  if (suggestions && suggestions.length) {
+    const sugDiv = document.createElement('div');
+    sugDiv.className = 'ask-suggestions';
+    sugDiv.innerHTML = suggestions.map(s =>
+      `<div class="ask-suggestion-card" onclick="sendAskMessage(${JSON.stringify(s)});this.closest('.ask-suggestions').remove();">${s}</div>`
+    ).join('');
+    chat.appendChild(sugDiv);
+  }
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function sendAskMessage(text) {
+  if (!text || askState.loading) return;
+  el('ask-input').value = '';
+  document.getElementById('ask-starters')?.remove();
+
+  askState.chatHistory.push({ role: 'user', content: text });
+  askAddMessage('user', text);
+
+  const chat = el('ask-chat');
+  const loadBubble = document.createElement('div');
+  loadBubble.className = 'ask-bubble ai loading';
+  loadBubble.textContent = '···';
+  chat.appendChild(loadBubble);
+  chat.scrollTop = chat.scrollHeight;
+  askState.loading = true;
+
+  try {
+    const d = loadData();
+    const apiKey = d.settings.openaiApiKey;
+    const systemPrompt = buildAskSystemPrompt(d);
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      ...askState.chatHistory
+    ];
+    const userTurns = askState.chatHistory.filter(m => m.role === 'user').length;
+    const raw = await callOpenAIChat(messages, apiKey, userTurns > 4 ? 1500 : 1000);
+
+    loadBubble.remove();
+
+    let displayText = raw;
+    let suggestions = null;
+    const jsonMatch = raw.match(/\{"suggestions"\s*:\s*\[[\s\S]*?\]\}/);
+    if (jsonMatch) {
+      try {
+        suggestions = JSON.parse(jsonMatch[0]).suggestions;
+        displayText = raw.replace(jsonMatch[0], '').trim();
+      } catch(e) { /* fallback: show full text as-is */ }
+    }
+
+    askState.chatHistory.push({ role: 'assistant', content: displayText });
+    askAddMessage('ai', displayText, suggestions);
+  } catch(e) {
+    loadBubble.remove();
+    logError('askAnything', e);
+    askAddMessage('ai', 'Something went wrong. Please try again.');
+  }
+  askState.loading = false;
+}
 </script>
 </body>
 </html>
