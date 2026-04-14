@@ -300,10 +300,7 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
           <div class="booster-list">
             ${r.meal_boosters.map(b=>`
               <div class="booster-item">
-                <div class="booster-left">
-                  <div class="booster-nutrient">${b.nutrient}</div>
-                  <div class="booster-qty">${b.quantity}</div>
-                </div>
+                <div class="booster-nutrient">${b.nutrient}</div>
                 <div class="booster-right">
                   <div class="booster-item-name">${b.item}</div>
                   <div class="booster-why">${b.why}</div>
@@ -311,6 +308,8 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
               </div>
             `).join('')}
           </div>
+          <div class="booster-personalise-link" id="booster-personalise-link" onclick="togglePersonalisePanel()"><span class="mio">auto_fix_high</span> Personalise these suggestions ›</div>
+          <div class="booster-personalise-panel" id="booster-personalise-panel" style="display:none;"><div class="booster-personalise-label">Any preferences or restrictions?</div><textarea id="booster-personalise-input" class="booster-personalise-textarea" rows="2" placeholder="e.g. no dairy, don\'t have spinach, prefer something light…"></textarea><button class="btn-personalise-boosters" id="btn-personalise-boosters" onclick="refineBoostersWithContext()"><span class="mio">auto_fix_high</span> Get Better Suggestions</button></div>
         </div>`;
     }
 
@@ -402,6 +401,70 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
   }
 
   el('app-content').scrollTop = 0;
+}
+
+function togglePersonalisePanel() {
+  const panel = el('booster-personalise-panel');
+  if (!panel) return;
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+async function refineBoostersWithContext() {
+  const userContext = (el('booster-personalise-input')?.value || '').trim();
+  if (!userContext) { showToast('Please describe your preferences first'); return; }
+  const d = loadData();
+  if (!d.settings?.openaiApiKey) { showToast('Add API key in Settings'); return; }
+  const cache = JSON.parse(localStorage.getItem('ayurai_food_cache') || '{}');
+  if (!cache.result) { showToast('Food analysis not found — run a new check'); return; }
+  const food = cache.food || '';
+  const reason = cache.result.reason || '';
+  const dosha = d.dosha?.primary || 'Vata';
+  const originalBoosters = cache.result?.meal_boosters ? [...cache.result.meal_boosters] : [];
+  const btn = el('btn-personalise-boosters');
+  const link = el('booster-personalise-link');
+  const list = document.querySelector('.booster-list');
+  if (btn) { btn.textContent = 'Generating…'; btn.disabled = true; }
+  if (link) link.style.opacity = '0.4';
+  if (list) list.innerHTML = '<div class="booster-shimmer"></div><div class="booster-shimmer" style="opacity:0.6"></div>';
+  const prompt = `You are an Ayurvedic nutritionist. The user ate "${food}" and got a YES verdict.\nOriginal reason: "${reason}"\nUser dosha: ${dosha}\nUser's personalisation request: "${userContext}"\n\nSuggest updated meal boosters that respect the user's preferences/restrictions.\nRespond ONLY in this JSON format (no markdown):\n{\n  "meal_boosters": [\n    { "nutrient": "e.g. Protein", "item": "Specific item", "why": "One short reason" }\n  ]\n}\nProvide 2-3 boosters.`;
+  try {
+    const resp = await callOpenAI(prompt, d.settings.openaiApiKey);
+    const parsed = JSON.parse(resp.replace(/```json|```/g, '').trim());
+    const boosters = parsed.meal_boosters || [];
+    cache.result.meal_boosters = boosters;
+    localStorage.setItem('ayurai_food_cache', JSON.stringify(cache));
+    if (list) {
+      list.innerHTML = boosters.map(b => `
+        <div class="booster-item">
+          <div class="booster-nutrient">${b.nutrient}</div>
+          <div class="booster-right">
+            <div class="booster-item-name">${b.item}</div>
+            <div class="booster-why">${b.why}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+    if (link) { link.style.opacity = '1'; link.innerHTML = '<span class="mio">auto_fix_high</span> Refine again ›'; }
+    const panel = el('booster-personalise-panel');
+    if (panel) panel.style.display = 'none';
+  } catch(e) {
+    logError('refineBoostersWithContext', e);
+    showToast('Could not refine suggestions. Try again.');
+    if (list) {
+      list.innerHTML = originalBoosters.map(b => `
+        <div class="booster-item">
+          <div class="booster-nutrient">${b.nutrient}</div>
+          <div class="booster-right">
+            <div class="booster-item-name">${b.item}</div>
+            <div class="booster-why">${b.why}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  } finally {
+    if (btn) { btn.innerHTML = '<span class="mio">auto_fix_high</span> Get Better Suggestions'; btn.disabled = false; }
+    if (link) link.style.opacity = '1';
+  }
 }
 
 async function getRemedy() {

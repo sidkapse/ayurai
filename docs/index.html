@@ -1050,13 +1050,12 @@ body::before{
 /* ── MEAL BOOSTER CARDS (replaces cluttered table) ── */
 .booster-list{display:flex;flex-direction:column;gap:10px;margin-top:2px;}
 .booster-item{
-  display:flex;gap:12px;
+  display:flex;gap:12px;align-items:center;
   background:var(--cream);
   border-radius:var(--radius-sm);
   padding:13px 14px;
   border-left:3px solid var(--gold);
 }
-.booster-left{flex-shrink:0;text-align:center;}
 .booster-nutrient{
   display:inline-block;
   padding:3px 9px;
@@ -1067,11 +1066,7 @@ body::before{
   letter-spacing:0.5px;
   text-transform:uppercase;
   white-space:nowrap;
-  margin-bottom:4px;
-}
-.booster-qty{
-  font-size:10px;color:var(--text-light);
-  font-weight:500;white-space:nowrap;
+  flex-shrink:0;
 }
 .booster-right{flex:1;min-width:0;}
 .booster-item-name{
@@ -1082,6 +1077,78 @@ body::before{
 .booster-why{
   font-size:12px;color:var(--text-muted);
   line-height:1.5;
+}
+/* ── BOOSTER PERSONALISE ── */
+.booster-personalise-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--burgundy);
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 12px;
+  cursor: pointer;
+  opacity: 0.8;
+}
+.booster-personalise-link:active { opacity: 0.5; }
+.booster-personalise-panel {
+  margin-top: 10px;
+  background: var(--cream);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  border: 1px solid var(--cream-dark);
+}
+.booster-personalise-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.booster-personalise-textarea {
+  width: 100%;
+  border: 1.5px solid var(--cream-dark);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--charcoal);
+  background: white;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+.booster-personalise-textarea:focus { border-color: var(--lotus); }
+.btn-personalise-boosters {
+  width: 100%;
+  background: var(--burgundy);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 11px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.btn-personalise-boosters:disabled { opacity: 0.6; cursor: not-allowed; }
+.booster-shimmer {
+  background: linear-gradient(90deg, var(--cream-dark) 25%, var(--cream) 50%, var(--cream-dark) 75%);
+  background-size: 200% 100%;
+  animation: boosterShimmer 1.2s infinite;
+  border-radius: 8px;
+  height: 52px;
+  margin-bottom: 8px;
+}
+@keyframes boosterShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* ── DINACHARYA (DAILY ROUTINE) ── */
@@ -2902,7 +2969,7 @@ body::before{
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.20 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.26 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -2964,7 +3031,7 @@ body::before{
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.20'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.26'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -4184,10 +4251,7 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
           <div class="booster-list">
             ${r.meal_boosters.map(b=>`
               <div class="booster-item">
-                <div class="booster-left">
-                  <div class="booster-nutrient">${b.nutrient}</div>
-                  <div class="booster-qty">${b.quantity}</div>
-                </div>
+                <div class="booster-nutrient">${b.nutrient}</div>
                 <div class="booster-right">
                   <div class="booster-item-name">${b.item}</div>
                   <div class="booster-why">${b.why}</div>
@@ -4195,6 +4259,8 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
               </div>
             `).join('')}
           </div>
+          <div class="booster-personalise-link" id="booster-personalise-link" onclick="togglePersonalisePanel()"><span class="mio">auto_fix_high</span> Personalise these suggestions ›</div>
+          <div class="booster-personalise-panel" id="booster-personalise-panel" style="display:none;"><div class="booster-personalise-label">Any preferences or restrictions?</div><textarea id="booster-personalise-input" class="booster-personalise-textarea" rows="2" placeholder="e.g. no dairy, don\'t have spinach, prefer something light…"></textarea><button class="btn-personalise-boosters" id="btn-personalise-boosters" onclick="refineBoostersWithContext()"><span class="mio">auto_fix_high</span> Get Better Suggestions</button></div>
         </div>`;
     }
 
@@ -4286,6 +4352,70 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
   }
 
   el('app-content').scrollTop = 0;
+}
+
+function togglePersonalisePanel() {
+  const panel = el('booster-personalise-panel');
+  if (!panel) return;
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+async function refineBoostersWithContext() {
+  const userContext = (el('booster-personalise-input')?.value || '').trim();
+  if (!userContext) { showToast('Please describe your preferences first'); return; }
+  const d = loadData();
+  if (!d.settings?.openaiApiKey) { showToast('Add API key in Settings'); return; }
+  const cache = JSON.parse(localStorage.getItem('ayurai_food_cache') || '{}');
+  if (!cache.result) { showToast('Food analysis not found — run a new check'); return; }
+  const food = cache.food || '';
+  const reason = cache.result.reason || '';
+  const dosha = d.dosha?.primary || 'Vata';
+  const originalBoosters = cache.result?.meal_boosters ? [...cache.result.meal_boosters] : [];
+  const btn = el('btn-personalise-boosters');
+  const link = el('booster-personalise-link');
+  const list = document.querySelector('.booster-list');
+  if (btn) { btn.textContent = 'Generating…'; btn.disabled = true; }
+  if (link) link.style.opacity = '0.4';
+  if (list) list.innerHTML = '<div class="booster-shimmer"></div><div class="booster-shimmer" style="opacity:0.6"></div>';
+  const prompt =`You are an Ayurvedic nutritionist. The user ate "${food}" and got a YES verdict.\nOriginal reason: "${reason}"\nUser dosha: ${dosha}\nUser's personalisation request: "${userContext}"\n\nSuggest updated meal boosters that respect the user's preferences/restrictions.\nRespond ONLY in this JSON format (no markdown):\n{\n  "meal_boosters": [\n    { "nutrient": "e.g. Protein", "item": "Specific item", "why": "One short reason" }\n  ]\n}\nProvide 2-3 boosters.`;
+  try {
+    const resp = await callOpenAI(prompt, d.settings.openaiApiKey);
+    const parsed = JSON.parse(resp.replace(/```json|```/g, '').trim());
+    const boosters = parsed.meal_boosters || [];
+    cache.result.meal_boosters = boosters;
+    localStorage.setItem('ayurai_food_cache', JSON.stringify(cache));
+    if (list) {
+      list.innerHTML = boosters.map(b => `
+        <div class="booster-item">
+          <div class="booster-nutrient">${b.nutrient}</div>
+          <div class="booster-right">
+            <div class="booster-item-name">${b.item}</div>
+            <div class="booster-why">${b.why}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+    if (link) { link.style.opacity = '1'; link.innerHTML = '<span class="mio">auto_fix_high</span> Refine again ›'; }
+    const panel = el('booster-personalise-panel');
+    if (panel) panel.style.display = 'none';
+  } catch(e) {
+    logError('refineBoostersWithContext', e);
+    showToast('Could not refine suggestions. Try again.');
+    if (list) {
+      list.innerHTML = originalBoosters.map(b => `
+        <div class="booster-item">
+          <div class="booster-nutrient">${b.nutrient}</div>
+          <div class="booster-right">
+            <div class="booster-item-name">${b.item}</div>
+            <div class="booster-why">${b.why}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+  } finally {
+    if (btn) { btn.innerHTML = '<span class="mio">auto_fix_high</span> Get Better Suggestions'; btn.disabled = false; }
+    if (link) link.style.opacity = '1';
+  }
 }
 
 async function getRemedy() {
@@ -5000,7 +5130,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.20',
+      app_version: '1.26',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
