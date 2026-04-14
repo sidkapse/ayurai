@@ -2855,6 +2855,21 @@ body::before{
 
 </div><!-- end screen-app -->
 
+    <!-- ── Ask Anything Overlay ── -->
+    <div id="ask-overlay" class="ask-overlay" style="display:none;">
+      <div class="ask-header">
+        <button class="ask-close-btn" onclick="closeAskAnything()"><span class="mi">close</span></button>
+        <div class="ask-header-title">Ask Anything</div>
+        <div style="width:36px;"></div>
+      </div>
+      <div class="ask-dosha-chip" id="ask-dosha-chip"></div>
+      <div class="ask-chat" id="ask-chat"></div>
+      <div class="ask-input-bar">
+        <input type="text" id="ask-input" class="ask-input" placeholder="Type your question..."
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();var t=el('ask-input').value.trim();if(t)sendAskMessage(t);}"/>
+        <button class="ask-send-btn" onclick="var t=el('ask-input').value.trim();if(t)sendAskMessage(t);"><span class="mi">send</span></button>
+      </div>
+    </div>
 <div class="toast" id="toast"></div>
 
 <!-- ═══════════════════════════════════════════ -->
