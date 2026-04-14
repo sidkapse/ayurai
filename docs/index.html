@@ -6700,7 +6700,7 @@ function buildAskSystemPrompt(d) {
   const name = d.user?.name || 'the user';
   const age = getUserAge();
   const city = d.city || null;
-  const dosha = d.dosha;
+  const dosha = d.dosha || { primary: 'unknown', scores: {} };
   const ailments = (d.ailments?.length) ? d.ailments.join(', ') : 'none listed';
   const foods = (d.doshaInsights?.foods_to_avoid?.length)
     ? d.doshaInsights.foods_to_avoid.join(', ')
@@ -6753,7 +6753,8 @@ async function sendAskMessage(text) {
 
   try {
     const d = loadData();
-    const apiKey = d.settings.openaiApiKey;
+    const apiKey = d.settings?.openaiApiKey;
+    if (!apiKey) { askAddMessage('ai', 'Please add your API key in Settings.'); askState.loading = false; return; }
     const systemPrompt = buildAskSystemPrompt(d);
     const messages = [
       { role: 'system', content: systemPrompt },
