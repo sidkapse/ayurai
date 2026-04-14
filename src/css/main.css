@@ -1031,13 +1031,12 @@ body::before{
 /* ── MEAL BOOSTER CARDS (replaces cluttered table) ── */
 .booster-list{display:flex;flex-direction:column;gap:10px;margin-top:2px;}
 .booster-item{
-  display:flex;gap:12px;
+  display:flex;gap:12px;align-items:center;
   background:var(--cream);
   border-radius:var(--radius-sm);
   padding:13px 14px;
   border-left:3px solid var(--gold);
 }
-.booster-left{flex-shrink:0;text-align:center;}
 .booster-nutrient{
   display:inline-block;
   padding:3px 9px;
@@ -1048,11 +1047,7 @@ body::before{
   letter-spacing:0.5px;
   text-transform:uppercase;
   white-space:nowrap;
-  margin-bottom:4px;
-}
-.booster-qty{
-  font-size:10px;color:var(--text-light);
-  font-weight:500;white-space:nowrap;
+  flex-shrink:0;
 }
 .booster-right{flex:1;min-width:0;}
 .booster-item-name{
@@ -1063,6 +1058,46 @@ body::before{
 .booster-why{
   font-size:12px;color:var(--text-muted);
   line-height:1.5;
+}
+
+/* ── BOOSTER PERSONALISE ── */
+.booster-personalise-link{
+  display:flex;align-items:center;gap:5px;
+  color:var(--burgundy);font-size:13px;font-weight:600;
+  margin-top:12px;cursor:pointer;opacity:0.8;
+}
+.booster-personalise-link:active{opacity:0.5;}
+.booster-personalise-panel{
+  margin-top:10px;background:var(--cream);
+  border-radius:var(--radius-sm);padding:12px;
+  border:1px solid var(--cream-dark);
+}
+.booster-personalise-label{
+  font-size:10px;font-weight:700;color:var(--text-muted);
+  letter-spacing:0.4px;text-transform:uppercase;margin-bottom:6px;
+}
+.booster-personalise-textarea{
+  width:100%;border:1.5px solid var(--cream-dark);
+  border-radius:8px;padding:8px 10px;font-size:13px;
+  color:var(--charcoal);background:white;resize:none;
+  outline:none;font-family:inherit;box-sizing:border-box;line-height:1.5;
+}
+.booster-personalise-textarea:focus{border-color:var(--lotus);}
+.btn-personalise-boosters{
+  width:100%;background:var(--burgundy);color:white;
+  border:none;border-radius:var(--radius-sm);padding:11px;
+  font-size:13px;font-weight:700;margin-top:8px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-personalise-boosters:disabled{opacity:0.6;cursor:not-allowed;}
+.booster-shimmer{
+  background:linear-gradient(90deg,var(--cream-dark) 25%,var(--cream) 50%,var(--cream-dark) 75%);
+  background-size:200% 100%;animation:boosterShimmer 1.2s infinite;
+  border-radius:8px;height:52px;margin-bottom:8px;
+}
+@keyframes boosterShimmer{
+  0%{background-position:200% 0;}
+  100%{background-position:-200% 0;}
 }
 
 /* ── DINACHARYA (DAILY ROUTINE) ── */

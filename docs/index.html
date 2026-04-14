@@ -4366,17 +4366,18 @@ async function refineBoostersWithContext() {
   const d = loadData();
   if (!d.settings?.openaiApiKey) { showToast('Add API key in Settings'); return; }
   const cache = JSON.parse(localStorage.getItem('ayurai_food_cache') || '{}');
-  if (!cache.result) return;
+  if (!cache.result) { showToast('Food analysis not found — run a new check'); return; }
   const food = cache.food || '';
   const reason = cache.result.reason || '';
   const dosha = d.dosha?.primary || 'Vata';
+  const originalBoosters = cache.result?.meal_boosters ? [...cache.result.meal_boosters] : [];
   const btn = el('btn-personalise-boosters');
   const link = el('booster-personalise-link');
   const list = document.querySelector('.booster-list');
   if (btn) { btn.textContent = 'Generating…'; btn.disabled = true; }
   if (link) link.style.opacity = '0.4';
   if (list) list.innerHTML = '<div class="booster-shimmer"></div><div class="booster-shimmer" style="opacity:0.6"></div>';
-  const prompt = `You are an Ayurvedic nutritionist. The user ate "${food}" and got a YES verdict.\nOriginal reason: "${reason}"\nUser dosha: ${dosha}\nUser's personalisation request: "${userContext}"\n\nSuggest updated meal boosters that respect the user's preferences/restrictions.\nRespond ONLY in this JSON format (no markdown):\n{\n  "meal_boosters": [\n    { "nutrient": "e.g. Protein", "item": "Specific item", "why": "One short reason" }\n  ]\n}\nProvide 2-3 boosters.`;
+  const prompt =`You are an Ayurvedic nutritionist. The user ate "${food}" and got a YES verdict.\nOriginal reason: "${reason}"\nUser dosha: ${dosha}\nUser's personalisation request: "${userContext}"\n\nSuggest updated meal boosters that respect the user's preferences/restrictions.\nRespond ONLY in this JSON format (no markdown):\n{\n  "meal_boosters": [\n    { "nutrient": "e.g. Protein", "item": "Specific item", "why": "One short reason" }\n  ]\n}\nProvide 2-3 boosters.`;
   try {
     const resp = await callOpenAI(prompt, d.settings.openaiApiKey);
     const parsed = JSON.parse(resp.replace(/```json|```/g, '').trim());
@@ -4400,9 +4401,8 @@ async function refineBoostersWithContext() {
   } catch(e) {
     logError('refineBoostersWithContext', e);
     showToast('Could not refine suggestions. Try again.');
-    const origBoosters = cache.result?.meal_boosters || [];
     if (list) {
-      list.innerHTML = origBoosters.map(b => `
+      list.innerHTML = originalBoosters.map(b => `
         <div class="booster-item">
           <div class="booster-nutrient">${b.nutrient}</div>
           <div class="booster-right">
