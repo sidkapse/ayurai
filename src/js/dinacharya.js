@@ -201,6 +201,7 @@ function resetSymptomChecker() {
 // ══════════════════════════════════════════
 
 let dinaCache = null; // in-memory mirror of localStorage cache
+let _dinaTicker = null; // interval id for live "Right Now" updates
 
 const DINA_CACHE_KEY = 'ayurai_dina_cache';
 
@@ -232,6 +233,38 @@ function clearDinaCache() {
   dinaCache = null;
 }
 
+function stopDinaTicker() {
+  if (_dinaTicker) { clearInterval(_dinaTicker); _dinaTicker = null; }
+}
+
+function startDinaTicker() {
+  stopDinaTicker();
+  _dinaTicker = setInterval(() => {
+    if (!dinaCache || !dinaCache.targetDateStr) return;
+    // Recompute offset in case midnight has passed (Tomorrow → Today)
+    dinaFilterState.dayOffset = computeOffsetFromDate(dinaCache.targetDateStr);
+    renderDinacharya(
+      dinaCache.data,
+      new Date(dinaCache.targetDateStr),
+      dinaCache.wakeDisplay,
+      dinaCache.sleepDisplay,
+      dinaCache.generatedAt
+    );
+  }, 60000);
+}
+
+// Returns how many days from today the given ISO date string is (clamped 0–2).
+// Used to keep dayOffset in sync with the real calendar after midnight.
+function computeOffsetFromDate(dateStr) {
+  if (!dateStr) return 1;
+  const target = new Date(dateStr);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  target.setHours(0,0,0,0);
+  const diff = Math.round((target - today) / 86400000);
+  return Math.max(0, Math.min(2, diff));
+}
+
 function initDinacharya() {
   const d = loadData();
   const wrap = el('dina-wrap');
@@ -256,6 +289,7 @@ function initDinacharya() {
     const today = new Date(); today.setHours(0,0,0,0);
     cachedDate.setHours(0,0,0,0);
     if(cachedDate >= today) {
+      dinaFilterState.dayOffset = computeOffsetFromDate(dinaCache.targetDateStr);
       renderDinacharya(dinaCache.data,
         new Date(dinaCache.targetDateStr),
         dinaCache.wakeDisplay,
@@ -263,6 +297,7 @@ function initDinacharya() {
         dinaCache.generatedAt
       );
       el('dina-refresh-btn').style.display = 'flex';
+      startDinaTicker();
       return;
     }
   }
@@ -271,6 +306,7 @@ function initDinacharya() {
   const stored = loadDinaCache();
   if(stored) {
     dinaCache = stored; // restore in-memory mirror
+    dinaFilterState.dayOffset = computeOffsetFromDate(stored.targetDateStr);
     renderDinacharya(stored.data,
       new Date(stored.targetDateStr),
       stored.wakeDisplay,
@@ -278,6 +314,7 @@ function initDinacharya() {
       stored.generatedAt
     );
     el('dina-refresh-btn').style.display = 'flex';
+    startDinaTicker();
     return;
   }
 
@@ -307,17 +344,29 @@ const DINA_DIET_PREFS = [
 function getDinaPrefs() {
   try {
     const p = JSON.parse(localStorage.getItem('ayurai_dina_prefs')||'{}');
+    let dayOffset;
+    if (p.targetDateStr) {
+      dayOffset = computeOffsetFromDate(p.targetDateStr);
+    } else if (p.dayOffset !== undefined) {
+      dayOffset = p.dayOffset; // legacy fallback
+    } else {
+      dayOffset = 1; // default tomorrow
+    }
     return {
-      wake:     p.wake     || DINA_DEFAULT_WAKE,
-      sleep:    p.sleep    || DINA_DEFAULT_SLEEP,
-      dayOffset:(p.dayOffset !== undefined) ? p.dayOffset : 1,
-      diets:    p.diets    || []
+      wake:  p.wake  || DINA_DEFAULT_WAKE,
+      sleep: p.sleep || DINA_DEFAULT_SLEEP,
+      dayOffset,
+      diets: p.diets || []
     };
   } catch { return { wake:DINA_DEFAULT_WAKE, sleep:DINA_DEFAULT_SLEEP, dayOffset:1, diets:[] }; }
 }
 
 function saveDinaPrefs(wake, sleep, dayOffset, diets) {
-  localStorage.setItem('ayurai_dina_prefs', JSON.stringify({wake, sleep, dayOffset, diets}));
+  // Store absolute target date so dayOffset stays correct across midnight
+  const target = new Date();
+  target.setDate(target.getDate() + dayOffset);
+  const targetDateStr = target.toISOString().split('T')[0];
+  localStorage.setItem('ayurai_dina_prefs', JSON.stringify({wake, sleep, targetDateStr, diets}));
 }
 
 let dinaFilterState = {
@@ -636,6 +685,7 @@ Respond ONLY as valid JSON (no markdown, no trailing commas):
     saveDinaCache(cacheObj);
     renderDinacharya(result, targetDate, wakeDisplay, sleepDisplay, cacheObj.generatedAt);
     el('dina-refresh-btn').style.display = 'flex';
+    startDinaTicker();
   } catch(e) {
     el('dina-wrap').innerHTML = `
       <div style="padding:16px;">

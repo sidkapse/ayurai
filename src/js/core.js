@@ -235,6 +235,7 @@ function initApp() {
 // ── TABS ──
 let currentTab = 'home';
 function switchTab(name) {
+  if(name !== 'dina') stopDinaTicker();
   document.querySelectorAll('.tab-panel').forEach(p=>p.style.display='none');
   document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
   el('tab-'+name).style.display='block';
