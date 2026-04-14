@@ -144,7 +144,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.10',
+      app_version: '1.11',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
@@ -154,6 +154,10 @@ function exportJSON() {
   a.href=url; a.download='my_info.json'; a.click();
   URL.revokeObjectURL(url);
   showToast('Exported my_info.json');
+}
+
+function triggerImport() {
+  document.getElementById('import-file-input').click();
 }
 
 function importJSON(evt) {
