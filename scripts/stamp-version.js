@@ -3,7 +3,7 @@
  * AyurAI Version Stamper
  * Runs automatically on every `git push` via the pre-push hook.
  *
- * What it does:
+ * What it do:
  *   1. Reads the current app version from docs/index.html
  *   2. Increments the minor version  (e.g. v1.0 → v1.1)
  *   3. Updates the version string in all 5 locations across src/ and docs/
