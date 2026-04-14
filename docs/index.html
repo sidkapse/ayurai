@@ -4164,7 +4164,7 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
 
         ${!yes ? `
         <button class="rescue-btn" id="rescue-btn" onclick="getRemedy()" style="margin-top:14px;">
-          <span class="mi" style="font-size:16px;">shield</span> Already cooked — how do I reduce the effect?
+          <span class="mi" style="font-size:16px;">shield</span> Going ahead anyway — how to reduce the impact?
         </button>` : ''}
 
       </div>
@@ -4387,7 +4387,7 @@ Provide 3 to 5 remedies. Prioritise items commonly available in a household kitc
     const b = el('rescue-btn');
     if(b) {
       b.disabled = false;
-      b.innerHTML = '<span class="mi" style="font-size:16px;">shield</span> Already cooked — how do I reduce the effect?';
+      b.innerHTML = '<span class="mi" style="font-size:16px;">shield</span> Going ahead anyway — how to reduce the impact?';
     }
   } finally {
     _remedyLoading = false;
