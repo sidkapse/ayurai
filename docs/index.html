@@ -4454,6 +4454,26 @@ async function callOpenAILarge(prompt, apiKey, maxTokens=3500) {
   }
 }
 
+async function callOpenAIChat(messages, apiKey, maxTokens=1000) {
+  try {
+    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+      body:JSON.stringify({ model:'gpt-4o-mini', messages:messages, temperature:0.3, max_tokens:maxTokens })
+    });
+    if(!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+    const data = await resp.json();
+    setApiErrorState(false);
+    return data.choices[0].message.content;
+  } catch(e) {
+    logError('callOpenAIChat', e);
+    throw e;
+  }
+}
+
 // ── API ERROR CLASSIFICATION ──
 const API_ERR_STORAGE_KEY = 'ayurai_api_err';
 
