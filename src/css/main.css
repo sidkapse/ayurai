@@ -2226,6 +2226,7 @@ body::before{
   padding:16px;min-height:56px;flex-shrink:0;
 }
 .ask-header-title{font-size:17px;font-weight:600;}
+.ask-header-sub{font-size:11px;opacity:0.75;margin-top:1px;}
 .ask-close-btn{
   background:none;border:none;color:white;cursor:pointer;
   width:36px;height:36px;display:flex;align-items:center;justify-content:center;

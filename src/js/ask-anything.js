@@ -79,7 +79,7 @@ function renderAskStarters(d) {
   el('ask-chat').innerHTML = `
     <div class="ask-bubble ai">Hi ${name}! Namaste 🙏 I'm your Ayurvedic herb advisor. You are a ${dosha} type. Ask me anything.</div>
     <div class="ask-starters" id="ask-starters">
-      ${prompts.map(p => `<div class="ask-starter-card" onclick="sendAskMessage(${JSON.stringify(p)});document.getElementById('ask-starters')?.remove();">${p}</div>`).join('')}
+      ${prompts.map(p => `<div class="ask-starter-card" onclick="sendAskMessage(this.dataset.p)" data-p="${p.replace(/"/g,'&quot;')}">${p}</div>`).join('')}
     </div>`;
 }
 
@@ -115,7 +115,7 @@ function askAddMessage(role, text, suggestions) {
     const sugDiv = document.createElement('div');
     sugDiv.className = 'ask-suggestions';
     sugDiv.innerHTML = suggestions.map(s =>
-      `<div class="ask-suggestion-card" onclick="sendAskMessage(${JSON.stringify(s)});this.closest('.ask-suggestions').remove();">${s}</div>`
+      `<div class="ask-suggestion-card" onclick="sendAskMessage(this.dataset.p)" data-p="${s.replace(/"/g,'&quot;')}">${s}</div>`
     ).join('');
     chat.appendChild(sugDiv);
   }

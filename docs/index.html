@@ -2218,6 +2218,7 @@ body::before{
   padding:16px;min-height:56px;flex-shrink:0;
 }
 .ask-header-title{font-size:17px;font-weight:600;}
+.ask-header-sub{font-size:11px;opacity:0.75;margin-top:1px;}
 .ask-close-btn{
   background:none;border:none;color:white;cursor:pointer;
   width:36px;height:36px;display:flex;align-items:center;justify-content:center;
@@ -2517,7 +2518,7 @@ body::before{
           </div>
           <div class="quick-card" onclick="openAskAnything()">
             <div class="qc-icon"><span class="mio" style="font-size:30px;color:var(--burgundy);">chat</span></div>
-            <div class="qc-title">Ask Anything</div>
+            <div class="qc-title">Ask AI Vaidya</div>
             <div class="qc-desc">Your personal Ayurvedic advisor</div>
           </div>
         </div>
@@ -2936,11 +2937,14 @@ body::before{
 
 </div><!-- end screen-app -->
 
-    <!-- ── Ask Anything Overlay ── -->
+    <!-- ── Ask AI Vaidya Overlay ── -->
     <div id="ask-overlay" class="ask-overlay" style="display:none;">
       <div class="ask-header">
         <button class="ask-close-btn" onclick="closeAskAnything()"><span class="mi">close</span></button>
-        <div class="ask-header-title">Ask Anything</div>
+        <div style="text-align:center;">
+          <div class="ask-header-title">Ask AI Vaidya</div>
+          <div class="ask-header-sub">Your personal Ayurvedic advisor</div>
+        </div>
         <div style="width:36px;"></div>
       </div>
       <div class="ask-dosha-chip" id="ask-dosha-chip"></div>
@@ -6700,7 +6704,7 @@ function renderAskStarters(d) {
   el('ask-chat').innerHTML = `
     <div class="ask-bubble ai">Hi ${name}! Namaste 🙏 I'm your Ayurvedic herb advisor. You are a ${dosha} type. Ask me anything.</div>
     <div class="ask-starters" id="ask-starters">
-      ${prompts.map(p => `<div class="ask-starter-card" onclick="sendAskMessage(${JSON.stringify(p)});document.getElementById('ask-starters')?.remove();">${p}</div>`).join('')}
+      ${prompts.map(p => `<div class="ask-starter-card" onclick="sendAskMessage(this.dataset.p)" data-p="${p.replace(/"/g,'&quot;')}">${p}</div>`).join('')}
     </div>`;
 }
 
@@ -6736,7 +6740,7 @@ function askAddMessage(role, text, suggestions) {
     const sugDiv = document.createElement('div');
     sugDiv.className = 'ask-suggestions';
     sugDiv.innerHTML = suggestions.map(s =>
-      `<div class="ask-suggestion-card" onclick="sendAskMessage(${JSON.stringify(s)});this.closest('.ask-suggestions').remove();">${s}</div>`
+      `<div class="ask-suggestion-card" onclick="sendAskMessage(this.dataset.p)" data-p="${s.replace(/"/g,'&quot;')}">${s}</div>`
     ).join('');
     chat.appendChild(sugDiv);
   }
