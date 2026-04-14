@@ -2899,7 +2899,7 @@ body::before{
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.11 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.12 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -2958,7 +2958,7 @@ body::before{
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.11'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.12'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -4993,7 +4993,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.11',
+      app_version: '1.12',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
