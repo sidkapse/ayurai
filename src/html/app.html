@@ -251,7 +251,7 @@
           </div>
           <div class="quick-card" onclick="openAskAnything()">
             <div class="qc-icon"><span class="mio" style="font-size:30px;color:var(--burgundy);">chat</span></div>
-            <div class="qc-title">Ask Anything</div>
+            <div class="qc-title">Ask AI Vaidya</div>
             <div class="qc-desc">Your personal Ayurvedic advisor</div>
           </div>
         </div>
@@ -635,7 +635,7 @@
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.14 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.16 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -670,11 +670,14 @@
 
 </div><!-- end screen-app -->
 
-    <!-- ── Ask Anything Overlay ── -->
+    <!-- ── Ask AI Vaidya Overlay ── -->
     <div id="ask-overlay" class="ask-overlay" style="display:none;">
       <div class="ask-header">
         <button class="ask-close-btn" onclick="closeAskAnything()"><span class="mi">close</span></button>
-        <div class="ask-header-title">Ask Anything</div>
+        <div style="text-align:center;">
+          <div class="ask-header-title">Ask AI Vaidya</div>
+          <div class="ask-header-sub">Your personal Ayurvedic advisor</div>
+        </div>
         <div style="width:36px;"></div>
       </div>
       <div class="ask-dosha-chip" id="ask-dosha-chip"></div>
@@ -738,7 +741,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.14',
+    app_version: '1.16',
     error_count: logs.length,
     errors: logs
   };
@@ -2570,7 +2573,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.14',
+      app_version: '1.16',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
