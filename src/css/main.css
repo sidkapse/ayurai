@@ -2288,3 +2288,16 @@ body::before{
   transition:background 0.15s;
 }
 .ask-send-btn:hover{background:var(--lotus);}
+/* ── AUTH IMPORT LINK ── */
+.auth-import{
+  text-align:center;
+  margin-top:14px;
+  font-size:12px;
+  color:var(--text-muted);
+}
+.auth-import a{
+  color:var(--burgundy);
+  cursor:pointer;
+  text-decoration:underline;
+  font-weight:500;
+}

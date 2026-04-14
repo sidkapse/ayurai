@@ -2280,6 +2280,19 @@ body::before{
   transition:background 0.15s;
 }
 .ask-send-btn:hover{background:var(--lotus);}
+/* ── AUTH IMPORT LINK ── */
+.auth-import{
+  text-align:center;
+  margin-top:14px;
+  font-size:12px;
+  color:var(--text-muted);
+}
+.auth-import a{
+  color:var(--burgundy);
+  cursor:pointer;
+  text-decoration:underline;
+  font-weight:500;
+}
 </style>
 </head>
 <body>
@@ -2396,7 +2409,7 @@ body::before{
   <!-- SLIDE 5 – CTA -->
   <div id="onboarding-slide-5" class="onboarding-slide ob-s5">
     <div class="ob-particles" id="ob-particles-5"></div>
-    <button class="ob-skip" onclick="document.getElementById('import-file-input').click()" title="Import your my_info.json backup">
+    <button class="ob-skip" onclick="triggerImport()" title="Import your my_info.json backup">
       <span class="mio" style="font-size:12px;vertical-align:middle;margin-right:3px;">upload_file</span>Import
     </button>
     <div class="ob-hero-content ob-hero-cta">
@@ -2438,6 +2451,7 @@ body::before{
       </div>
       <button class="btn-primary" onclick="doLogin()">Sign In</button>
       <div class="auth-switch">Don't have an account? <a onclick="showScreen('screen-signup')">Create one</a></div>
+      <div class="auth-import"><span class="mio" style="font-size:13px;vertical-align:-2px;">upload_file</span> Have a backup? <a onclick="triggerImport()">Restore from file</a></div>
     </div>
   </div>
   </div>
@@ -2469,6 +2483,7 @@ body::before{
       </div>
       <button class="btn-primary" onclick="doSignup()">Create Account</button>
       <div class="auth-switch">Already have an account? <a onclick="showScreen('screen-login')">Sign in</a></div>
+      <div class="auth-import"><span class="mio" style="font-size:13px;vertical-align:-2px;">upload_file</span> Have a backup? <a onclick="triggerImport()">Restore from file</a></div>
     </div>
   </div>
   </div>
@@ -5001,6 +5016,10 @@ function exportJSON() {
   a.href=url; a.download='my_info.json'; a.click();
   URL.revokeObjectURL(url);
   showToast('Exported my_info.json');
+}
+
+function triggerImport() {
+  document.getElementById('import-file-input').click();
 }
 
 function importJSON(evt) {

@@ -156,6 +156,10 @@ function exportJSON() {
   showToast('Exported my_info.json');
 }
 
+function triggerImport() {
+  document.getElementById('import-file-input').click();
+}
+
 function importJSON(evt) {
   const file = evt.target.files[0];
   if(!file) return;
