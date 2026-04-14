@@ -2870,7 +2870,6 @@ body::before{
                 <span>Import<br><small>my_info.json</small></span>
               </button>
             </div>
-            <input type="file" id="import-file-input" accept=".json" onchange="importJSON(event)" style="display:none;"/>
             <div id="settings-export-meta" style="margin-top:10px;font-size:11px;color:var(--text-light);text-align:center;"></div>
           </div>
         </div>
@@ -2964,6 +2963,7 @@ body::before{
       </div>
     </div>
 <div class="toast" id="toast"></div>
+<input type="file" id="import-file-input" accept=".json" onchange="importJSON(event)" style="display:none;position:absolute;"/>
 
 <!-- ═══════════════════════════════════════════ -->
 <!--  JAVASCRIPT                                 -->
