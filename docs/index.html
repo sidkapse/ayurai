@@ -6631,6 +6631,70 @@ function triggerPWAInstall() {
   initPWA();
   initPullToRefresh();
 })();
+
+/* ══════════════════════════════════════
+   ASK ANYTHING
+══════════════════════════════════════ */
+let askState = { chatHistory: [], loading: false };
+
+function openAskAnything() {
+  const d = loadData();
+  if (!d.settings?.openaiApiKey) { showToast('Add your API key in Settings'); return; }
+  if (!d.dosha) { showToast('Complete your Dosha Quiz first'); return; }
+  askState = { chatHistory: [], loading: false };
+  const overlay = el('ask-overlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('open'));
+  const dosha = d.dosha.primary || '—';
+  const city = d.city || 'Location not set';
+  el('ask-dosha-chip').innerHTML = `<span class="mio" style="font-size:14px;vertical-align:-2px;">spa</span> ${dosha} · ${city}`;
+  renderAskStarters(d);
+}
+
+function closeAskAnything() {
+  const overlay = el('ask-overlay');
+  overlay.classList.remove('open');
+  overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
+  askState = { chatHistory: [], loading: false };
+}
+
+function getAskStarterPrompts(d) {
+  const dosha = d.dosha?.primary || 'Vata';
+  const ailment = d.ailments?.[0] || null;
+  const ailmentQ = ailment ? `What can help with my ${ailment}?` : null;
+  const map = {
+    Vata: [
+      'What foods are good for me to eat?',
+      'How can I reduce stress and anxiety naturally?',
+      'What should my morning routine look like?',
+      ailmentQ || 'Which herbs are good for my body type?'
+    ],
+    Pitta: [
+      'What foods should I avoid?',
+      'How can I cool down my body in summer?',
+      'What helps with digestion for my type?',
+      ailmentQ || 'What should my daily routine look like?'
+    ],
+    Kapha: [
+      'How can I feel more energetic during the day?',
+      'What foods are good for me to eat?',
+      'What should my morning routine look like?',
+      ailmentQ || 'Which herbs help with my body type?'
+    ]
+  };
+  return map[dosha] || map['Vata'];
+}
+
+function renderAskStarters(d) {
+  const name = (d.user?.name || '').split(' ')[0] || 'there';
+  const dosha = d.dosha?.primary || 'your';
+  const prompts = getAskStarterPrompts(d);
+  el('ask-chat').innerHTML = `
+    <div class="ask-bubble ai">Hi ${name}! Namaste 🙏 I'm your Ayurvedic herb advisor. You are a ${dosha} type. Ask me anything.</div>
+    <div class="ask-starters" id="ask-starters">
+      ${prompts.map(p => `<div class="ask-starter-card" onclick="sendAskMessage(${JSON.stringify(p)});document.getElementById('ask-starters')?.remove();">${p}</div>`).join('')}
+    </div>`;
+}
 </script>
 </body>
 </html>
