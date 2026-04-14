@@ -77,7 +77,7 @@ function renderAskStarters(d) {
   const dosha = d.dosha?.primary || 'your';
   const prompts = getAskStarterPrompts(d);
   el('ask-chat').innerHTML = `
-    <div class="ask-bubble ai">Hi ${name}! Namaste 🙏 I'm your Ayurvedic herb advisor. You are a ${dosha} type. Ask me anything.</div>
+    <div class="ask-bubble ai">Hi ${name}! Namaste 🙏 I'm your Ayurvedic Advisor. Ask me anything.</div>
     <div class="ask-starters" id="ask-starters">
       ${prompts.map(p => `<div class="ask-starter-card" onclick="sendAskMessage(this.dataset.p)" data-p="${p.replace(/"/g,'&quot;')}">${p}</div>`).join('')}
     </div>`;
