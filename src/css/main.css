@@ -2213,7 +2213,7 @@ body::before{
 /* ── ASK ANYTHING OVERLAY ── */
 .ask-overlay{
   position:fixed;top:0;left:0;width:100%;height:100%;
-  z-index:200;background:var(--cream);
+  z-index:300;background:var(--cream);
   display:flex;flex-direction:column;
   transform:translateY(100%);
   transition:transform 0.3s ease;
