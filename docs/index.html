@@ -257,6 +257,15 @@ body::before{
   color:var(--text-muted);
 }
 .auth-switch a{color:var(--burgundy);font-weight:600;cursor:pointer;text-decoration:none;}
+.auth-import{
+  text-align:center;
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid var(--cream-dark);
+  font-size:12px;
+  color:var(--text-light);
+}
+.auth-import a{color:var(--text-muted);font-weight:500;cursor:pointer;text-decoration:underline;text-decoration-color:rgba(139,111,94,0.3);}
 .error-msg{
   background:rgba(180,30,30,0.08);
   border:1px solid rgba(180,30,30,0.2);
@@ -2488,7 +2497,7 @@ body::before{
 <!--  AUTH SCREENS                               -->
 <!-- ═══════════════════════════════════════════ -->
 <div id="screen-login" class="screen active">
-  <div id="app-content" style="height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div id="app-content" style="height:100vh;height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
   <div class="auth-wrap">
     <div class="auth-logo">
       <span class="lotus-icon"><span class="mio" style="font-size:56px;color:var(--burgundy);">spa</span></span>
@@ -2516,7 +2525,7 @@ body::before{
 </div>
 
 <div id="screen-signup" class="screen">
-  <div id="app-content-signup" style="height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div id="app-content-signup" style="height:100vh;height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
   <div class="auth-wrap">
     <div class="auth-logo">
       <span class="lotus-icon"><span class="mio" style="font-size:56px;color:var(--burgundy);">spa</span></span>
@@ -2970,7 +2979,7 @@ body::before{
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.30 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.31 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -3032,7 +3041,7 @@ body::before{
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.30'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.31'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -5131,7 +5140,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.30',
+      app_version: '1.31',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };

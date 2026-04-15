@@ -153,7 +153,7 @@
 <!--  AUTH SCREENS                               -->
 <!-- ═══════════════════════════════════════════ -->
 <div id="screen-login" class="screen active">
-  <div id="app-content" style="height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div id="app-content" style="height:100vh;height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
   <div class="auth-wrap">
     <div class="auth-logo">
       <span class="lotus-icon"><span class="mio" style="font-size:56px;color:var(--burgundy);">spa</span></span>
@@ -181,7 +181,7 @@
 </div>
 
 <div id="screen-signup" class="screen">
-  <div id="app-content-signup" style="height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div id="app-content-signup" style="height:100vh;height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
   <div class="auth-wrap">
     <div class="auth-logo">
       <span class="lotus-icon"><span class="mio" style="font-size:56px;color:var(--burgundy);">spa</span></span>
@@ -635,7 +635,7 @@
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.30 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.31 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -741,7 +741,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.30',
+    app_version: '1.31',
     error_count: logs.length,
     errors: logs
   };
@@ -2573,7 +2573,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.30',
+      app_version: '1.31',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
