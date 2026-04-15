@@ -2074,11 +2074,11 @@ body::before{
 }
 
 /* ── ONBOARDING ── */
-#screen-onboarding{height:100vh;overflow:hidden;position:relative;}
+#screen-onboarding{height:100vh;height:100dvh;overflow:hidden;position:relative;}
 
 .onboarding-slide{
   display:none;flex-direction:column;
-  height:100vh;position:relative;overflow:hidden;
+  height:100vh;height:100dvh;position:relative;overflow:hidden;
 }
 .onboarding-slide.active{
   display:flex;
