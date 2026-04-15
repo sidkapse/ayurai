@@ -1,6 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.26'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.27'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -254,6 +254,7 @@ function switchTab(name) {
 // ── ONBOARDING ──
 let _obSlide = 1;
 let _obParticlesInit = false;
+let _obOrigin = null; // 'home' | 'settings' | null (first-time user)
 
 function isFirstTimeUser() {
   const d = loadData();
@@ -290,14 +291,40 @@ function goToOnboardingSlide(n) {
   if(next) next.classList.add('active');
 }
 
-function skipOnboarding() { goToOnboardingSlide(5); }
+function skipOnboarding() {
+  if (_obOrigin) { closeOnboarding(); } else { goToOnboardingSlide(5); }
+}
 
-function replayOnboarding() {
+function closeOnboarding() {
+  showScreen('screen-app');
+  if (_obOrigin) switchTab(_obOrigin);
+  _obOrigin = null;
+}
+
+function replayOnboarding(origin) {
+  _obOrigin = origin || null;
   _obSlide = 1;
   _obParticlesInit = false;
   showScreen('screen-onboarding');
   goToOnboardingSlide(1);
   setTimeout(initOnboardingParticles, 50);
+  initOnboardingSwipe();
+  const label = _obOrigin ? 'Close' : 'Skip';
+  document.querySelectorAll('.ob-skip-btn').forEach(btn => btn.textContent = label);
+  const ctaDesc = el('ob-cta-desc');
+  const ctaPrimary = el('ob-cta-primary');
+  const ctaSecondary = el('ob-cta-secondary');
+  if (_obOrigin && ctaDesc && ctaPrimary && ctaSecondary) {
+    ctaDesc.textContent = "You're all set! Head back to explore all features.";
+    ctaPrimary.textContent = 'Return to App';
+    ctaPrimary.onclick = closeOnboarding;
+    ctaSecondary.style.display = 'none';
+  } else if (ctaDesc && ctaPrimary && ctaSecondary) {
+    ctaDesc.textContent = "Create your free account to unlock your personalised Ayurvedic experience.";
+    ctaPrimary.textContent = 'Create Account';
+    ctaPrimary.onclick = () => showScreen('screen-signup');
+    ctaSecondary.style.display = '';
+  }
 }
 
 function nextOnboardingSlide() {

@@ -2362,7 +2362,7 @@ body::before{
   <!-- SLIDE 1 – Know Your Dosha -->
   <div id="onboarding-slide-1" class="onboarding-slide ob-s1 active">
     <div class="ob-particles" id="ob-particles-1"></div>
-    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <button class="ob-skip ob-skip-btn" onclick="skipOnboarding()">Skip</button>
     <div class="ob-hero-content">
       <div class="ob-slide-num">01 &nbsp;/&nbsp; 04</div>
       <div class="ob-big-icon"><span class="mio" style="font-size:52px;color:#fff;">self_improvement</span></div>
@@ -2388,7 +2388,7 @@ body::before{
   <!-- SLIDE 2 – Eat Right for You -->
   <div id="onboarding-slide-2" class="onboarding-slide ob-s2">
     <div class="ob-particles" id="ob-particles-2"></div>
-    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <button class="ob-skip ob-skip-btn" onclick="skipOnboarding()">Skip</button>
     <div class="ob-hero-content">
       <div class="ob-slide-num">02 &nbsp;/&nbsp; 04</div>
       <div class="ob-big-icon"><span class="mio" style="font-size:52px;color:#fff;">restaurant</span></div>
@@ -2414,7 +2414,7 @@ body::before{
   <!-- SLIDE 3 – Herbs & Symptoms -->
   <div id="onboarding-slide-3" class="onboarding-slide ob-s3">
     <div class="ob-particles" id="ob-particles-3"></div>
-    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <button class="ob-skip ob-skip-btn" onclick="skipOnboarding()">Skip</button>
     <div class="ob-hero-content">
       <div class="ob-slide-num">03 &nbsp;/&nbsp; 04</div>
       <div class="ob-big-icon"><span class="mio" style="font-size:52px;color:#fff;">eco</span></div>
@@ -2440,7 +2440,7 @@ body::before{
   <!-- SLIDE 4 – Live Your Best Day -->
   <div id="onboarding-slide-4" class="onboarding-slide ob-s4">
     <div class="ob-particles" id="ob-particles-4"></div>
-    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <button class="ob-skip ob-skip-btn" onclick="skipOnboarding()">Skip</button>
     <div class="ob-hero-content">
       <div class="ob-slide-num">04 &nbsp;/&nbsp; 04</div>
       <div class="ob-big-icon"><span class="mio" style="font-size:52px;color:#fff;">wb_sunny</span></div>
@@ -2475,9 +2475,9 @@ body::before{
       <div class="ob-tagline">Ancient wisdom · Modern intelligence</div>
     </div>
     <div class="ob-bottom-card ob-bottom-cta">
-      <p class="ob-cta-desc">Create your free account to unlock your personalised Ayurvedic experience.</p>
-      <button class="ob-cta-primary" onclick="showScreen('screen-signup')">Create Account</button>
-      <button class="ob-cta-secondary" onclick="showScreen('screen-login')">Sign In</button>
+      <p class="ob-cta-desc" id="ob-cta-desc">Create your free account to unlock your personalised Ayurvedic experience.</p>
+      <button class="ob-cta-primary" id="ob-cta-primary" onclick="showScreen('screen-signup')">Create Account</button>
+      <button class="ob-cta-secondary" id="ob-cta-secondary" onclick="showScreen('screen-login')">Sign In</button>
     </div>
   </div>
 
@@ -2567,7 +2567,7 @@ body::before{
             <div class="home-greeting" id="home-greeting">Good Morning</div>
             <div class="home-name" id="home-name">Loading...</div>
           </div>
-          <button class="home-tour-btn" onclick="replayOnboarding()" title="Explore app features">
+          <button class="home-tour-btn" onclick="replayOnboarding('home')" title="Explore app features">
             <span class="mio" style="font-size:16px;vertical-align:-3px;">explore</span>
             <span>App Tour</span>
           </button>
@@ -2812,7 +2812,7 @@ body::before{
           <div class="settings-group-body">
             <div class="settings-row-label">App Tour</div>
             <div class="settings-row-sub">Revisit the feature walkthrough to explore everything AyurAI can do for you</div>
-            <button class="settings-tour-btn" onclick="replayOnboarding()">
+            <button class="settings-tour-btn" onclick="replayOnboarding('settings')">
               <span class="mio" style="font-size:18px;">explore</span>
               <span>Start App Tour</span>
               <span class="mi" style="font-size:16px;margin-left:auto;">arrow_forward</span>
@@ -2969,7 +2969,7 @@ body::before{
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.26 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.27 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -3031,7 +3031,7 @@ body::before{
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.26'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.27'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -3285,6 +3285,7 @@ function switchTab(name) {
 // ── ONBOARDING ──
 let _obSlide = 1;
 let _obParticlesInit = false;
+let _obOrigin = null; // 'home' | 'settings' | null (first-time user)
 
 function isFirstTimeUser() {
   const d = loadData();
@@ -3321,15 +3322,40 @@ function goToOnboardingSlide(n) {
   if(next) next.classList.add('active');
 }
 
-function skipOnboarding() { goToOnboardingSlide(5); }
+function skipOnboarding() {
+  if (_obOrigin) { closeOnboarding(); } else { goToOnboardingSlide(5); }
+}
 
-function replayOnboarding() {
+function closeOnboarding() {
+  showScreen('screen-app');
+  if (_obOrigin) switchTab(_obOrigin);
+  _obOrigin = null;
+}
+
+function replayOnboarding(origin) {
+  _obOrigin = origin || null;
   _obSlide = 1;
   _obParticlesInit = false;
   showScreen('screen-onboarding');
   goToOnboardingSlide(1);
   setTimeout(initOnboardingParticles, 50);
   initOnboardingSwipe();
+  const label = _obOrigin ? 'Close' : 'Skip';
+  document.querySelectorAll('.ob-skip-btn').forEach(btn => btn.textContent = label);
+  const ctaDesc = el('ob-cta-desc');
+  const ctaPrimary = el('ob-cta-primary');
+  const ctaSecondary = el('ob-cta-secondary');
+  if (_obOrigin && ctaDesc && ctaPrimary && ctaSecondary) {
+    ctaDesc.textContent = "You're all set! Head back to explore all features.";
+    ctaPrimary.textContent = 'Return to App';
+    ctaPrimary.onclick = closeOnboarding;
+    ctaSecondary.style.display = 'none';
+  } else if (ctaDesc && ctaPrimary && ctaSecondary) {
+    ctaDesc.textContent = "Create your free account to unlock your personalised Ayurvedic experience.";
+    ctaPrimary.textContent = 'Create Account';
+    ctaPrimary.onclick = () => showScreen('screen-signup');
+    ctaSecondary.style.display = '';
+  }
 }
 
 function nextOnboardingSlide() {
@@ -5130,7 +5156,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.26',
+      app_version: '1.27',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
