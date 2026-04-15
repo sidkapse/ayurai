@@ -648,6 +648,10 @@ Rules:
 - Create exactly 8 time blocks covering their full day
 - If they have active symptoms, avoid activities that could aggravate those
 - Each block must be specific, actionable, personalised. No generic advice.
+- DOSHA DIETARY GUARDRAILS (strictly enforce in every food, drink and activity suggestion):
+  * Pitta: AVOID sour (lemon, citrus, vinegar), hot, spicy, salty; NO lemon water in morning drinks; use COOL or room-temp water, coconut water, mint/fennel/coriander infusions, cooling foods
+  * Vata: PREFER warm, oily, grounding foods; warm water, ginger tea, sesame; AVOID cold, raw, dry foods
+  * Kapha: PREFER warm, light, dry foods; warm water with ginger or honey; AVOID cold, heavy, oily, sweet foods
 ${fastingRules.length ? '- DIETARY RULES (strictly follow these):\n' + fastingRules.map(r=>'  * '+r).join('\n') : ''}
 
 Respond ONLY as valid JSON (no markdown, no trailing commas):
