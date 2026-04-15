@@ -43,9 +43,9 @@
   --tab-h: 72px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{height:100%;width:100%;}
+html{height:100%;height:100dvh;width:100%;}
 body{
-  height:100%;
+  height:100%;height:100dvh;
   width:100%;
   font-family:'Jost',sans-serif;
   background:var(--cream);
@@ -65,6 +65,7 @@ body{
   overflow-y:auto;
   overflow-x:hidden;
   height:calc(100vh - var(--tab-h) - env(safe-area-inset-bottom));
+  height:calc(100dvh - var(--tab-h) - env(safe-area-inset-bottom));
   padding-bottom:8px;
   scroll-behavior:smooth;
   -webkit-overflow-scrolling:touch;
@@ -114,7 +115,7 @@ body::before{
 
 /* ── AUTH SCREENS ── */
 .auth-wrap{
-  min-height:100vh;
+  min-height:100vh;min-height:100dvh;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -2078,7 +2079,7 @@ body::before{
 
 /* Responsive tweaks */
 @media(min-width:480px){
-  body{border-radius:0;min-height:100vh;}
+  body{border-radius:0;min-height:100vh;min-height:100dvh;}
   #tab-bar{border-radius:0;}
 }
 
@@ -2969,7 +2970,7 @@ body::before{
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.28 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.29 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -3031,7 +3032,7 @@ body::before{
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.28'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.29'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -5130,7 +5131,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.28',
+      app_version: '1.29',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
