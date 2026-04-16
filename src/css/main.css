@@ -61,7 +61,7 @@ body{
   height:52px;
   transform:translateY(-52px);
   transition:transform 0.2s ease;
-  z-index:10;
+  z-index:150;
 }
 .ptr-indicator.ptr-visible{transform:translateY(0);}
 .ptr-icon{
