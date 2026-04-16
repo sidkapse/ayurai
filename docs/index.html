@@ -360,7 +360,7 @@ body::before{
 /* ── HOME SCREEN ── */
 .home-hero{
   background:linear-gradient(155deg,var(--burgundy-dark) 0%,var(--burgundy) 50%,var(--burgundy-light) 100%);
-  padding:max(32px, calc(env(safe-area-inset-top) + 24px)) 24px 40px;
+  padding:max(32px, calc(env(safe-area-inset-top) + 24px)) 24px 24px;
   position:relative;
   overflow:hidden;
 }
@@ -406,7 +406,7 @@ body::before{
   font-size:12px;
   color:var(--gold-light);
   font-weight:500;
-  margin-top:10px;
+  margin-top:6px;
   letter-spacing:0.5px;
 }
 .home-cards{padding:20px 16px 16px;}
@@ -2093,7 +2093,7 @@ body::before{
 /* ── HOME HERO TOP ROW ── */
 .home-hero-top{
   display:flex;justify-content:space-between;align-items:flex-start;
-  margin-bottom:16px;
+  margin-bottom:10px;
 }
 /* ── HOME TOUR BUTTON ── */
 .home-tour-btn{
@@ -3070,7 +3070,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.37 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.38 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -3132,7 +3132,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.37'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.38'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -5263,7 +5263,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.37',
+      app_version: '1.38',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
@@ -6917,6 +6917,7 @@ function initPWA() {
     _deferredInstallPrompt = e;
     const btn = el('pwa-install-btn');
     if(btn) btn.style.display = 'flex';
+    initPWABanner(); // Only show banner when browser confirms app is installable
   });
   window.addEventListener('appinstalled', () => {
     _deferredInstallPrompt = null;
@@ -6932,8 +6933,8 @@ function initPWA() {
   if(isIOS && !isStandalone) {
     const hint = el('pwa-ios-hint');
     if(hint) hint.style.display = 'flex';
+    initPWABanner(); // iOS has no beforeinstallprompt — show banner directly
   }
-  initPWABanner();
 }
 
 function triggerPWAInstall() {

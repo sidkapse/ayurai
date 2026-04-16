@@ -1,6 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.37'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.38'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -427,6 +427,7 @@ function initPWA() {
     _deferredInstallPrompt = e;
     const btn = el('pwa-install-btn');
     if(btn) btn.style.display = 'flex';
+    initPWABanner(); // Only show banner when browser confirms app is installable
   });
   window.addEventListener('appinstalled', () => {
     _deferredInstallPrompt = null;
@@ -442,8 +443,8 @@ function initPWA() {
   if(isIOS && !isStandalone) {
     const hint = el('pwa-ios-hint');
     if(hint) hint.style.display = 'flex';
+    initPWABanner(); // iOS has no beforeinstallprompt — show banner directly
   }
-  initPWABanner();
 }
 
 function triggerPWAInstall() {
