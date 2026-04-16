@@ -1,6 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.36'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.37'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -230,6 +230,12 @@ function initApp() {
   renderHistory();
   // Init quiz
   initQuiz();
+  // Restore tab after pull-to-refresh reload
+  const _reloadTab = sessionStorage.getItem('ayurai_reload_tab');
+  if (_reloadTab) {
+    sessionStorage.removeItem('ayurai_reload_tab');
+    switchTab(_reloadTab);
+  }
 }
 
 // ── TABS ──
@@ -351,6 +357,7 @@ function initOnboardingSwipe() {
 
 // ── PULL TO REFRESH ──
 function _refreshCurrentTab() {
+  sessionStorage.setItem('ayurai_reload_tab', currentTab);
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready
       .then(reg => reg.update())
