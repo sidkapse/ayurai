@@ -2425,11 +2425,6 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
   padding:4px 12px;font-size:11px;font-weight:600;
   cursor:pointer;flex-shrink:0;white-space:nowrap;font-family:'Jost',sans-serif;
 }
-.pwa-mini-close{
-  background:none;border:none;color:rgba(255,255,255,0.65);
-  cursor:pointer;padding:2px;line-height:1;
-  display:flex;align-items:center;flex-shrink:0;
-}
 </style>
 </head>
 <body>
@@ -2460,9 +2455,6 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
   <span class="mio" style="font-size:15px;flex-shrink:0;">spa</span>
   <span class="pwa-mini-text">Install AyurAI for a better experience</span>
   <button class="pwa-mini-btn" onclick="handlePWAInstall()">Add</button>
-  <button class="pwa-mini-close" onclick="dismissPWAPopup()" aria-label="Dismiss">
-    <span class="mi">close</span>
-  </button>
 </div>
 
 <!-- ═══════════════════════════════════════════ -->
@@ -3080,7 +3072,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.33 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.34 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -3142,7 +3134,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.33'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.34'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -5267,7 +5259,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.33',
+      app_version: '1.34',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
