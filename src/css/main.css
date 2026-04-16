@@ -64,7 +64,14 @@ body{
   z-index:10;
 }
 .ptr-indicator.ptr-visible{transform:translateY(0);}
-.ptr-icon{font-size:22px;color:var(--burgundy);transition:transform 0.3s ease;}
+.ptr-icon{
+  font-size:22px;color:#fff;
+  width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--burgundy);border-radius:50%;
+  transition:transform 0.3s ease;
+  box-shadow:0 2px 8px rgba(107,30,58,0.25);
+}
 .ptr-indicator.ptr-spinning .ptr-icon{animation:ptrSpin 0.7s linear infinite;}
 @keyframes ptrSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 

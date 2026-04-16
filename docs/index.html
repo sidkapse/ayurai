@@ -83,7 +83,7 @@ body{
   z-index:10;
 }
 .ptr-indicator.ptr-visible{transform:translateY(0);}
-.ptr-icon{font-size:22px;color:var(--burgundy);transition:transform 0.3s ease;}
+.ptr-icon{font-size:22px;color:#fff;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--burgundy);border-radius:50%;transition:transform 0.3s ease;box-shadow:0 2px 8px rgba(107,30,58,0.25);}
 .ptr-indicator.ptr-spinning .ptr-icon{animation:ptrSpin 0.7s linear infinite;}
 @keyframes ptrSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 
@@ -3070,7 +3070,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.35 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.36 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -3132,7 +3132,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.35'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.36'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -5257,7 +5257,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.35',
+      app_version: '1.36',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
