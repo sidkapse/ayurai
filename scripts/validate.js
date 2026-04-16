@@ -49,7 +49,7 @@ const REQUIRED_FUNCTIONS = [
   'classifyApiError', 'setApiErrorState', 'buildApiErrHTML',
   // Core — onboarding
   'isFirstTimeUser', 'goToOnboardingSlide', 'skipOnboarding', 'nextOnboardingSlide',
-  'replayOnboarding', 'initOnboardingSwipe', 'initOnboardingParticles',
+  'replayOnboarding', 'closeOnboarding', 'initOnboardingSwipe', 'initOnboardingParticles',
   // Core — PWA & pull-to-refresh
   'initPWA', 'triggerPWAInstall', 'initPullToRefresh',
   // Quiz
@@ -136,6 +136,8 @@ const REQUIRED_IDS = [
   'pwa-install-btn', 'pwa-ios-hint', 'pwa-install-section', 'pwa-default-hint',
   // Ask Anything overlay
   'ask-overlay', 'ask-chat', 'ask-input', 'ask-dosha-chip',
+  // Onboarding slide 5 CTA
+  'ob-cta-desc', 'ob-cta-primary', 'ob-cta-secondary',
 ];
 REQUIRED_IDS.forEach(id => check('id="' + id + '"', html.includes('id="' + id + '"')));
 
