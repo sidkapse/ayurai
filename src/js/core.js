@@ -1,6 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.32'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.33'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -406,6 +406,7 @@ function initPullToRefresh() {
 
 // ── PWA ──
 let _deferredInstallPrompt = null;
+const PWA_BANNER_KEY = 'ayurai_pwa_banner';
 
 function initPWA() {
   // If already running as installed PWA — hide install section
@@ -426,6 +427,7 @@ function initPWA() {
     _deferredInstallPrompt = null;
     const sec = el('pwa-install-section');
     if(sec) sec.style.display = 'none';
+    hidePWAAll();
     showToast('AyurAI installed! 🎉');
   });
   window.addEventListener('offline', () => showToast('You\'re offline — AI features unavailable'));
@@ -436,12 +438,87 @@ function initPWA() {
     const hint = el('pwa-ios-hint');
     if(hint) hint.style.display = 'flex';
   }
+  initPWABanner();
 }
 
 function triggerPWAInstall() {
   if(_deferredInstallPrompt) {
     _deferredInstallPrompt.prompt();
     _deferredInstallPrompt.userChoice.then(() => { _deferredInstallPrompt = null; });
+  }
+}
+
+function isPWAInstalled() {
+  return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+}
+
+function initPWABanner() {
+  if (isPWAInstalled()) return;
+  const today = new Date().toISOString().slice(0, 10);
+  let stored = {};
+  try { stored = JSON.parse(localStorage.getItem(PWA_BANNER_KEY) || '{}'); } catch {}
+  if (stored.popupDate === today) {
+    const banner = el('pwa-mini-banner');
+    if (banner) {
+      banner.style.display = 'flex';
+      requestAnimationFrame(() => banner.classList.add('open'));
+      document.body.classList.add('has-pwa-banner');
+    }
+  } else {
+    showPWAPopup();
+  }
+}
+
+function showPWAPopup() {
+  const popup = el('pwa-popup');
+  if (!popup) return;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) {
+    const btn = el('pwa-popup-btn');
+    if (btn) btn.textContent = 'How to Install';
+    const sub = el('pwa-popup-sub');
+    if (sub) sub.textContent = 'Tap Share → "Add to Home Screen" for a better experience';
+  }
+  popup.style.display = 'flex';
+  document.body.classList.add('has-pwa-popup');
+  requestAnimationFrame(() => popup.classList.add('open'));
+}
+
+function dismissPWAPopup() {
+  const today = new Date().toISOString().slice(0, 10);
+  localStorage.setItem(PWA_BANNER_KEY, JSON.stringify({ popupDate: today }));
+  const popup = el('pwa-popup');
+  if (popup) {
+    popup.classList.remove('open');
+    popup.addEventListener('transitionend', () => { popup.style.display = 'none'; }, { once: true });
+    document.body.classList.remove('has-pwa-popup');
+  }
+  const banner = el('pwa-mini-banner');
+  if (banner) {
+    banner.style.display = 'flex';
+    requestAnimationFrame(() => banner.classList.add('open'));
+    document.body.classList.add('has-pwa-banner');
+  }
+}
+
+function hidePWAAll() {
+  localStorage.removeItem(PWA_BANNER_KEY);
+  document.body.classList.remove('has-pwa-popup', 'has-pwa-banner');
+  const popup = el('pwa-popup');
+  if (popup) { popup.classList.remove('open'); popup.style.display = 'none'; }
+  const banner = el('pwa-mini-banner');
+  if (banner) { banner.classList.remove('open'); banner.style.display = 'none'; }
+}
+
+function handlePWAInstall() {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) {
+    dismissPWAPopup();
+    showScreen('screen-app');
+    switchTab('settings');
+  } else {
+    triggerPWAInstall();
   }
 }
 

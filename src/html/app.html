@@ -1,4 +1,35 @@
 <!-- ═══════════════════════════════════════════ -->
+<!--  PWA INSTALL BANNER (global, all screens)  -->
+<!-- ═══════════════════════════════════════════ -->
+
+<!-- Big banner — shown first time each day -->
+<div id="pwa-popup" class="pwa-popup" style="display:none;" role="banner" aria-label="Install AyurAI">
+  <div class="pwa-popup-left">
+    <span class="mio pwa-popup-icon">spa</span>
+    <div class="pwa-popup-text">
+      <div class="pwa-popup-title">Get a better AyurAI experience</div>
+      <div class="pwa-popup-sub" id="pwa-popup-sub">Install the app — it's free</div>
+    </div>
+  </div>
+  <div class="pwa-popup-actions">
+    <button class="pwa-popup-btn" id="pwa-popup-btn" onclick="handlePWAInstall()">Install</button>
+    <button class="pwa-popup-close" onclick="dismissPWAPopup()" aria-label="Dismiss">
+      <span class="mi">close</span>
+    </button>
+  </div>
+</div>
+
+<!-- Mini banner — shown after dismissal, persists all day -->
+<div id="pwa-mini-banner" class="pwa-mini-banner" style="display:none;" role="banner">
+  <span class="mio" style="font-size:15px;flex-shrink:0;">spa</span>
+  <span class="pwa-mini-text">Install AyurAI for a better experience</span>
+  <button class="pwa-mini-btn" onclick="handlePWAInstall()">Add</button>
+  <button class="pwa-mini-close" onclick="dismissPWAPopup()" aria-label="Dismiss">
+    <span class="mi">close</span>
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
 <!--  ONBOARDING SCREEN (first-time users only)  -->
 <!-- ═══════════════════════════════════════════ -->
 <div id="screen-onboarding" class="screen">
@@ -635,7 +666,7 @@
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.32 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.33 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -741,7 +772,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.32',
+    app_version: '1.33',
     error_count: logs.length,
     errors: logs
   };
@@ -2573,7 +2604,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.32',
+      app_version: '1.33',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
