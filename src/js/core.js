@@ -1,6 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.34'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.35'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -351,15 +351,13 @@ function initOnboardingSwipe() {
 
 // ── PULL TO REFRESH ──
 function _refreshCurrentTab() {
-  switch(currentTab) {
-    case 'home':     renderHomeHistory(); loadDoshaInsights(); break;
-    case 'dina':     initDinacharya();    break;
-    case 'food':     initFoodCheck(); initMealTiming(); break;
-    case 'herbs':    initHerbAdvisor();   break;
-    case 'symptom':  initSymptomChecker(); break;
-    case 'history':  renderHistory();     break;
-    case 'settings': renderErrorLogs();   break;
-    default: break;
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready
+      .then(reg => reg.update())
+      .catch(() => {})
+      .finally(() => window.location.reload());
+  } else {
+    window.location.reload();
   }
 }
 
