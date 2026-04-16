@@ -348,7 +348,7 @@ body::before{
 /* ── HOME SCREEN ── */
 .home-hero{
   background:linear-gradient(155deg,var(--burgundy-dark) 0%,var(--burgundy) 50%,var(--burgundy-light) 100%);
-  padding:max(32px, calc(env(safe-area-inset-top) + 24px)) 24px 40px;
+  padding:max(32px, calc(env(safe-area-inset-top) + 24px)) 24px 24px;
   position:relative;
   overflow:hidden;
 }
@@ -394,7 +394,7 @@ body::before{
   font-size:12px;
   color:var(--gold-light);
   font-weight:500;
-  margin-top:10px;
+  margin-top:6px;
   letter-spacing:0.5px;
 }
 .home-cards{padding:20px 16px 16px;}
@@ -2049,7 +2049,7 @@ body::before{
 /* ── HOME HERO TOP ROW ── */
 .home-hero-top{
   display:flex;justify-content:space-between;align-items:flex-start;
-  margin-bottom:16px;
+  margin-bottom:10px;
 }
 /* ── HOME TOUR BUTTON ── */
 .home-tour-btn{
