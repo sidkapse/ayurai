@@ -3081,7 +3081,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.43 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.46 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -3143,7 +3143,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.43'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.46'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -4527,6 +4527,23 @@ async function refineBoostersWithContext() {
   const food = cache.food || '';
   const reason = cache.result.reason || '';
   const dosha = d.dosha?.primary || 'Vata';
+  const age = getUserAge();
+  const timingMode = window._mealTimingMode || 'now';
+  let timeContext;
+  if (timingMode === 'plan') {
+    const dateVal = el('meal-plan-date')?.value;
+    const hourVal = el('meal-plan-hour')?.value;
+    if (dateVal && hourVal !== undefined && hourVal !== '') {
+      const mealDate = new Date(dateVal + 'T' + String(hourVal).padStart(2,'0') + ':30:00');
+      const dayName = mealDate.toLocaleString('default',{weekday:'long'});
+      const dateStr = mealDate.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'});
+      const h = mealDate.getHours(), fmt = h => { const ampm=h>=12?'PM':'AM'; return (h%12||12)+':00 '+ampm; };
+      timeContext = `Planned meal on ${dayName}, ${dateStr} at ${fmt(h)}`;
+    }
+  }
+  if (!timeContext) {
+    timeContext = `Right now at ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+  }
   const originalBoosters = cache.result?.meal_boosters ? [...cache.result.meal_boosters] : [];
   const btn = el('btn-personalise-boosters');
   const link = el('booster-personalise-link');
@@ -4534,7 +4551,7 @@ async function refineBoostersWithContext() {
   if (btn) { btn.textContent = 'Generating…'; btn.disabled = true; }
   if (link) link.style.opacity = '0.4';
   if (list) list.innerHTML = '<div class="booster-shimmer"></div><div class="booster-shimmer" style="opacity:0.6"></div>';
-  const prompt =`You are an Ayurvedic nutritionist. The user ate "${food}" and got a YES verdict.\nOriginal reason: "${reason}"\nUser dosha: ${dosha}\nUser's personalisation request: "${userContext}"\n\nSuggest updated meal boosters that respect the user's preferences/restrictions.\nRespond ONLY in this JSON format (no markdown):\n{\n  "meal_boosters": [\n    { "nutrient": "e.g. Protein", "item": "Specific item", "why": "One short reason" }\n  ]\n}\nProvide 2-3 boosters.`;
+  const prompt =`You are an Ayurvedic nutritionist. The user ate "${food}" and got a YES verdict.\nOriginal reason: "${reason}"\nUser dosha: ${dosha}${age ? `\nUser age: ${age}` : ''}\nMeal time: ${timeContext}\nUser's personalisation request: "${userContext}"\n\nSuggest updated meal boosters that respect the user's preferences/restrictions and meal timing.\nRespond ONLY in this JSON format (no markdown):\n{\n  "meal_boosters": [\n    { "nutrient": "e.g. Protein", "item": "Specific item", "why": "One short reason" }\n  ]\n}\nProvide 2-3 boosters.`;
   try {
     const resp = await callOpenAI(prompt, d.settings.openaiApiKey);
     const parsed = JSON.parse(resp.replace(/```json|```/g, '').trim());
@@ -5314,7 +5331,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.43',
+      app_version: '1.46',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
@@ -5771,6 +5788,7 @@ async function sendHerbChat() {
 
   const systemPrompt = `You are an expert Ayurvedic Vaidya and herbalist. The user's profile:
 - Dosha: ${ctx.dosha} (Vata ${ctx.scores.Vata||0}%, Pitta ${ctx.scores.Pitta||0}%, Kapha ${ctx.scores.Kapha||0}%)
+- Age: ${ctx.age}
 - Ailments: ${ctx.ailments}
 - City: ${ctx.city}, Month: ${ctx.month}
 
@@ -7154,10 +7172,19 @@ function getAskStarterPrompts(d) {
 
 function renderAskStarters(d) {
   const name = (d.user?.name || '').split(' ')[0] || 'there';
-  const dosha = d.dosha?.primary || 'your';
   const prompts = getAskStarterPrompts(d);
+  const now = new Date();
+  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const city = d.city || null;
+  const age = getUserAge();
+  const contextParts = [
+    `<span class="mi" style="font-size:12px;vertical-align:-2px;">schedule</span> ${time}`,
+    city ? `<span class="mi" style="font-size:12px;vertical-align:-2px;">location_on</span> ${city}` : null,
+    age ? `<span class="mi" style="font-size:12px;vertical-align:-2px;">person</span> Age ${age}` : null,
+  ].filter(Boolean).join('<span style="opacity:0.4"> · </span>');
   el('ask-chat').innerHTML = `
     <div class="ask-bubble ai">Hi ${name}! Namaste 🙏 I'm your Ayurvedic Advisor. Ask me anything.</div>
+    <div style="font-size:11px;color:var(--text-light);text-align:center;margin:-2px 0 8px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;">${contextParts}</div>
     <div class="ask-starters" id="ask-starters">
       ${prompts.map(p => `<div class="ask-starter-card" onclick="sendAskMessage(this.dataset.p)" data-p="${p.replace(/"/g,'&quot;')}">${p}</div>`).join('')}
     </div>`;
