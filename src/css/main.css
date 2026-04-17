@@ -1231,6 +1231,16 @@ body::before{
   background:#1C2E4A;border-color:#1C2E4A;
   color:white;font-weight:600;
 }
+.dina-notes-input{
+  width:100%;padding:10px 12px;
+  border:1.5px solid var(--cream-dark);border-radius:10px;
+  font-family:'Jost',sans-serif;font-size:13px;line-height:1.5;
+  background:var(--cream);color:var(--charcoal);
+  outline:none;resize:none;box-sizing:border-box;
+  transition:border-color 0.2s;
+}
+.dina-notes-input:focus{border-color:var(--lotus);}
+.dina-notes-input::placeholder{color:var(--text-light);}
 
 .herbs-wrap{padding:20px 16px 16px;}
 .herb-hero{
