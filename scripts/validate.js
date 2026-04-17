@@ -134,7 +134,7 @@ const REQUIRED_IDS = [
   // History
   'history-list',
   // PWA
-  'pwa-install-btn', 'pwa-ios-hint', 'pwa-install-section', 'pwa-default-hint',
+  'pwa-install-btn', 'pwa-ios-hint', 'pwa-install-section', 'pwa-default-hint', 'pwa-installed-hint',
   // Ask Anything overlay
   'ask-overlay', 'ask-chat', 'ask-input', 'ask-dosha-chip',
   // Onboarding slide 5 CTA

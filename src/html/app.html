@@ -525,6 +525,13 @@
                 <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Add to your home screen for a full-screen native experience</div>
               </div>
             </div>
+            <div id="pwa-installed-hint" class="pwa-default-hint" style="display:none;">
+              <span class="mi" style="font-size:22px;color:#4A7C59;flex-shrink:0;">check_circle</span>
+              <div>
+                <div style="font-weight:600;font-size:13px;color:var(--charcoal);">AyurAI is installed</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">You're using the full-screen app experience</div>
+              </div>
+            </div>
             <button class="settings-tour-btn" id="pwa-install-btn" onclick="triggerPWAInstall()" style="display:none;">
               <span class="mio" style="font-size:20px;">install_mobile</span>
               <div style="flex:1;text-align:left;">
@@ -663,7 +670,7 @@
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.39 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.40 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -769,7 +776,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.39',
+    app_version: '1.40',
     error_count: logs.length,
     errors: logs
   };
@@ -2601,7 +2608,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.39',
+      app_version: '1.40',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };

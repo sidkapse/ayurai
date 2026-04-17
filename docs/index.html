@@ -2932,6 +2932,13 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
                 <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Add to your home screen for a full-screen native experience</div>
               </div>
             </div>
+            <div id="pwa-installed-hint" class="pwa-default-hint" style="display:none;">
+              <span class="mi" style="font-size:22px;color:#4A7C59;flex-shrink:0;">check_circle</span>
+              <div>
+                <div style="font-weight:600;font-size:13px;color:var(--charcoal);">AyurAI is installed</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">You're using the full-screen app experience</div>
+              </div>
+            </div>
             <button class="settings-tour-btn" id="pwa-install-btn" onclick="triggerPWAInstall()" style="display:none;">
               <span class="mio" style="font-size:20px;">install_mobile</span>
               <div style="flex:1;text-align:left;">
@@ -3070,7 +3077,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.39 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.40 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -3132,7 +3139,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.39'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.40'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -5263,7 +5270,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.39',
+      app_version: '1.40',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
@@ -6903,26 +6910,37 @@ function initPullToRefresh() {
 let _deferredInstallPrompt = null;
 const PWA_BANNER_KEY = 'ayurai_pwa_banner';
 
+function _showInstalledState() {
+  const defaultHint = el('pwa-default-hint');
+  if(defaultHint) defaultHint.style.display = 'none';
+  const installBtn = el('pwa-install-btn');
+  if(installBtn) installBtn.style.display = 'none';
+  const iosHint = el('pwa-ios-hint');
+  if(iosHint) iosHint.style.display = 'none';
+  const installedHint = el('pwa-installed-hint');
+  if(installedHint) installedHint.style.display = 'flex';
+}
+
 function initPWA() {
-  // If already running as installed PWA — hide install section
-  if(window.matchMedia('(display-mode: standalone)').matches) {
-    const sec = el('pwa-install-section');
-    if(sec) sec.style.display = 'none';
-  }
   if('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(e => logError('sw', e));
+  }
+  // Already running as installed PWA — show installed confirmation
+  if(window.matchMedia('(display-mode: standalone)').matches) {
+    _showInstalledState();
   }
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     _deferredInstallPrompt = e;
     const btn = el('pwa-install-btn');
     if(btn) btn.style.display = 'flex';
+    const defaultHint = el('pwa-default-hint');
+    if(defaultHint) defaultHint.style.display = 'none';
     initPWABanner(); // Only show banner when browser confirms app is installable
   });
   window.addEventListener('appinstalled', () => {
     _deferredInstallPrompt = null;
-    const sec = el('pwa-install-section');
-    if(sec) sec.style.display = 'none';
+    _showInstalledState();
     hidePWAAll();
     showToast('AyurAI installed! 🎉');
   });
@@ -6933,6 +6951,8 @@ function initPWA() {
   if(isIOS && !isStandalone) {
     const hint = el('pwa-ios-hint');
     if(hint) hint.style.display = 'flex';
+    const defaultHint = el('pwa-default-hint');
+    if(defaultHint) defaultHint.style.display = 'none';
     initPWABanner(); // iOS has no beforeinstallprompt — show banner directly
   }
 }
