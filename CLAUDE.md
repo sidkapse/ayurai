@@ -2,6 +2,8 @@
 
 This file gives Claude Code the context it needs to work effectively on this project.
 
+> **Also read:** [`MEMORY.md`](./MEMORY.md) — discovered bugs, non-obvious patterns, and key decisions from past sessions.
+
 ## What This Project Is
 
 AyurAI is a single-file Ayurvedic wellness web app. It runs entirely client-side — no backend, no build step, no npm install. The deployable artifact is `docs/index.html`.
