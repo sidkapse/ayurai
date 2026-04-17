@@ -2279,10 +2279,9 @@ body::before{
 }
 /* ── ASK ANYTHING OVERLAY ── */
 .ask-overlay{
-  position:fixed;top:0;left:0;width:100%;
-  height:100%;height:100dvh;
+  position:fixed;top:0;left:0;right:0;bottom:0;
   z-index:300;background:var(--cream);
-  display:flex;flex-direction:column;
+  display:flex;flex-direction:column;overflow:hidden;
   transform:translateY(100%);
   transition:transform 0.3s ease;
 }
@@ -2308,6 +2307,7 @@ body::before{
 .ask-chat{
   flex:1;overflow-y:auto;padding:16px;
   display:flex;flex-direction:column;gap:12px;
+  min-height:0;
 }
 .ask-bubble{
   max-width:85%;padding:12px 14px;border-radius:16px;
@@ -3081,7 +3081,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.46 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.47 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -3117,6 +3117,25 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 </div><!-- end screen-app -->
 
     <!-- ── Ask AI Vaidya Overlay ── -->
+    <div id="herb-chat-overlay" class="ask-overlay" style="display:none;">
+      <div class="ask-header">
+        <button class="ask-close-btn" onclick="closeHerbChatOverlay()"><span class="mi">close</span></button>
+        <div style="text-align:center;">
+          <div class="ask-header-title">Herb Chat</div>
+          <div class="ask-header-sub">Your Ayurvedic herb expert</div>
+        </div>
+        <div style="width:36px;"></div>
+      </div>
+      <div class="ask-dosha-chip" id="herb-dosha-chip"></div>
+      <div class="ask-chat" id="herb-chat-history"></div>
+      <div class="ask-input-bar">
+        <input type="text" id="herb-chat-input" class="ask-input" placeholder="Ask about any herb or supplement..."
+          onkeydown="if(event.key==='Enter')sendHerbChat();"/>
+        <button class="ask-send-btn" id="herb-send-btn" onclick="sendHerbChat()">
+          <span class="mi">send</span>
+        </button>
+      </div>
+    </div>
     <div id="ask-overlay" class="ask-overlay" style="display:none;">
       <div class="ask-header">
         <button class="ask-close-btn" onclick="closeAskAnything()"><span class="mi">close</span></button>
@@ -3143,7 +3162,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.46'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.47'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -5331,7 +5350,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.46',
+      app_version: '1.47',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
@@ -5720,35 +5739,27 @@ function renderHerbChat() {
   herbState.chatHistory = herbState.chatHistory.length ? herbState.chatHistory : [
     {role:'ai', text:`Namaste 🙏 I'm your Ayurvedic herb advisor. You are a <strong>${d.dosha?.primary||'—'}</strong> type. Ask me anything about herbs, supplements, combinations, dosage, or any specific health concern.`}
   ];
-
-  el('herbs-wrap').innerHTML = `
-    <div class="top-bar" style="position:sticky;top:0;z-index:10;margin:-20px -16px 16px;padding:14px 16px;">
-      <div>
-        <div class="top-bar-title">Herb Chat</div>
-        <div class="top-bar-sub">Your Ayurvedic expert</div>
-      </div>
-      <button onclick="resetHerbAdvisor()" style="display:inline-flex;align-items:center;gap:4px;padding:7px 14px;background:var(--lotus-pale);border:1.5px solid var(--lotus);border-radius:20px;font-family:'Jost',sans-serif;font-size:12px;font-weight:600;color:var(--burgundy);cursor:pointer;"><span class="mi" style="font-size:15px;">arrow_back</span> Back</button>
-    </div>
-    <div class="herb-chat-card">
-      <div class="herb-chat-history" id="herb-chat-history">
-        ${renderChatBubbles()}
-      </div>
-      <div class="chat-input-row">
-        <input type="text" id="herb-chat-input"
-          placeholder="Ask about any herb or supplement..."
-          onkeydown="if(event.key==='Enter')sendHerbChat()"/>
-        <button class="chat-send-btn" id="herb-send-btn" onclick="sendHerbChat()">
-          <span class="mi" style="font-size:20px;">send</span>
-        </button>
-      </div>
-    </div>
-    <div class="herb-disclaimer">
-      <span class="mio" style="font-size:14px;vertical-align:-2px;margin-right:4px;">info</span> For serious conditions, always consult a qualified Vaidya or physician.
-    </div>
-  `;
   herbState.resultsShown = true;
   el('herb-reset-btn').style.display='flex';
+  openHerbChatOverlay();
+}
+
+function openHerbChatOverlay() {
+  const d = loadData();
+  const dosha = d.dosha?.primary || '—';
+  const city = d.city || 'Location not set';
+  el('herb-dosha-chip').innerHTML = `<span class="mio" style="font-size:14px;vertical-align:-2px;">eco</span> ${dosha} · ${city}`;
+  const overlay = el('herb-chat-overlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('open'));
+  updateChatDisplay();
   scrollChatToBottom();
+}
+
+function closeHerbChatOverlay() {
+  const overlay = el('herb-chat-overlay');
+  overlay.classList.remove('open');
+  overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
 }
 
 function renderChatBubbles() {
@@ -5835,6 +5846,7 @@ function updateChatDisplay() {
 }
 
 function resetHerbAdvisor() {
+  closeHerbChatOverlay();
   herbState = { mode:null, selectedConcerns:[], chatHistory:[], chatLoading:false, resultsShown:false };
   el('herb-reset-btn').style.display='none';
   const d = loadData();

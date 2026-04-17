@@ -76,6 +76,8 @@ const REQUIRED_FUNCTIONS = [
   'stopDinaTicker',
   // Ask Anything
   'openAskAnything', 'closeAskAnything', 'sendAskMessage', 'buildAskSystemPrompt', 'renderAskStarters',
+  // Herb Chat overlay
+  'openHerbChatOverlay', 'closeHerbChatOverlay',
 ];
 REQUIRED_FUNCTIONS.forEach(fn => check(fn + '()', js.includes('function ' + fn)));
 
