@@ -60,6 +60,7 @@ function updateChatDisplay() {
 }
 
 function resetHerbAdvisor() {
+  closeHerbChatOverlay();
   herbState = { mode:null, selectedConcerns:[], chatHistory:[], chatLoading:false, resultsShown:false };
   el('herb-reset-btn').style.display='none';
   const d = loadData();
