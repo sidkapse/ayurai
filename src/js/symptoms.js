@@ -13,6 +13,7 @@
 
   const systemPrompt = `You are an expert Ayurvedic Vaidya and herbalist. The user's profile:
 - Dosha: ${ctx.dosha} (Vata ${ctx.scores.Vata||0}%, Pitta ${ctx.scores.Pitta||0}%, Kapha ${ctx.scores.Kapha||0}%)
+- Age: ${ctx.age}
 - Ailments: ${ctx.ailments}
 - City: ${ctx.city}, Month: ${ctx.month}
 
