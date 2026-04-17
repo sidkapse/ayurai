@@ -1,0 +1,53 @@
+#!/bin/sh
+# AyurAI pre-push hook — bumps version + SW cache key before every push.
+# Installed automatically via `npm install` (see package.json postinstall).
+#
+# Strategy: hook does its own force-push with the amended commit, then
+# exits 1 to cancel the original push (which would try the pre-amend hash).
+# The trailing "error: failed to push some refs" from git is cosmetic —
+# the actual push already completed successfully.
+
+REMOTE="$1"
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+
+# Read push ref info — skip if nothing new to push
+HAS_CHANGES=false
+while read local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "0000000000000000000000000000000000000000" ] && continue
+  [ "$local_sha" != "$remote_sha" ] && HAS_CHANGES=true
+done
+if [ "$HAS_CHANGES" = false ]; then
+  exit 0
+fi
+
+# Bump version and SW cache key
+node "$REPO_ROOT/scripts/stamp-version.js" || exit 1
+
+# Stage the modified version files
+git add \
+  "$REPO_ROOT/docs/index.html" \
+  "$REPO_ROOT/docs/sw.js" \
+  "$REPO_ROOT/src/html/app.html" \
+  "$REPO_ROOT/src/js/core.js" \
+  "$REPO_ROOT/src/js/herbs.js"
+
+# Amend last commit to bake in the version bump
+if ! git diff --cached --quiet; then
+  git commit --amend --no-edit -q || exit 1
+fi
+
+# Push the amended commit (--no-verify prevents hook recursion)
+git push --force-with-lease --no-verify "$REMOTE" "$BRANCH"
+PUSH_STATUS=$?
+
+if [ $PUSH_STATUS -eq 0 ]; then
+  echo "  ✅ Pushed successfully with version bump."
+  echo ""
+else
+  echo "  ❌ Push failed — please check your connection or remote permissions."
+fi
+
+# Exit 1 to cancel the duplicate original push attempt
+# (push already completed above — this is expected behaviour)
+exit 1
