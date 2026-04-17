@@ -3081,7 +3081,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.42 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.43 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -3143,7 +3143,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.42'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.43'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -4508,7 +4508,7 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
     el('food-result-area').prepend(bannerDiv);
   }
 
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
 }
 
 function togglePersonalisePanel() {
@@ -5314,7 +5314,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.42',
+      app_version: '1.43',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
@@ -7167,7 +7167,9 @@ function buildAskSystemPrompt(d) {
   const name = d.user?.name || 'the user';
   const age = getUserAge();
   const city = d.city || null;
-  const month = new Date().toLocaleString('default', { month: 'long' });
+  const now = new Date();
+  const month = now.toLocaleString('default', { month: 'long' });
+  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const dosha = d.dosha || { primary: 'unknown', scores: {} };
   const ailments = (d.ailments?.length) ? d.ailments.join(', ') : 'none listed';
   const foods = (d.doshaInsights?.foods_to_avoid?.length)
@@ -7178,7 +7180,7 @@ function buildAskSystemPrompt(d) {
 Their dosha profile: ${dosha.primary} dominant (Vata ${dosha.scores?.Vata||0}%, Pitta ${dosha.scores?.Pitta||0}%, Kapha ${dosha.scores?.Kapha||0}%).
 Current ailments: ${ailments}.
 Foods they should avoid: ${foods}.
-Season context: ${city ? city + ', ' : ''}${month}.
+Season context: ${city ? city + ', ' : ''}${month}. Current time: ${time}.
 
 ${buildDoshaRules(dosha.primary)}
 Apply the above rules in every answer. Context matters — a food that is generally limited may be acceptable in small amounts at the right time or season; always explain the nuance.

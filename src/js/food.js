@@ -401,7 +401,7 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
     el('food-result-area').prepend(bannerDiv);
   }
 
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
 }
 
 function togglePersonalisePanel() {
