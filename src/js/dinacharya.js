@@ -374,7 +374,8 @@ let dinaFilterState = {
   wake: DINA_DEFAULT_WAKE,
   sleep: DINA_DEFAULT_SLEEP,
   symptoms: [],
-  diets: []   // persisted dietary preferences
+  diets: [],   // persisted dietary preferences
+  notes: ''    // transient — not persisted
 };
 
 function renderDinacharya_StartScreen(d) {
@@ -482,6 +483,17 @@ function renderDinacharya_StartScreen(d) {
             </div>`).join('')}
         </div>
       </div>
+
+      <!-- Special context -->
+      <div class="dina-filter-section">
+        <div class="dina-filter-label">
+          <span class="mi">edit_note</span> Anything special about today?
+          <span style="font-size:11px;font-weight:400;color:var(--text-light);">Optional</span>
+        </div>
+        <textarea id="dina-notes" class="dina-notes-input" rows="3"
+          placeholder="e.g. Birthday dinner tonight · Travelling to Mumbai · Might have a hangover · Indian food only"
+          oninput="dinaFilterState.notes=this.value.trim()">${dinaFilterState.notes || ''}</textarea>
+      </div>
     </div>
 
     <!-- What's included -->
@@ -552,6 +564,7 @@ async function generateDinacharya(forceRefresh=false) {
   const sleepVal = el('dina-sleep')?.value || dinaFilterState.sleep;
   dinaFilterState.wake = wakeVal;
   dinaFilterState.sleep = sleepVal;
+  dinaFilterState.notes = el('dina-notes')?.value.trim() || '';
 
   // Persist prefs
   saveDinaPrefs(wakeVal, sleepVal, dinaFilterState.dayOffset, dinaFilterState.diets);
@@ -636,7 +649,7 @@ Profile:
 - Chronic ailments: ${baseAilments.join(', ')||'None'}
 - Active symptoms today: ${activeSymptoms.join(', ')||'None'}
 - Dietary preferences: ${dietContext}
-- City: ${d.city||'unknown'}, Month: ${month}
+${dinaFilterState.notes ? `- Special context for today: ${dinaFilterState.notes}` : ''}- City: ${d.city||'unknown'}, Month: ${month}
 - Day: ${dayName} (${dateStr})
 - Wake up time: ${wakeDisplay}
 - Sleep time: ${sleepDisplay}
@@ -648,6 +661,7 @@ Rules:
 - Create exactly 8 time blocks covering their full day
 - If they have active symptoms, avoid activities that could aggravate those
 - Each block must be specific, actionable, personalised. No generic advice.
+- If "Special context for today" is provided, adapt the routine meaningfully — e.g. hangover → prioritise hydration, electrolytes, rest; travel → portable/minimal activities; heavy meal planned → keep earlier meals light, add digestive herbs in nearby blocks; food preference (e.g. Indian only) → all food suggestions must match that cuisine.
 - DOSHA DIETARY GUARDRAILS (strictly enforce in every food, drink and activity suggestion):
   * Pitta: AVOID sour (lemon, citrus, vinegar), hot, spicy, salty; NO lemon water in morning drinks; use COOL or room-temp water, coconut water, mint/fennel/coriander infusions, cooling foods
   * Vata: PREFER warm, oily, grounding foods; warm water, ginger tea, sesame; AVOID cold, raw, dry foods
