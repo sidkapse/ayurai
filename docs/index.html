@@ -7154,10 +7154,19 @@ function getAskStarterPrompts(d) {
 
 function renderAskStarters(d) {
   const name = (d.user?.name || '').split(' ')[0] || 'there';
-  const dosha = d.dosha?.primary || 'your';
   const prompts = getAskStarterPrompts(d);
+  const now = new Date();
+  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const city = d.city || null;
+  const age = getUserAge();
+  const contextParts = [
+    `<span class="mi" style="font-size:12px;vertical-align:-2px;">schedule</span> ${time}`,
+    city ? `<span class="mi" style="font-size:12px;vertical-align:-2px;">location_on</span> ${city}` : null,
+    age ? `<span class="mi" style="font-size:12px;vertical-align:-2px;">person</span> Age ${age}` : null,
+  ].filter(Boolean).join('<span style="opacity:0.4"> · </span>');
   el('ask-chat').innerHTML = `
     <div class="ask-bubble ai">Hi ${name}! Namaste 🙏 I'm your Ayurvedic Advisor. Ask me anything.</div>
+    <div style="font-size:11px;color:var(--text-light);text-align:center;margin:-2px 0 8px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;">${contextParts}</div>
     <div class="ask-starters" id="ask-starters">
       ${prompts.map(p => `<div class="ask-starter-card" onclick="sendAskMessage(this.dataset.p)" data-p="${p.replace(/"/g,'&quot;')}">${p}</div>`).join('')}
     </div>`;
