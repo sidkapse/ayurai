@@ -44,7 +44,7 @@ const REQUIRED_FUNCTIONS = [
   // Core — error logging
   'logError', 'getErrorLogs', 'renderErrorLogs', 'exportErrorLogs', 'clearErrorLogs', 'sendErrorLogs',
   // Core — API wrappers
-  'callOpenAI', 'callOpenAILarge', 'callOpenAIChat',
+  'callOpenAI', 'callOpenAILarge', 'callOpenAIChat', 'callOpenAIChatStream',
   // Core — API error state
   'classifyApiError', 'setApiErrorState', 'buildApiErrHTML',
   // Core — onboarding
