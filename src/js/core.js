@@ -1,6 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.40'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.41'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -260,6 +260,7 @@ function switchTab(name) {
 // ── ONBOARDING ──
 let _obSlide = 1;
 let _obParticlesInit = false;
+let _obSwipeInit = false;
 let _obOrigin = null; // 'home' | 'settings' | null (first-time user)
 
 function isFirstTimeUser() {
@@ -338,6 +339,8 @@ function nextOnboardingSlide() {
 }
 
 function initOnboardingSwipe() {
+  if(_obSwipeInit) return; // listeners already attached — don't stack duplicates
+  _obSwipeInit = true;
   const screen = el('screen-onboarding');
   if(!screen) return;
   let _touchStartX = 0;
