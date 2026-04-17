@@ -2,6 +2,33 @@
    ASK ANYTHING
 ══════════════════════════════════════ */
 
+async function callOpenAIChatStream(messages, apiKey, maxTokens, onChunk) {
+  const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+    body:JSON.stringify({model:'gpt-4o-mini',messages,stream:true,temperature:0.3,max_tokens:maxTokens})
+  });
+  if(!resp.ok){const err=await resp.json().catch(()=>({}));throw new Error(err.error?.message||`HTTP ${resp.status}`);}
+  setApiErrorState(false);
+  const reader=resp.body.getReader();
+  const decoder=new TextDecoder();
+  let buffer='',fullText='';
+  while(true){
+    const{done,value}=await reader.read();
+    if(done)break;
+    buffer+=decoder.decode(value,{stream:true});
+    const lines=buffer.split('\n');
+    buffer=lines.pop()||'';
+    for(const line of lines){
+      if(!line.startsWith('data: '))continue;
+      const chunk=line.slice(6).trim();
+      if(chunk==='[DONE]')return fullText;
+      try{const delta=JSON.parse(chunk).choices[0]?.delta?.content||'';if(delta){fullText+=delta;onChunk(fullText);}}catch{}
+    }
+  }
+  return fullText;
+}
+
 async function callOpenAIChat(messages, apiKey, maxTokens=1000) {
   try {
     const resp = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -149,29 +176,47 @@ async function sendAskMessage(text) {
   try {
     const d = loadData();
     const apiKey = d.settings?.openaiApiKey;
-    if (!apiKey) { askAddMessage('ai', 'Please add your API key in Settings.'); askState.loading = false; return; }
+    if (!apiKey) { loadBubble.remove(); askAddMessage('ai', 'Please add your API key in Settings.'); askState.loading = false; return; }
     const systemPrompt = buildAskSystemPrompt(d);
     const messages = [
       { role: 'system', content: systemPrompt },
       ...askState.chatHistory
     ];
     const userTurns = askState.chatHistory.filter(m => m.role === 'user').length;
-    const raw = await callOpenAIChat(messages, apiKey, userTurns > 4 ? 1500 : 1000);
+    const maxTokens = userTurns > 4 ? 1500 : 1000;
 
-    loadBubble.remove();
+    // Convert loading bubble to streaming in-place
+    loadBubble.textContent = '';
+    loadBubble.classList.remove('loading');
+    loadBubble.classList.add('streaming');
 
-    let displayText = raw;
+    const fullText = await callOpenAIChatStream(messages, apiKey, maxTokens, (accumulated) => {
+      loadBubble.textContent = accumulated;
+      el('ask-chat').scrollTop = el('ask-chat').scrollHeight;
+    });
+
+    loadBubble.classList.remove('streaming');
+
+    let displayText = fullText;
     let suggestions = null;
-    const jsonMatch = raw.match(/\{"suggestions"\s*:\s*\[[\s\S]*?\]\}/);
+    const jsonMatch = fullText.match(/\{"suggestions"\s*:\s*\[[\s\S]*?\]\}/);
     if (jsonMatch) {
       try {
         suggestions = JSON.parse(jsonMatch[0]).suggestions;
-        displayText = raw.replace(jsonMatch[0], '').trim();
-      } catch(e) { /* fallback: show full text as-is */ }
+        displayText = fullText.replace(jsonMatch[0], '').trim();
+      } catch {}
     }
-
+    loadBubble.textContent = displayText;
     askState.chatHistory.push({ role: 'assistant', content: displayText });
-    askAddMessage('ai', displayText, suggestions);
+    if (suggestions?.length) {
+      const sugDiv = document.createElement('div');
+      sugDiv.className = 'ask-suggestions';
+      sugDiv.innerHTML = suggestions.map(s =>
+        `<div class="ask-suggestion-card" onclick="sendAskMessage(this.dataset.p)" data-p="${s.replace(/"/g,'&quot;')}">${s}</div>`
+      ).join('');
+      el('ask-chat').appendChild(sugDiv);
+      el('ask-chat').scrollTop = el('ask-chat').scrollHeight;
+    }
   } catch(e) {
     loadBubble.remove();
     logError('askAnything', e);

@@ -4,13 +4,10 @@
   const sendBtn = el('herb-send-btn');
   if(sendBtn) { sendBtn.disabled=true; sendBtn.innerHTML='<span class="loading-spinner" style="width:18px;height:18px;border-width:2px;margin:0;"></span>'; }
 
-  // Add loading bubble
-  herbState.chatHistory.push({role:'ai', text:'<span style="opacity:0.6">Consulting the Vaidya...</span>', loading:true});
   updateChatDisplay();
 
   const ctx = buildHerbContext();
   const history = herbState.chatHistory
-    .filter(m=>!m.loading)
     .slice(-8)
     .map(m=>({role: m.role==='user'?'user':'assistant', content: m.text.replace(/<[^>]+>/g,'')}));
 
@@ -21,21 +18,20 @@
 
 Answer herb and supplement questions from a classical Ayurvedic perspective. Be specific, practical, and always mention dosage, form, and timing. Flag any safety concerns. Keep answers concise (3-5 sentences). Never recommend stopping prescribed medications.`;
 
+  // Create streaming bubble directly in DOM
+  const chatEl = el('herb-chat-history');
+  const streamBubble = document.createElement('div');
+  streamBubble.className = 'chat-bubble ai streaming';
+  chatEl?.appendChild(streamBubble);
+  scrollChatToBottom();
+
   try {
-    const resp = await fetch('https://api.openai.com/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+ctx.apiKey},
-      body:JSON.stringify({
-        model:'gpt-4o-mini',
-        messages:[{role:'system',content:systemPrompt},...history],
-        temperature:0.4, max_tokens:500
-      })
-    });
-    if(!resp.ok){const e=await resp.json();throw new Error(e.error?.message||'API error');}
-    const data = await resp.json();
-    const aiText = data.choices[0].message.content;
-    // Replace loading bubble
-    herbState.chatHistory = herbState.chatHistory.filter(m=>!m.loading);
+    const aiText = await callOpenAIChatStream(
+      [{role:'system',content:systemPrompt},...history],
+      ctx.apiKey, 500,
+      (accumulated) => { streamBubble.textContent = accumulated; scrollChatToBottom(); }
+    );
+    streamBubble.remove();
     herbState.chatHistory.push({role:'ai', text: aiText});
   } catch(e) {
     const type = classifyApiError(e);
@@ -48,7 +44,7 @@ Answer herb and supplement questions from a classical Ayurvedic perspective. Be 
       network: 'No internet connection. Please check your network.',
       unknown: `Could not connect right now. (${e.message})`
     };
-    herbState.chatHistory = herbState.chatHistory.filter(m=>!m.loading);
+    streamBubble.remove();
     herbState.chatHistory.push({role:'ai', text: chatMsgs[type] || chatMsgs.unknown});
   } finally {
     herbState.chatLoading = false;
