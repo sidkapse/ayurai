@@ -1,6 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.41'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.42'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -97,6 +97,15 @@ function getUserAge() {
   let age = now.getFullYear() - d.birth_year;
   if(d.birth_month && (now.getMonth() + 1) < d.birth_month) age--;
   return age;
+}
+
+function buildDoshaRules(dosha) {
+  const rules = {
+    Pitta: 'Pitta rules: avoid highly acidic/sour foods (lemon, vinegar, tamarind, fermented items), very spicy/hot foods, and excess salt. Sweet fruits in moderation (ripe mango, ripe pineapple, melons) are generally fine. Prioritise cooling, sweet, and bitter foods. Cooling herbs: mint, coriander, fennel.',
+    Vata:  'Vata rules: avoid cold, raw, dry, or light foods. Prioritise warm, oily, moist, grounding foods. Warm water or ginger tea preferred. Cooked vegetables over raw.',
+    Kapha: 'Kapha rules: avoid cold, heavy, oily, or very sweet foods. Prioritise warm, light, dry, spiced foods. Warm water with ginger or honey. Limit dairy and fried foods.'
+  };
+  return rules[dosha] || rules['Vata'];
 }
 
 // ── SCREENS ──

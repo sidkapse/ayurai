@@ -3081,7 +3081,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.41 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.42 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -3143,7 +3143,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.41'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.42'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -3240,6 +3240,15 @@ function getUserAge() {
   let age = now.getFullYear() - d.birth_year;
   if(d.birth_month && (now.getMonth() + 1) < d.birth_month) age--;
   return age;
+}
+
+function buildDoshaRules(dosha) {
+  const rules = {
+    Pitta: 'Pitta rules: avoid highly acidic/sour foods (lemon, vinegar, tamarind, fermented items), very spicy/hot foods, and excess salt. Sweet fruits in moderation (ripe mango, ripe pineapple, melons) are generally fine. Prioritise cooling, sweet, and bitter foods. Cooling herbs: mint, coriander, fennel.',
+    Vata:  'Vata rules: avoid cold, raw, dry, or light foods. Prioritise warm, oily, moist, grounding foods. Warm water or ginger tea preferred. Cooked vegetables over raw.',
+    Kapha: 'Kapha rules: avoid cold, heavy, oily, or very sweet foods. Prioritise warm, light, dry, spiced foods. Warm water with ginger or honey. Limit dairy and fried foods.'
+  };
+  return rules[dosha] || rules['Vata'];
 }
 
 // ── SCREENS ──
@@ -4201,6 +4210,7 @@ User Profile:
 - City: ${city}
 - Meal context: ${timeContext}
 - Month: ${month} (infer the likely season and weather for this city and month)
+- Dosha dietary rules: ${buildDoshaRules(dosha)}
 
 Item to analyse: "${food}"
 
@@ -5304,7 +5314,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.41',
+      app_version: '1.42',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
@@ -7170,11 +7180,8 @@ Current ailments: ${ailments}.
 Foods they should avoid: ${foods}.
 Season context: ${city ? city + ', ' : ''}${month}.
 
-Strict Ayurvedic principles for their dosha (apply these in every answer):
-- Pitta: avoid sour (lemon/citrus), hot, spicy, salty; recommend cooling foods, room-temp or cool water, coconut water, mint/fennel/coriander infusions.
-- Vata: avoid cold, raw, dry; recommend warm, oily, grounding foods, warm water, ginger tea.
-- Kapha: avoid cold, heavy, oily, sweet; recommend warm, light, dry foods, warm water with ginger or honey.
-Apply the rule for ${dosha.primary} dosha in every answer.
+${buildDoshaRules(dosha.primary)}
+Apply the above rules in every answer. Context matters — a food that is generally limited may be acceptable in small amounts at the right time or season; always explain the nuance.
 
 Answer ONLY Ayurvedic wellness questions — diet, dosha, herbs, lifestyle, and seasonal routines.
 If asked anything outside this scope, respond with a brief, warm decline and suggest 2 relevant Ayurvedic questions the user might actually want to ask. Format the suggestions as a JSON block at the end of your response in this exact format:

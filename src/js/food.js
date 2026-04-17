@@ -103,6 +103,7 @@ User Profile:
 - City: ${city}
 - Meal context: ${timeContext}
 - Month: ${month} (infer the likely season and weather for this city and month)
+- Dosha dietary rules: ${buildDoshaRules(dosha)}
 
 Item to analyse: "${food}"
 
