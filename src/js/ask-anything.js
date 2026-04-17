@@ -127,11 +127,8 @@ Current ailments: ${ailments}.
 Foods they should avoid: ${foods}.
 Season context: ${city ? city + ', ' : ''}${month}.
 
-Strict Ayurvedic principles for their dosha (apply these in every answer):
-- Pitta: avoid sour (lemon/citrus), hot, spicy, salty; recommend cooling foods, room-temp or cool water, coconut water, mint/fennel/coriander infusions.
-- Vata: avoid cold, raw, dry; recommend warm, oily, grounding foods, warm water, ginger tea.
-- Kapha: avoid cold, heavy, oily, sweet; recommend warm, light, dry foods, warm water with ginger or honey.
-Apply the rule for ${dosha.primary} dosha in every answer.
+${buildDoshaRules(dosha.primary)}
+Apply the above rules in every answer. Context matters — a food that is generally limited may be acceptable in small amounts at the right time or season; always explain the nuance.
 
 Answer ONLY Ayurvedic wellness questions — diet, dosha, herbs, lifestyle, and seasonal routines.
 If asked anything outside this scope, respond with a brief, warm decline and suggest 2 relevant Ayurvedic questions the user might actually want to ask. Format the suggestions as a JSON block at the end of your response in this exact format:
