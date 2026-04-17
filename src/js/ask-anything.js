@@ -114,7 +114,9 @@ function buildAskSystemPrompt(d) {
   const name = d.user?.name || 'the user';
   const age = getUserAge();
   const city = d.city || null;
-  const month = new Date().toLocaleString('default', { month: 'long' });
+  const now = new Date();
+  const month = now.toLocaleString('default', { month: 'long' });
+  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const dosha = d.dosha || { primary: 'unknown', scores: {} };
   const ailments = (d.ailments?.length) ? d.ailments.join(', ') : 'none listed';
   const foods = (d.doshaInsights?.foods_to_avoid?.length)
@@ -125,7 +127,7 @@ function buildAskSystemPrompt(d) {
 Their dosha profile: ${dosha.primary} dominant (Vata ${dosha.scores?.Vata||0}%, Pitta ${dosha.scores?.Pitta||0}%, Kapha ${dosha.scores?.Kapha||0}%).
 Current ailments: ${ailments}.
 Foods they should avoid: ${foods}.
-Season context: ${city ? city + ', ' : ''}${month}.
+Season context: ${city ? city + ', ' : ''}${month}. Current time: ${time}.
 
 ${buildDoshaRules(dosha.primary)}
 Apply the above rules in every answer. Context matters — a food that is generally limited may be acceptable in small amounts at the right time or season; always explain the nuance.
