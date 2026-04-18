@@ -384,6 +384,16 @@ function renderAilmentSelection() {
       }).join('')}
     </div>
     <div class="form-group" style="margin-top:22px;">
+      <label>Gender</label>
+      <select id="quiz-gender" style="width:100%;padding:14px 12px;border:1.5px solid var(--cream-dark);border-radius:10px;font-size:15px;font-family:Jost,sans-serif;background:var(--cream);color:var(--text-main);outline:none;margin-top:6px;">
+        <option value="">Prefer not to say</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Non-binary">Non-binary</option>
+      </select>
+      <div style="font-size:11px;color:var(--text-light);margin-top:5px;">Helps personalise Ayurvedic recommendations</div>
+    </div>
+    <div class="form-group" style="margin-top:16px;">
       <label>Your City</label>
       <input type="text" id="quiz-city"
         placeholder="e.g. Mumbai, Singapore, Bangalore"
@@ -453,6 +463,8 @@ function saveStage1() {
   };
   data.ailments = quizState.ailments;
   if(city) { data.city = city; quizState.city = city; }
+  const gender = el('quiz-gender')?.value || '';
+  if(gender) data.gender = gender;
   const birthMonth = parseInt(el('quiz-birth-month')?.value || '0', 10) || null;
   const birthYear  = parseInt(el('quiz-birth-year')?.value  || '0', 10) || null;
   if(birthMonth) data.birth_month = birthMonth;

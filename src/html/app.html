@@ -586,6 +586,17 @@
               <input type="number" id="settings-birth-year" class="settings-input" placeholder="Year e.g. 1990" min="1930" max="2010" style="flex:1;"/>
               <button class="settings-save-btn" onclick="saveBirthDate()"><span class="mi" style="font-size:15px;">check</span> Save</button>
             </div>
+            <div class="settings-row-label" style="margin-top:18px;">Gender</div>
+            <div class="settings-row-sub">Helps personalise Ayurvedic recommendations (hormonal patterns, agni tendencies)</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <select id="settings-gender" class="settings-input" style="flex:1;">
+                <option value="">Prefer not to say</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Non-binary">Non-binary</option>
+              </select>
+              <button class="settings-save-btn" onclick="saveGender()"><span class="mi" style="font-size:15px;">check</span> Save</button>
+            </div>
           </div>
         </div>
 
@@ -684,8 +695,7 @@
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.77 · Ancient Wisdom, Modern Intelligence
-        </div>
+          AyurAI v1.81 · Ancient Wisdom, Modern Intelligence        </div>
 
       </div>
     </div>
@@ -809,8 +819,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.77',
-    error_count: logs.length,
+    app_version: '1.81',    error_count: logs.length,
     errors: logs
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
@@ -2641,8 +2650,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.77',
-      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.81',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});

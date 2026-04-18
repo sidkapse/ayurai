@@ -93,12 +93,14 @@ async function checkFood() {
   const ailments = allAilments.length ? allAilments.join(', ') : 'None';
   const city = d.city||'unknown location';
   const age = getUserAge();
+  const gender = d.gender || '';
 
   const prompt = `You are an expert Ayurvedic nutritionist. The user wants to know if a food or drink is suitable for a specific meal time.
 
 User Profile:
 - Primary Dosha: ${dosha} (Scores: Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
 - Age: ${age ? age + ' years' : 'unknown'}
+- Gender: ${gender || 'Not specified'}
 - Ailments (chronic + currently active): ${ailments}
 - City: ${city}
 - Meal context: ${timeContext}
@@ -445,8 +447,7 @@ async function refineBoostersWithContext() {
   if (link) link.style.opacity = '0.4';
   if (list) list.innerHTML = '<div class="booster-shimmer"></div><div class="booster-shimmer" style="opacity:0.6"></div>';
   const prevList = originalBoosters.length ? `\nPreviously suggested (DO NOT repeat any of these): ${originalBoosters.map(b => b.item).join(', ')}` : '';
-  const prompt = `You are an Ayurvedic nutritionist. The user ate "${food}" and got a YES verdict.\nOriginal reason: "${reason}"\nUser dosha: ${dosha}${age ? `\nUser age: ${age}` : ''}\nMeal time: ${timeContext}${prevList}\nUser's personalisation request: "${userContext}"\n\nSuggest updated meal boosters that respect the user's preferences/restrictions and meal timing. Suggest genuinely different items from any previously suggested.\nRespond ONLY in this JSON format (no markdown):\n{\n  "meal_boosters": [\n    { "nutrient": "e.g. Protein", "item": "Specific item", "why": "One short reason" }\n  ]\n}\nProvide 2-3 boosters.`;
-  try {
+  const prompt = `You are an Ayurvedic nutritionist. The user ate "${food}" and got a YES verdict.\nOriginal reason: "${reason}"\nUser dosha: ${dosha}${age ? `\nUser age: ${age}` : ''}\nMeal time: ${timeContext}${prevList}\nUser's personalisation request: "${userContext}"\n\nSuggest updated meal boosters that respect the user's preferences/restrictions and meal timing. Suggest genuinely different items from any previously suggested.\nRespond ONLY in this JSON format (no markdown):\n{\n  "meal_boosters": [\n    { "nutrient": "e.g. Protein", "item": "Specific item", "why": "One short reason" }\n  ]\n}\nProvide 2-3 boosters.`;  try {
     const resp = await callOpenAI(prompt, d.settings.openaiApiKey);
     const parsed = JSON.parse(resp.replace(/```json|```/g, '').trim());
     const boosters = parsed.meal_boosters || [];
@@ -532,6 +533,7 @@ async function getRemedy() {
   const ailments = d.ailments?.join(', ')||'None';
   const city = d.city||'unknown location';
   const age = getUserAge();
+  const gender = d.gender || '';
   const itemType = loadFoodCache()?.result?.item_type || 'food';
   const isDrink = itemType === 'drink';
 
@@ -540,6 +542,7 @@ async function getRemedy() {
 User Profile:
 - Primary Dosha: ${dosha} (Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
 - Age: ${age ? age + ' years' : 'unknown'}
+- Gender: ${gender || 'Not specified'}
 - Known ailments: ${ailments}
 - City: ${city}
 - Current time: ${time}, Month: ${month}
@@ -671,11 +674,13 @@ async function getCuisineAlts() {
   const time = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 
   const age = getUserAge();
+  const gender = d.gender || '';
   const prompt = `You are an expert Ayurvedic nutritionist. Suggest the best 5 dishes to eat right now.
 
 User Profile:
 - Primary Dosha: ${d.dosha.primary}
 - Age: ${age ? age + ' years' : 'unknown'}
+- Gender: ${gender || 'Not specified'}
 - Common ailments: ${d.ailments?.join(', ')||'None'}
 - City: ${d.city||'unknown'}
 - Current time: ${time}, Month: ${month}
@@ -985,6 +990,12 @@ function saveBirthDate() {
   d.birth_year  = year;
   saveData(d);
   showToast('Birth date saved');
+}
+
+function saveGender() {
+  const gender = el('settings-gender')?.value || '';
+  setData('gender', gender);
+  showToast(gender ? 'Gender saved: ' + gender : 'Gender cleared');
 }
 
 function renderErrorLogs() {

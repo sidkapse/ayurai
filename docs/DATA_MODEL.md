@@ -45,6 +45,9 @@ All persistent data is stored in the browser's `localStorage`. No server, no dat
   // ── Location ──
   "city": "string",             // Used for seasonal inference in AI prompts
 
+  // ── Gender ──
+  "gender": "Male|Female|Non-binary|''",  // '' = Prefer not to say; used in all AI prompts
+
   // ── Food History ──
   "foodHistory": [              // Capped at 10 entries (FIFO)
     {

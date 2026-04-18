@@ -131,7 +131,8 @@ function buildAskSystemPrompt(d) {
   const foods = (d.doshaInsights?.foods_to_avoid?.length)
     ? d.doshaInsights.foods_to_avoid.join(', ')
     : 'not yet generated';
-  return `You are an Ayurvedic wellness assistant for ${name}${age ? `, age ${age}` : ''}${city ? `, based in ${city}` : ''}.
+  const gender = d.gender || '';
+  return `You are an Ayurvedic wellness assistant for ${name}${age ? `, age ${age}` : ''}${gender ? `, ${gender}` : ''}${city ? `, based in ${city}` : ''}.
 
 Their dosha profile: ${dosha.primary} dominant (Vata ${dosha.scores?.Vata||0}%, Pitta ${dosha.scores?.Pitta||0}%, Kapha ${dosha.scores?.Kapha||0}%).
 Current ailments: ${ailments}.

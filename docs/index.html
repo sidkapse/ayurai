@@ -3007,6 +3007,17 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
               <input type="number" id="settings-birth-year" class="settings-input" placeholder="Year e.g. 1990" min="1930" max="2010" style="flex:1;"/>
               <button class="settings-save-btn" onclick="saveBirthDate()"><span class="mi" style="font-size:15px;">check</span> Save</button>
             </div>
+            <div class="settings-row-label" style="margin-top:18px;">Gender</div>
+            <div class="settings-row-sub">Helps personalise Ayurvedic recommendations (hormonal patterns, agni tendencies)</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <select id="settings-gender" class="settings-input" style="flex:1;">
+                <option value="">Prefer not to say</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Non-binary">Non-binary</option>
+              </select>
+              <button class="settings-save-btn" onclick="saveGender()"><span class="mi" style="font-size:15px;">check</span> Save</button>
+            </div>
           </div>
         </div>
 
@@ -3105,8 +3116,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.77 · Ancient Wisdom, Modern Intelligence
-        </div>
+          AyurAI v1.81 · Ancient Wisdom, Modern Intelligence        </div>
 
       </div>
     </div>
@@ -3186,8 +3196,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.77'; // kept in sync by pre-push hook (scripts/stamp-version.js)
-
+const APP_VERSION = '1.81'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -3313,7 +3322,7 @@ function doSignup() {
   if(existing.user) { err.textContent='An account already exists on this device.'; err.style.display='block'; return; }
   const data = {
     user: { name, email, password: pass, createdAt: new Date().toISOString() },
-    dosha: null, ailments: [], city: '', foodHistory: [],
+    dosha: null, ailments: [], city: '', gender: '', foodHistory: [],
     settings: { openaiApiKey: '' },
     meta: { appVersion: '1.0', lastLogin: new Date().toISOString() }
   };
@@ -3364,6 +3373,7 @@ function initApp() {
   el('settings-city').value = d.city || '';
   if(el('settings-birth-month')) el('settings-birth-month').value = d.birth_month || '';
   if(el('settings-birth-year'))  el('settings-birth-year').value  = d.birth_year  || '';
+  if(el('settings-gender'))      el('settings-gender').value      = d.gender       || '';
   el('settings-apikey').value = d.settings?.openaiApiKey || '';
   // Dosha badge + card
   if(d.dosha) {
@@ -3944,6 +3954,16 @@ function renderAilmentSelection() {
       }).join('')}
     </div>
     <div class="form-group" style="margin-top:22px;">
+      <label>Gender</label>
+      <select id="quiz-gender" style="width:100%;padding:14px 12px;border:1.5px solid var(--cream-dark);border-radius:10px;font-size:15px;font-family:Jost,sans-serif;background:var(--cream);color:var(--text-main);outline:none;margin-top:6px;">
+        <option value="">Prefer not to say</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Non-binary">Non-binary</option>
+      </select>
+      <div style="font-size:11px;color:var(--text-light);margin-top:5px;">Helps personalise Ayurvedic recommendations</div>
+    </div>
+    <div class="form-group" style="margin-top:16px;">
       <label>Your City</label>
       <input type="text" id="quiz-city"
         placeholder="e.g. Mumbai, Singapore, Bangalore"
@@ -4013,6 +4033,8 @@ function saveStage1() {
   };
   data.ailments = quizState.ailments;
   if(city) { data.city = city; quizState.city = city; }
+  const gender = el('quiz-gender')?.value || '';
+  if(gender) data.gender = gender;
   const birthMonth = parseInt(el('quiz-birth-month')?.value || '0', 10) || null;
   const birthYear  = parseInt(el('quiz-birth-year')?.value  || '0', 10) || null;
   if(birthMonth) data.birth_month = birthMonth;
@@ -4243,12 +4265,14 @@ async function checkFood() {
   const ailments = allAilments.length ? allAilments.join(', ') : 'None';
   const city = d.city||'unknown location';
   const age = getUserAge();
+  const gender = d.gender || '';
 
   const prompt = `You are an expert Ayurvedic nutritionist. The user wants to know if a food or drink is suitable for a specific meal time.
 
 User Profile:
 - Primary Dosha: ${dosha} (Scores: Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
 - Age: ${age ? age + ' years' : 'unknown'}
+- Gender: ${gender || 'Not specified'}
 - Ailments (chronic + currently active): ${ailments}
 - City: ${city}
 - Meal context: ${timeContext}
@@ -4595,8 +4619,7 @@ async function refineBoostersWithContext() {
   if (link) link.style.opacity = '0.4';
   if (list) list.innerHTML = '<div class="booster-shimmer"></div><div class="booster-shimmer" style="opacity:0.6"></div>';
   const prevList = originalBoosters.length ? `\nPreviously suggested (DO NOT repeat any of these): ${originalBoosters.map(b => b.item).join(', ')}` : '';
-  const prompt = `You are an Ayurvedic nutritionist. The user ate "${food}" and got a YES verdict.\nOriginal reason: "${reason}"\nUser dosha: ${dosha}${age ? `\nUser age: ${age}` : ''}\nMeal time: ${timeContext}${prevList}\nUser's personalisation request: "${userContext}"\n\nSuggest updated meal boosters that respect the user's preferences/restrictions and meal timing. Suggest genuinely different items from any previously suggested.\nRespond ONLY in this JSON format (no markdown):\n{\n  "meal_boosters": [\n    { "nutrient": "e.g. Protein", "item": "Specific item", "why": "One short reason" }\n  ]\n}\nProvide 2-3 boosters.`;
-  try {
+  const prompt = `You are an Ayurvedic nutritionist. The user ate "${food}" and got a YES verdict.\nOriginal reason: "${reason}"\nUser dosha: ${dosha}${age ? `\nUser age: ${age}` : ''}\nMeal time: ${timeContext}${prevList}\nUser's personalisation request: "${userContext}"\n\nSuggest updated meal boosters that respect the user's preferences/restrictions and meal timing. Suggest genuinely different items from any previously suggested.\nRespond ONLY in this JSON format (no markdown):\n{\n  "meal_boosters": [\n    { "nutrient": "e.g. Protein", "item": "Specific item", "why": "One short reason" }\n  ]\n}\nProvide 2-3 boosters.`;  try {
     const resp = await callOpenAI(prompt, d.settings.openaiApiKey);
     const parsed = JSON.parse(resp.replace(/```json|```/g, '').trim());
     const boosters = parsed.meal_boosters || [];
@@ -4682,6 +4705,7 @@ async function getRemedy() {
   const ailments = d.ailments?.join(', ')||'None';
   const city = d.city||'unknown location';
   const age = getUserAge();
+  const gender = d.gender || '';
   const itemType = loadFoodCache()?.result?.item_type || 'food';
   const isDrink = itemType === 'drink';
 
@@ -4690,6 +4714,7 @@ async function getRemedy() {
 User Profile:
 - Primary Dosha: ${dosha} (Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
 - Age: ${age ? age + ' years' : 'unknown'}
+- Gender: ${gender || 'Not specified'}
 - Known ailments: ${ailments}
 - City: ${city}
 - Current time: ${time}, Month: ${month}
@@ -4821,11 +4846,13 @@ async function getCuisineAlts() {
   const time = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 
   const age = getUserAge();
+  const gender = d.gender || '';
   const prompt = `You are an expert Ayurvedic nutritionist. Suggest the best 5 dishes to eat right now.
 
 User Profile:
 - Primary Dosha: ${d.dosha.primary}
 - Age: ${age ? age + ' years' : 'unknown'}
+- Gender: ${gender || 'Not specified'}
 - Common ailments: ${d.ailments?.join(', ')||'None'}
 - City: ${d.city||'unknown'}
 - Current time: ${time}, Month: ${month}
@@ -5184,6 +5211,12 @@ function saveBirthDate() {
   showToast('Birth date saved');
 }
 
+function saveGender() {
+  const gender = el('settings-gender')?.value || '';
+  setData('gender', gender);
+  showToast(gender ? 'Gender saved: ' + gender : 'Gender cleared');
+}
+
 function renderErrorLogs() {
   const container = el('settings-error-log');
   if(!container) return;
@@ -5282,10 +5315,12 @@ async function loadDoshaInsights(d) {
     </div>`;
 
   const age = getUserAge();
+  const gender = d.gender || '';
   const prompt = `You are an expert Ayurvedic nutritionist. Based on this person's dosha, provide concise personalised insights.
 
 Dosha: ${d.dosha.primary} (Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
 Age: ${age ? age + ' years' : 'unknown'}
+Gender: ${gender || 'Not specified'}
 Known ailments: ${d.ailments?.join(', ')||'None'}
 
 Respond ONLY in this exact JSON (no markdown):
@@ -5375,8 +5410,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.77',
-      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.81',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
@@ -5637,6 +5671,7 @@ function buildHerbContext() {
     month: now.toLocaleString('default',{month:'long'}),
     time: now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),
     age: age ? age + ' years' : 'unknown',
+    gender: d.gender||'',
     apiKey: d.settings?.openaiApiKey||''
   };
 }
@@ -5675,6 +5710,7 @@ async function getHerbsByDosha() {
 User Profile:
 - Primary Dosha: ${ctx.dosha} (Vata ${ctx.scores.Vata||0}%, Pitta ${ctx.scores.Pitta||0}%, Kapha ${ctx.scores.Kapha||0}%)
 - Age: ${ctx.age}
+- Gender: ${ctx.gender || 'Not specified'}
 - Known ailments: ${ctx.ailments}
 - City: ${ctx.city}, Month: ${ctx.month}
 - Time: ${ctx.time}
@@ -6147,12 +6183,14 @@ async function runSymptomCheck() {
   const month = now.toLocaleString('default',{month:'long'});
   const time = now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   const age = getUserAge();
+  const gender = d.gender || '';
 
   const prompt = `You are a senior Ayurvedic physician (Vaidya) with 30 years of clinical experience. Perform a thorough Ayurvedic Nidana (diagnostic) analysis.
 
 Patient Profile:
 - Primary Dosha: ${d.dosha?.primary||'Unknown'} (Vata ${d.dosha?.scores?.Vata||0}%, Pitta ${d.dosha?.scores?.Pitta||0}%, Kapha ${d.dosha?.scores?.Kapha||0}%)
 - Age: ${age ? age + ' years' : 'unknown'}
+- Gender: ${gender || 'Not specified'}
 - Known ailments: ${d.ailments?.join(', ')||'None'}
 - City: ${d.city||'Unknown'}, Month: ${month}, Time: ${time}
 
@@ -6755,11 +6793,13 @@ async function generateDinacharya(forceRefresh=false) {
   if(dinaFilterState.diets.includes('lowcarb'))       fastingRules.push('User follows Low-Carb/High-Protein — reduce grains/sugar, emphasise protein-rich foods');
 
   const age = getUserAge();
+  const gender = d.gender || '';
   const prompt = `You are a master Ayurvedic physician. Create a personalised Dinacharya (daily routine) for this person.
 
 Profile:
 - Dosha: ${d.dosha.primary} (V${d.dosha.scores?.Vata||0}% P${d.dosha.scores?.Pitta||0}% K${d.dosha.scores?.Kapha||0}%)
 - Age: ${age ? age + ' years' : 'unknown'}
+- Gender: ${gender || 'Not specified'}
 - Chronic ailments: ${baseAilments.join(', ')||'None'}
 - Active symptoms today: ${activeSymptoms.join(', ')||'None'}
 - Dietary preferences: ${dietContext}
@@ -7266,7 +7306,8 @@ function buildAskSystemPrompt(d) {
   const foods = (d.doshaInsights?.foods_to_avoid?.length)
     ? d.doshaInsights.foods_to_avoid.join(', ')
     : 'not yet generated';
-  return `You are an Ayurvedic wellness assistant for ${name}${age ? `, age ${age}` : ''}${city ? `, based in ${city}` : ''}.
+  const gender = d.gender || '';
+  return `You are an Ayurvedic wellness assistant for ${name}${age ? `, age ${age}` : ''}${gender ? `, ${gender}` : ''}${city ? `, based in ${city}` : ''}.
 
 Their dosha profile: ${dosha.primary} dominant (Vata ${dosha.scores?.Vata||0}%, Pitta ${dosha.scores?.Pitta||0}%, Kapha ${dosha.scores?.Kapha||0}%).
 Current ailments: ${ailments}.
