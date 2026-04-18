@@ -62,7 +62,7 @@ const REQUIRED_FUNCTIONS = [
   'togglePersonalisePanel', 'refineBoostersWithContext',
   // Food history & settings
   'saveFoodHistory', 'renderHistory', 'renderHomeHistory', 'clearHistory',
-  'saveCity', 'saveBirthDate', 'saveApiKey', 'triggerImport', 'exportJSON', 'importJSON',
+  'saveCity', 'saveBirthDate', 'saveGender', 'saveApiKey', 'triggerImport', 'exportJSON', 'importJSON',
   // Dosha insights
   'loadDoshaInsights', 'renderDoshaInsights',
   // Meal timing
@@ -129,7 +129,7 @@ const REQUIRED_IDS = [
   // Settings
   'settings-name', 'settings-email', 'settings-city', 'settings-apikey',
   'settings-apikey-status', 'settings-warn-dot',
-  'settings-birth-month', 'settings-birth-year',
+  'settings-birth-month', 'settings-birth-year', 'settings-gender',
   'settings-hero-chips', 'settings-dosha-label', 'settings-dosha-sub',
   'settings-error-log', 'settings-error-section', 'settings-export-meta',
   'import-file-input', 'send-logs-btn',

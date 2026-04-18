@@ -51,10 +51,12 @@ async function loadDoshaInsights(d) {
     </div>`;
 
   const age = getUserAge();
+  const gender = d.gender || '';
   const prompt = `You are an expert Ayurvedic nutritionist. Based on this person's dosha, provide concise personalised insights.
 
 Dosha: ${d.dosha.primary} (Vata ${d.dosha.scores?.Vata||0}%, Pitta ${d.dosha.scores?.Pitta||0}%, Kapha ${d.dosha.scores?.Kapha||0}%)
 Age: ${age ? age + ' years' : 'unknown'}
+Gender: ${gender || 'Not specified'}
 Known ailments: ${d.ailments?.join(', ')||'None'}
 
 Respond ONLY in this exact JSON (no markdown):
@@ -144,8 +146,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.77',
-      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.80',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
@@ -405,6 +406,7 @@ function buildHerbContext() {
     month: now.toLocaleString('default',{month:'long'}),
     time: now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),
     age: age ? age + ' years' : 'unknown',
+    gender: d.gender||'',
     apiKey: d.settings?.openaiApiKey||''
   };
 }
@@ -443,6 +445,7 @@ async function getHerbsByDosha() {
 User Profile:
 - Primary Dosha: ${ctx.dosha} (Vata ${ctx.scores.Vata||0}%, Pitta ${ctx.scores.Pitta||0}%, Kapha ${ctx.scores.Kapha||0}%)
 - Age: ${ctx.age}
+- Gender: ${ctx.gender || 'Not specified'}
 - Known ailments: ${ctx.ailments}
 - City: ${ctx.city}, Month: ${ctx.month}
 - Time: ${ctx.time}
