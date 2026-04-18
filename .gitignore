@@ -44,7 +44,10 @@ temp/
 *.tmp
 
 # ── Claude Desktop / AI tools ──
-.claude/
+.claude/*
+!.claude/settings.json
+!.claude/hooks
+!.claude/hooks/session-start.sh
 
 # ── Never commit these ──
 # API keys should never be in source — they are stored in localStorage by the user

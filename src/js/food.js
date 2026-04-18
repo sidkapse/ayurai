@@ -103,6 +103,7 @@ User Profile:
 - City: ${city}
 - Meal context: ${timeContext}
 - Month: ${month} (infer the likely season and weather for this city and month)
+- Dosha dietary rules: ${buildDoshaRules(dosha)}
 
 Item to analyse: "${food}"
 
@@ -400,7 +401,7 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
     el('food-result-area').prepend(bannerDiv);
   }
 
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
 }
 
 function togglePersonalisePanel() {
@@ -419,6 +420,23 @@ async function refineBoostersWithContext() {
   const food = cache.food || '';
   const reason = cache.result.reason || '';
   const dosha = d.dosha?.primary || 'Vata';
+  const age = getUserAge();
+  const timingMode = window._mealTimingMode || 'now';
+  let timeContext;
+  if (timingMode === 'plan') {
+    const dateVal = el('meal-plan-date')?.value;
+    const hourVal = el('meal-plan-hour')?.value;
+    if (dateVal && hourVal !== undefined && hourVal !== '') {
+      const mealDate = new Date(dateVal + 'T' + String(hourVal).padStart(2,'0') + ':30:00');
+      const dayName = mealDate.toLocaleString('default',{weekday:'long'});
+      const dateStr = mealDate.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'});
+      const h = mealDate.getHours(), fmt = h => { const ampm=h>=12?'PM':'AM'; return (h%12||12)+':00 '+ampm; };
+      timeContext = `Planned meal on ${dayName}, ${dateStr} at ${fmt(h)}`;
+    }
+  }
+  if (!timeContext) {
+    timeContext = `Right now at ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+  }
   const originalBoosters = cache.result?.meal_boosters ? [...cache.result.meal_boosters] : [];
   const btn = el('btn-personalise-boosters');
   const link = el('booster-personalise-link');
@@ -426,7 +444,7 @@ async function refineBoostersWithContext() {
   if (btn) { btn.textContent = 'Generating…'; btn.disabled = true; }
   if (link) link.style.opacity = '0.4';
   if (list) list.innerHTML = '<div class="booster-shimmer"></div><div class="booster-shimmer" style="opacity:0.6"></div>';
-  const prompt = `You are an Ayurvedic nutritionist. The user ate "${food}" and got a YES verdict.\nOriginal reason: "${reason}"\nUser dosha: ${dosha}\nUser's personalisation request: "${userContext}"\n\nSuggest updated meal boosters that respect the user's preferences/restrictions.\nRespond ONLY in this JSON format (no markdown):\n{\n  "meal_boosters": [\n    { "nutrient": "e.g. Protein", "item": "Specific item", "why": "One short reason" }\n  ]\n}\nProvide 2-3 boosters.`;
+  const prompt = `You are an Ayurvedic nutritionist. The user ate "${food}" and got a YES verdict.\nOriginal reason: "${reason}"\nUser dosha: ${dosha}${age ? `\nUser age: ${age}` : ''}\nMeal time: ${timeContext}\nUser's personalisation request: "${userContext}"\n\nSuggest updated meal boosters that respect the user's preferences/restrictions and meal timing.\nRespond ONLY in this JSON format (no markdown):\n{\n  "meal_boosters": [\n    { "nutrient": "e.g. Protein", "item": "Specific item", "why": "One short reason" }\n  ]\n}\nProvide 2-3 boosters.`;
   try {
     const resp = await callOpenAI(prompt, d.settings.openaiApiKey);
     const parsed = JSON.parse(resp.replace(/```json|```/g, '').trim());

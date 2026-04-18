@@ -1,6 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.26'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.53'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -97,6 +97,15 @@ function getUserAge() {
   let age = now.getFullYear() - d.birth_year;
   if(d.birth_month && (now.getMonth() + 1) < d.birth_month) age--;
   return age;
+}
+
+function buildDoshaRules(dosha) {
+  const rules = {
+    Pitta: 'Pitta rules: avoid highly acidic/sour foods (lemon, vinegar, tamarind, fermented items), very spicy/hot foods, and excess salt. Sweet fruits in moderation (ripe mango, ripe pineapple, melons) are generally fine. Prioritise cooling, sweet, and bitter foods. Cooling herbs: mint, coriander, fennel.',
+    Vata:  'Vata rules: avoid cold, raw, dry, or light foods. Prioritise warm, oily, moist, grounding foods. Warm water or ginger tea preferred. Cooked vegetables over raw.',
+    Kapha: 'Kapha rules: avoid cold, heavy, oily, or very sweet foods. Prioritise warm, light, dry, spiced foods. Warm water with ginger or honey. Limit dairy and fried foods.'
+  };
+  return rules[dosha] || rules['Vata'];
 }
 
 // ── SCREENS ──
@@ -230,6 +239,12 @@ function initApp() {
   renderHistory();
   // Init quiz
   initQuiz();
+  // Restore tab after pull-to-refresh reload
+  const _reloadTab = sessionStorage.getItem('ayurai_reload_tab');
+  if (_reloadTab) {
+    sessionStorage.removeItem('ayurai_reload_tab');
+    switchTab(_reloadTab);
+  }
 }
 
 // ── TABS ──
@@ -254,6 +269,8 @@ function switchTab(name) {
 // ── ONBOARDING ──
 let _obSlide = 1;
 let _obParticlesInit = false;
+let _obSwipeInit = false;
+let _obOrigin = null; // 'home' | 'settings' | null (first-time user)
 
 function isFirstTimeUser() {
   const d = loadData();
@@ -290,14 +307,40 @@ function goToOnboardingSlide(n) {
   if(next) next.classList.add('active');
 }
 
-function skipOnboarding() { goToOnboardingSlide(5); }
+function skipOnboarding() {
+  if (_obOrigin) { closeOnboarding(); } else { goToOnboardingSlide(5); }
+}
 
-function replayOnboarding() {
+function closeOnboarding() {
+  showScreen('screen-app');
+  if (_obOrigin) switchTab(_obOrigin);
+  _obOrigin = null;
+}
+
+function replayOnboarding(origin) {
+  _obOrigin = origin || null;
   _obSlide = 1;
   _obParticlesInit = false;
   showScreen('screen-onboarding');
   goToOnboardingSlide(1);
   setTimeout(initOnboardingParticles, 50);
+  initOnboardingSwipe();
+  const label = _obOrigin ? 'Close' : 'Skip';
+  document.querySelectorAll('.ob-skip-btn').forEach(btn => btn.textContent = label);
+  const ctaDesc = el('ob-cta-desc');
+  const ctaPrimary = el('ob-cta-primary');
+  const ctaSecondary = el('ob-cta-secondary');
+  if (_obOrigin && ctaDesc && ctaPrimary && ctaSecondary) {
+    ctaDesc.textContent = "You're all set! Head back to explore all features.";
+    ctaPrimary.textContent = 'Return to App';
+    ctaPrimary.onclick = closeOnboarding;
+    ctaSecondary.style.display = 'none';
+  } else if (ctaDesc && ctaPrimary && ctaSecondary) {
+    ctaDesc.textContent = "Create your free account to unlock your personalised Ayurvedic experience.";
+    ctaPrimary.textContent = 'Create Account';
+    ctaPrimary.onclick = () => showScreen('screen-signup');
+    ctaSecondary.style.display = '';
+  }
 }
 
 function nextOnboardingSlide() {
@@ -305,6 +348,8 @@ function nextOnboardingSlide() {
 }
 
 function initOnboardingSwipe() {
+  if(_obSwipeInit) return; // listeners already attached — don't stack duplicates
+  _obSwipeInit = true;
   const screen = el('screen-onboarding');
   if(!screen) return;
   let _touchStartX = 0;
@@ -324,15 +369,14 @@ function initOnboardingSwipe() {
 
 // ── PULL TO REFRESH ──
 function _refreshCurrentTab() {
-  switch(currentTab) {
-    case 'home':     renderHomeHistory(); loadDoshaInsights(); break;
-    case 'dina':     initDinacharya();    break;
-    case 'food':     initFoodCheck(); initMealTiming(); break;
-    case 'herbs':    initHerbAdvisor();   break;
-    case 'symptom':  initSymptomChecker(); break;
-    case 'history':  renderHistory();     break;
-    case 'settings': renderErrorLogs();   break;
-    default: break;
+  sessionStorage.setItem('ayurai_reload_tab', currentTab);
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready
+      .then(reg => reg.update())
+      .catch(() => {})
+      .finally(() => window.location.reload());
+  } else {
+    window.location.reload();
   }
 }
 
@@ -379,26 +423,40 @@ function initPullToRefresh() {
 
 // ── PWA ──
 let _deferredInstallPrompt = null;
+const PWA_BANNER_KEY = 'ayurai_pwa_banner';
+
+function _showInstalledState() {
+  const defaultHint = el('pwa-default-hint');
+  if(defaultHint) defaultHint.style.display = 'none';
+  const installBtn = el('pwa-install-btn');
+  if(installBtn) installBtn.style.display = 'none';
+  const iosHint = el('pwa-ios-hint');
+  if(iosHint) iosHint.style.display = 'none';
+  const installedHint = el('pwa-installed-hint');
+  if(installedHint) installedHint.style.display = 'flex';
+}
 
 function initPWA() {
-  // If already running as installed PWA — hide install section
-  if(window.matchMedia('(display-mode: standalone)').matches) {
-    const sec = el('pwa-install-section');
-    if(sec) sec.style.display = 'none';
-  }
   if('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(e => logError('sw', e));
+  }
+  // Already running as installed PWA — show installed confirmation
+  if(window.matchMedia('(display-mode: standalone)').matches) {
+    _showInstalledState();
   }
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     _deferredInstallPrompt = e;
     const btn = el('pwa-install-btn');
     if(btn) btn.style.display = 'flex';
+    const defaultHint = el('pwa-default-hint');
+    if(defaultHint) defaultHint.style.display = 'none';
+    initPWABanner(); // Only show banner when browser confirms app is installable
   });
   window.addEventListener('appinstalled', () => {
     _deferredInstallPrompt = null;
-    const sec = el('pwa-install-section');
-    if(sec) sec.style.display = 'none';
+    _showInstalledState();
+    hidePWAAll();
     showToast('AyurAI installed! 🎉');
   });
   window.addEventListener('offline', () => showToast('You\'re offline — AI features unavailable'));
@@ -408,6 +466,9 @@ function initPWA() {
   if(isIOS && !isStandalone) {
     const hint = el('pwa-ios-hint');
     if(hint) hint.style.display = 'flex';
+    const defaultHint = el('pwa-default-hint');
+    if(defaultHint) defaultHint.style.display = 'none';
+    initPWABanner(); // iOS has no beforeinstallprompt — show banner directly
   }
 }
 
@@ -415,6 +476,80 @@ function triggerPWAInstall() {
   if(_deferredInstallPrompt) {
     _deferredInstallPrompt.prompt();
     _deferredInstallPrompt.userChoice.then(() => { _deferredInstallPrompt = null; });
+  }
+}
+
+function isPWAInstalled() {
+  return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+}
+
+function initPWABanner() {
+  if (isPWAInstalled()) return;
+  const today = new Date().toISOString().slice(0, 10);
+  let stored = {};
+  try { stored = JSON.parse(localStorage.getItem(PWA_BANNER_KEY) || '{}'); } catch {}
+  if (stored.popupDate === today) {
+    const banner = el('pwa-mini-banner');
+    if (banner) {
+      banner.style.display = 'flex';
+      requestAnimationFrame(() => banner.classList.add('open'));
+      document.body.classList.add('has-pwa-banner');
+    }
+  } else {
+    showPWAPopup();
+  }
+}
+
+function showPWAPopup() {
+  const popup = el('pwa-popup');
+  if (!popup) return;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) {
+    const btn = el('pwa-popup-btn');
+    if (btn) btn.textContent = 'How to Install';
+    const sub = el('pwa-popup-sub');
+    if (sub) sub.textContent = 'Tap Share → "Add to Home Screen" for a better experience';
+  }
+  popup.style.display = 'flex';
+  document.body.classList.add('has-pwa-popup');
+  requestAnimationFrame(() => popup.classList.add('open'));
+}
+
+function dismissPWAPopup() {
+  const today = new Date().toISOString().slice(0, 10);
+  localStorage.setItem(PWA_BANNER_KEY, JSON.stringify({ popupDate: today }));
+  const popup = el('pwa-popup');
+  if (popup) {
+    popup.classList.remove('open');
+    popup.addEventListener('transitionend', () => { popup.style.display = 'none'; }, { once: true });
+    document.body.classList.remove('has-pwa-popup');
+  }
+  const banner = el('pwa-mini-banner');
+  if (banner) {
+    banner.style.display = 'flex';
+    requestAnimationFrame(() => banner.classList.add('open'));
+    document.body.classList.add('has-pwa-banner');
+  }
+}
+
+function hidePWAAll() {
+  localStorage.removeItem(PWA_BANNER_KEY);
+  document.body.classList.remove('has-pwa-popup', 'has-pwa-banner');
+  const popup = el('pwa-popup');
+  if (popup) { popup.classList.remove('open'); popup.style.display = 'none'; }
+  const banner = el('pwa-mini-banner');
+  if (banner) { banner.classList.remove('open'); banner.style.display = 'none'; }
+}
+
+function handlePWAInstall() {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) {
+    dismissPWAPopup();
+    showScreen('screen-app');
+    switchTab('settings');
+  } else {
+    triggerPWAInstall();
   }
 }
 

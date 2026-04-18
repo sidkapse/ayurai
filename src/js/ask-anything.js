@@ -2,6 +2,33 @@
    ASK ANYTHING
 ══════════════════════════════════════ */
 
+async function callOpenAIChatStream(messages, apiKey, maxTokens, onChunk) {
+  const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+    body:JSON.stringify({model:'gpt-4o-mini',messages,stream:true,temperature:0.3,max_tokens:maxTokens})
+  });
+  if(!resp.ok){const err=await resp.json().catch(()=>({}));throw new Error(err.error?.message||`HTTP ${resp.status}`);}
+  setApiErrorState(false);
+  const reader=resp.body.getReader();
+  const decoder=new TextDecoder();
+  let buffer='',fullText='';
+  while(true){
+    const{done,value}=await reader.read();
+    if(done)break;
+    buffer+=decoder.decode(value,{stream:true});
+    const lines=buffer.split('\n');
+    buffer=lines.pop()||'';
+    for(const line of lines){
+      if(!line.startsWith('data: '))continue;
+      const chunk=line.slice(6).trim();
+      if(chunk==='[DONE]')return fullText;
+      try{const delta=JSON.parse(chunk).choices[0]?.delta?.content||'';if(delta){fullText+=delta;onChunk(fullText);}}catch{}
+    }
+  }
+  return fullText;
+}
+
 async function callOpenAIChat(messages, apiKey, maxTokens=1000) {
   try {
     const resp = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -74,10 +101,19 @@ function getAskStarterPrompts(d) {
 
 function renderAskStarters(d) {
   const name = (d.user?.name || '').split(' ')[0] || 'there';
-  const dosha = d.dosha?.primary || 'your';
   const prompts = getAskStarterPrompts(d);
+  const now = new Date();
+  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const city = d.city || null;
+  const age = getUserAge();
+  const contextParts = [
+    `<span class="mi" style="font-size:12px;vertical-align:-2px;">schedule</span> ${time}`,
+    city ? `<span class="mi" style="font-size:12px;vertical-align:-2px;">location_on</span> ${city}` : null,
+    age ? `<span class="mi" style="font-size:12px;vertical-align:-2px;">person</span> Age ${age}` : null,
+  ].filter(Boolean).join('<span style="opacity:0.4"> · </span>');
   el('ask-chat').innerHTML = `
     <div class="ask-bubble ai">Hi ${name}! Namaste 🙏 I'm your Ayurvedic Advisor. Ask me anything.</div>
+    <div style="font-size:11px;color:var(--text-light);text-align:center;margin:-2px 0 8px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;">${contextParts}</div>
     <div class="ask-starters" id="ask-starters">
       ${prompts.map(p => `<div class="ask-starter-card" onclick="sendAskMessage(this.dataset.p)" data-p="${p.replace(/"/g,'&quot;')}">${p}</div>`).join('')}
     </div>`;
@@ -87,6 +123,9 @@ function buildAskSystemPrompt(d) {
   const name = d.user?.name || 'the user';
   const age = getUserAge();
   const city = d.city || null;
+  const now = new Date();
+  const month = now.toLocaleString('default', { month: 'long' });
+  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const dosha = d.dosha || { primary: 'unknown', scores: {} };
   const ailments = (d.ailments?.length) ? d.ailments.join(', ') : 'none listed';
   const foods = (d.doshaInsights?.foods_to_avoid?.length)
@@ -97,6 +136,10 @@ function buildAskSystemPrompt(d) {
 Their dosha profile: ${dosha.primary} dominant (Vata ${dosha.scores?.Vata||0}%, Pitta ${dosha.scores?.Pitta||0}%, Kapha ${dosha.scores?.Kapha||0}%).
 Current ailments: ${ailments}.
 Foods they should avoid: ${foods}.
+Season context: ${city ? city + ', ' : ''}${month}. Current time: ${time}.
+
+${buildDoshaRules(dosha.primary)}
+Apply the above rules in every answer. Context matters — a food that is generally limited may be acceptable in small amounts at the right time or season; always explain the nuance.
 
 Answer ONLY Ayurvedic wellness questions — diet, dosha, herbs, lifestyle, and seasonal routines.
 If asked anything outside this scope, respond with a brief, warm decline and suggest 2 relevant Ayurvedic questions the user might actually want to ask. Format the suggestions as a JSON block at the end of your response in this exact format:
@@ -141,29 +184,47 @@ async function sendAskMessage(text) {
   try {
     const d = loadData();
     const apiKey = d.settings?.openaiApiKey;
-    if (!apiKey) { askAddMessage('ai', 'Please add your API key in Settings.'); askState.loading = false; return; }
+    if (!apiKey) { loadBubble.remove(); askAddMessage('ai', 'Please add your API key in Settings.'); askState.loading = false; return; }
     const systemPrompt = buildAskSystemPrompt(d);
     const messages = [
       { role: 'system', content: systemPrompt },
       ...askState.chatHistory
     ];
     const userTurns = askState.chatHistory.filter(m => m.role === 'user').length;
-    const raw = await callOpenAIChat(messages, apiKey, userTurns > 4 ? 1500 : 1000);
+    const maxTokens = userTurns > 4 ? 1500 : 1000;
 
-    loadBubble.remove();
+    // Convert loading bubble to streaming in-place
+    loadBubble.textContent = '';
+    loadBubble.classList.remove('loading');
+    loadBubble.classList.add('streaming');
 
-    let displayText = raw;
+    const fullText = await callOpenAIChatStream(messages, apiKey, maxTokens, (accumulated) => {
+      loadBubble.textContent = accumulated;
+      el('ask-chat').scrollTop = el('ask-chat').scrollHeight;
+    });
+
+    loadBubble.classList.remove('streaming');
+
+    let displayText = fullText;
     let suggestions = null;
-    const jsonMatch = raw.match(/\{"suggestions"\s*:\s*\[[\s\S]*?\]\}/);
+    const jsonMatch = fullText.match(/\{"suggestions"\s*:\s*\[[\s\S]*?\]\}/);
     if (jsonMatch) {
       try {
         suggestions = JSON.parse(jsonMatch[0]).suggestions;
-        displayText = raw.replace(jsonMatch[0], '').trim();
-      } catch(e) { /* fallback: show full text as-is */ }
+        displayText = fullText.replace(jsonMatch[0], '').trim();
+      } catch {}
     }
-
+    loadBubble.textContent = displayText;
     askState.chatHistory.push({ role: 'assistant', content: displayText });
-    askAddMessage('ai', displayText, suggestions);
+    if (suggestions?.length) {
+      const sugDiv = document.createElement('div');
+      sugDiv.className = 'ask-suggestions';
+      sugDiv.innerHTML = suggestions.map(s =>
+        `<div class="ask-suggestion-card" onclick="sendAskMessage(this.dataset.p)" data-p="${s.replace(/"/g,'&quot;')}">${s}</div>`
+      ).join('');
+      el('ask-chat').appendChild(sugDiv);
+      el('ask-chat').scrollTop = el('ask-chat').scrollHeight;
+    }
   } catch(e) {
     loadBubble.remove();
     logError('askAnything', e);

@@ -43,9 +43,9 @@
   --tab-h: 72px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{height:100%;width:100%;}
+html{height:100%;height:100dvh;width:100%;}
 body{
-  height:100%;
+  height:100%;height:100dvh;
   width:100%;
   font-family:'Jost',sans-serif;
   background:var(--cream);
@@ -65,7 +65,8 @@ body{
   overflow-y:auto;
   overflow-x:hidden;
   height:calc(100vh - var(--tab-h) - env(safe-area-inset-bottom));
-  padding-bottom:8px;
+  height:calc(100dvh - var(--tab-h) - env(safe-area-inset-bottom));
+  padding-bottom:32px;
   scroll-behavior:smooth;
   -webkit-overflow-scrolling:touch;
   position:relative;
@@ -77,14 +78,12 @@ body{
   position:absolute;top:0;left:0;right:0;
   display:flex;align-items:center;justify-content:center;
   height:52px;
-  background:var(--burgundy);
   transform:translateY(-52px);
   transition:transform 0.2s ease;
-  z-index:10;
-  border-radius:0 0 16px 16px;
+  z-index:150;
 }
 .ptr-indicator.ptr-visible{transform:translateY(0);}
-.ptr-icon{font-size:22px;color:var(--cream);transition:transform 0.3s ease;}
+.ptr-icon{font-size:22px;color:#fff;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--burgundy);border-radius:50%;transition:transform 0.3s ease;box-shadow:0 2px 8px rgba(107,30,58,0.25);}
 .ptr-indicator.ptr-spinning .ptr-icon{animation:ptrSpin 0.7s linear infinite;}
 @keyframes ptrSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 
@@ -114,7 +113,7 @@ body::before{
 
 /* ── AUTH SCREENS ── */
 .auth-wrap{
-  min-height:100vh;
+  min-height:100vh;min-height:100dvh;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -256,6 +255,15 @@ body::before{
   color:var(--text-muted);
 }
 .auth-switch a{color:var(--burgundy);font-weight:600;cursor:pointer;text-decoration:none;}
+.auth-import{
+  text-align:center;
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid var(--cream-dark);
+  font-size:12px;
+  color:var(--text-light);
+}
+.auth-import a{color:var(--text-muted);font-weight:500;cursor:pointer;text-decoration:underline;text-decoration-color:rgba(139,111,94,0.3);}
 .error-msg{
   background:rgba(180,30,30,0.08);
   border:1px solid rgba(180,30,30,0.2);
@@ -352,7 +360,7 @@ body::before{
 /* ── HOME SCREEN ── */
 .home-hero{
   background:linear-gradient(155deg,var(--burgundy-dark) 0%,var(--burgundy) 50%,var(--burgundy-light) 100%);
-  padding:max(32px, calc(env(safe-area-inset-top) + 24px)) 24px 40px;
+  padding:max(32px, calc(env(safe-area-inset-top) + 24px)) 24px 24px;
   position:relative;
   overflow:hidden;
 }
@@ -398,7 +406,7 @@ body::before{
   font-size:12px;
   color:var(--gold-light);
   font-weight:500;
-  margin-top:10px;
+  margin-top:6px;
   letter-spacing:0.5px;
 }
 .home-cards{padding:20px 16px 16px;}
@@ -1267,6 +1275,16 @@ body::before{
   background:#1C2E4A;border-color:#1C2E4A;
   color:white;font-weight:600;
 }
+.dina-notes-input{
+  width:100%;padding:10px 12px;
+  border:1.5px solid var(--cream-dark);border-radius:10px;
+  font-family:'Jost',sans-serif;font-size:13px;line-height:1.5;
+  background:var(--cream);color:var(--charcoal);
+  outline:none;resize:none;box-sizing:border-box;
+  transition:border-color 0.2s;
+}
+.dina-notes-input:focus{border-color:var(--lotus);}
+.dina-notes-input::placeholder{color:var(--text-light);}
 
 .herbs-wrap{padding:20px 16px 16px;}
 .herb-hero{
@@ -2078,14 +2096,14 @@ body::before{
 
 /* Responsive tweaks */
 @media(min-width:480px){
-  body{border-radius:0;min-height:100vh;}
+  body{border-radius:0;min-height:100vh;min-height:100dvh;}
   #tab-bar{border-radius:0;}
 }
 
 /* ── HOME HERO TOP ROW ── */
 .home-hero-top{
   display:flex;justify-content:space-between;align-items:flex-start;
-  margin-bottom:16px;
+  margin-bottom:10px;
 }
 /* ── HOME TOUR BUTTON ── */
 .home-tour-btn{
@@ -2125,11 +2143,11 @@ body::before{
 }
 
 /* ── ONBOARDING ── */
-#screen-onboarding{height:100vh;overflow:hidden;position:relative;}
+#screen-onboarding{height:100vh;height:100dvh;overflow:hidden;position:relative;}
 
 .onboarding-slide{
   display:none;flex-direction:column;
-  height:100vh;position:relative;overflow:hidden;
+  height:100vh;height:100dvh;position:relative;overflow:hidden;
 }
 .onboarding-slide.active{
   display:flex;
@@ -2271,10 +2289,9 @@ body::before{
 }
 /* ── ASK ANYTHING OVERLAY ── */
 .ask-overlay{
-  position:fixed;top:0;left:0;width:100%;
-  height:100%;height:100dvh;
+  position:fixed;top:0;left:0;right:0;bottom:0;
   z-index:300;background:var(--cream);
-  display:flex;flex-direction:column;
+  display:flex;flex-direction:column;overflow:hidden;
   transform:translateY(100%);
   transition:transform 0.3s ease;
 }
@@ -2300,6 +2317,7 @@ body::before{
 .ask-chat{
   flex:1;overflow-y:auto;padding:16px;
   display:flex;flex-direction:column;gap:12px;
+  min-height:0;
 }
 .ask-bubble{
   max-width:85%;padding:12px 14px;border-radius:16px;
@@ -2314,6 +2332,10 @@ body::before{
   border-bottom-right-radius:4px;align-self:flex-end;
 }
 .ask-bubble.loading{color:var(--text-muted);font-style:italic;}
+/* ── STREAMING CURSOR ── */
+.ask-bubble.ai.streaming::after,
+.chat-bubble.ai.streaming::after{content:'▌';display:inline;animation:cursorBlink 0.9s step-end infinite;opacity:0.7;color:var(--burgundy);}
+@keyframes cursorBlink{0%,100%{opacity:0.7;}50%{opacity:0;}}
 .ask-starters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;align-self:stretch;}
 .ask-starter-card{
   background:white;border:1px solid var(--cream-dark);
@@ -2350,9 +2372,102 @@ body::before{
   transition:background 0.15s;
 }
 .ask-send-btn:hover{background:var(--lotus);}
+
+/* ── PWA INSTALL BANNER ── */
+:root{--pwa-popup-h:64px;--pwa-mini-h:40px;}
+
+/* Body offset when banner is visible */
+body.has-pwa-popup{padding-top:max(var(--pwa-popup-h),calc(env(safe-area-inset-top) + var(--pwa-popup-h)));}
+body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-top) + var(--pwa-mini-h)));}
+
+/* Shared gradient base */
+.pwa-popup,.pwa-mini-banner{
+  position:fixed;top:0;left:0;right:0;
+  max-width:480px;margin:0 auto;
+  background:linear-gradient(100deg,var(--burgundy) 0%,#A63060 60%,var(--lotus) 100%);
+  color:#fff;
+  z-index:350;
+  display:flex;align-items:center;
+  padding-top:env(safe-area-inset-top);
+  transform:translateY(-110%);
+  transition:transform 0.3s ease;
+}
+.pwa-popup.open,.pwa-mini-banner.open{transform:translateY(0);}
+
+/* Big banner */
+.pwa-popup{
+  min-height:var(--pwa-popup-h);
+  padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;
+  gap:10px;
+  justify-content:space-between;
+}
+.pwa-popup-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
+.pwa-popup-icon{font-size:22px;flex-shrink:0;}
+.pwa-popup-text{min-width:0;}
+.pwa-popup-title{font-size:13px;font-weight:600;line-height:1.3;}
+.pwa-popup-sub{font-size:11px;opacity:0.85;margin-top:1px;}
+.pwa-popup-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.pwa-popup-btn{
+  background:rgba(255,255,255,0.22);
+  border:1.5px solid rgba(255,255,255,0.5);
+  color:#fff;border-radius:20px;
+  padding:6px 14px;font-size:12px;font-weight:600;
+  cursor:pointer;white-space:nowrap;font-family:'Jost',sans-serif;
+}
+.pwa-popup-close{
+  background:none;border:none;color:rgba(255,255,255,0.7);
+  cursor:pointer;padding:4px;line-height:1;
+  display:flex;align-items:center;
+}
+
+/* Mini banner */
+.pwa-mini-banner{
+  min-height:var(--pwa-mini-h);
+  padding:calc(env(safe-area-inset-top) + 6px) 12px 6px;
+  gap:8px;
+}
+.pwa-mini-text{
+  flex:1;font-size:11.5px;font-weight:500;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.pwa-mini-btn{
+  background:rgba(255,255,255,0.2);
+  border:1px solid rgba(255,255,255,0.45);
+  color:#fff;border-radius:14px;
+  padding:4px 12px;font-size:11px;font-weight:600;
+  cursor:pointer;flex-shrink:0;white-space:nowrap;font-family:'Jost',sans-serif;
+}
 </style>
 </head>
 <body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  PWA INSTALL BANNER (global, all screens)  -->
+<!-- ═══════════════════════════════════════════ -->
+
+<!-- Big banner — shown first time each day -->
+<div id="pwa-popup" class="pwa-popup" style="display:none;" role="banner" aria-label="Install AyurAI">
+  <div class="pwa-popup-left">
+    <span class="mio pwa-popup-icon">spa</span>
+    <div class="pwa-popup-text">
+      <div class="pwa-popup-title">Get a better AyurAI experience</div>
+      <div class="pwa-popup-sub" id="pwa-popup-sub">Install the app — it's free</div>
+    </div>
+  </div>
+  <div class="pwa-popup-actions">
+    <button class="pwa-popup-btn" id="pwa-popup-btn" onclick="handlePWAInstall()">Install</button>
+    <button class="pwa-popup-close" onclick="dismissPWAPopup()" aria-label="Dismiss">
+      <span class="mi">close</span>
+    </button>
+  </div>
+</div>
+
+<!-- Mini banner — shown after dismissal, persists all day -->
+<div id="pwa-mini-banner" class="pwa-mini-banner" style="display:none;" role="banner">
+  <span class="mio" style="font-size:15px;flex-shrink:0;">spa</span>
+  <span class="pwa-mini-text">Install AyurAI for a better experience</span>
+  <button class="pwa-mini-btn" onclick="handlePWAInstall()">Add</button>
+</div>
 
 <!-- ═══════════════════════════════════════════ -->
 <!--  ONBOARDING SCREEN (first-time users only)  -->
@@ -2362,7 +2477,7 @@ body::before{
   <!-- SLIDE 1 – Know Your Dosha -->
   <div id="onboarding-slide-1" class="onboarding-slide ob-s1 active">
     <div class="ob-particles" id="ob-particles-1"></div>
-    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <button class="ob-skip ob-skip-btn" onclick="skipOnboarding()">Skip</button>
     <div class="ob-hero-content">
       <div class="ob-slide-num">01 &nbsp;/&nbsp; 04</div>
       <div class="ob-big-icon"><span class="mio" style="font-size:52px;color:#fff;">self_improvement</span></div>
@@ -2388,7 +2503,7 @@ body::before{
   <!-- SLIDE 2 – Eat Right for You -->
   <div id="onboarding-slide-2" class="onboarding-slide ob-s2">
     <div class="ob-particles" id="ob-particles-2"></div>
-    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <button class="ob-skip ob-skip-btn" onclick="skipOnboarding()">Skip</button>
     <div class="ob-hero-content">
       <div class="ob-slide-num">02 &nbsp;/&nbsp; 04</div>
       <div class="ob-big-icon"><span class="mio" style="font-size:52px;color:#fff;">restaurant</span></div>
@@ -2414,7 +2529,7 @@ body::before{
   <!-- SLIDE 3 – Herbs & Symptoms -->
   <div id="onboarding-slide-3" class="onboarding-slide ob-s3">
     <div class="ob-particles" id="ob-particles-3"></div>
-    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <button class="ob-skip ob-skip-btn" onclick="skipOnboarding()">Skip</button>
     <div class="ob-hero-content">
       <div class="ob-slide-num">03 &nbsp;/&nbsp; 04</div>
       <div class="ob-big-icon"><span class="mio" style="font-size:52px;color:#fff;">eco</span></div>
@@ -2440,7 +2555,7 @@ body::before{
   <!-- SLIDE 4 – Live Your Best Day -->
   <div id="onboarding-slide-4" class="onboarding-slide ob-s4">
     <div class="ob-particles" id="ob-particles-4"></div>
-    <button class="ob-skip" onclick="skipOnboarding()">Skip</button>
+    <button class="ob-skip ob-skip-btn" onclick="skipOnboarding()">Skip</button>
     <div class="ob-hero-content">
       <div class="ob-slide-num">04 &nbsp;/&nbsp; 04</div>
       <div class="ob-big-icon"><span class="mio" style="font-size:52px;color:#fff;">wb_sunny</span></div>
@@ -2475,9 +2590,9 @@ body::before{
       <div class="ob-tagline">Ancient wisdom · Modern intelligence</div>
     </div>
     <div class="ob-bottom-card ob-bottom-cta">
-      <p class="ob-cta-desc">Create your free account to unlock your personalised Ayurvedic experience.</p>
-      <button class="ob-cta-primary" onclick="showScreen('screen-signup')">Create Account</button>
-      <button class="ob-cta-secondary" onclick="showScreen('screen-login')">Sign In</button>
+      <p class="ob-cta-desc" id="ob-cta-desc">Create your free account to unlock your personalised Ayurvedic experience.</p>
+      <button class="ob-cta-primary" id="ob-cta-primary" onclick="showScreen('screen-signup')">Create Account</button>
+      <button class="ob-cta-secondary" id="ob-cta-secondary" onclick="showScreen('screen-login')">Sign In</button>
     </div>
   </div>
 
@@ -2487,7 +2602,7 @@ body::before{
 <!--  AUTH SCREENS                               -->
 <!-- ═══════════════════════════════════════════ -->
 <div id="screen-login" class="screen active">
-  <div id="app-content" style="height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div id="app-content" style="height:100vh;height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
   <div class="auth-wrap">
     <div class="auth-logo">
       <span class="lotus-icon"><span class="mio" style="font-size:56px;color:var(--burgundy);">spa</span></span>
@@ -2515,7 +2630,7 @@ body::before{
 </div>
 
 <div id="screen-signup" class="screen">
-  <div id="app-content-signup" style="height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+  <div id="app-content-signup" style="height:100vh;height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;">
   <div class="auth-wrap">
     <div class="auth-logo">
       <span class="lotus-icon"><span class="mio" style="font-size:56px;color:var(--burgundy);">spa</span></span>
@@ -2567,7 +2682,7 @@ body::before{
             <div class="home-greeting" id="home-greeting">Good Morning</div>
             <div class="home-name" id="home-name">Loading...</div>
           </div>
-          <button class="home-tour-btn" onclick="replayOnboarding()" title="Explore app features">
+          <button class="home-tour-btn" onclick="replayOnboarding('home')" title="Explore app features">
             <span class="mio" style="font-size:16px;vertical-align:-3px;">explore</span>
             <span>App Tour</span>
           </button>
@@ -2812,7 +2927,7 @@ body::before{
           <div class="settings-group-body">
             <div class="settings-row-label">App Tour</div>
             <div class="settings-row-sub">Revisit the feature walkthrough to explore everything AyurAI can do for you</div>
-            <button class="settings-tour-btn" onclick="replayOnboarding()">
+            <button class="settings-tour-btn" onclick="replayOnboarding('settings')">
               <span class="mio" style="font-size:18px;">explore</span>
               <span>Start App Tour</span>
               <span class="mi" style="font-size:16px;margin-left:auto;">arrow_forward</span>
@@ -2829,6 +2944,13 @@ body::before{
               <div>
                 <div style="font-weight:600;font-size:13px;color:var(--charcoal);">Install AyurAI as an App</div>
                 <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Add to your home screen for a full-screen native experience</div>
+              </div>
+            </div>
+            <div id="pwa-installed-hint" class="pwa-default-hint" style="display:none;">
+              <span class="mi" style="font-size:22px;color:#4A7C59;flex-shrink:0;">check_circle</span>
+              <div>
+                <div style="font-weight:600;font-size:13px;color:var(--charcoal);">AyurAI is installed</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">You're using the full-screen app experience</div>
               </div>
             </div>
             <button class="settings-tour-btn" id="pwa-install-btn" onclick="triggerPWAInstall()" style="display:none;">
@@ -2969,7 +3091,7 @@ body::before{
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.26 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.53 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -3005,6 +3127,25 @@ body::before{
 </div><!-- end screen-app -->
 
     <!-- ── Ask AI Vaidya Overlay ── -->
+    <div id="herb-chat-overlay" class="ask-overlay" style="display:none;">
+      <div class="ask-header">
+        <button class="ask-close-btn" onclick="closeHerbChatOverlay()"><span class="mi">close</span></button>
+        <div style="text-align:center;">
+          <div class="ask-header-title">Herb Chat</div>
+          <div class="ask-header-sub">Your Ayurvedic herb expert</div>
+        </div>
+        <div style="width:36px;"></div>
+      </div>
+      <div class="ask-dosha-chip" id="herb-dosha-chip"></div>
+      <div class="ask-chat" id="herb-chat-history"></div>
+      <div class="ask-input-bar">
+        <input type="text" id="herb-chat-input" class="ask-input" placeholder="Ask about any herb or supplement..."
+          onkeydown="if(event.key==='Enter')sendHerbChat();"/>
+        <button class="ask-send-btn" id="herb-send-btn" onclick="sendHerbChat()">
+          <span class="mi">send</span>
+        </button>
+      </div>
+    </div>
     <div id="ask-overlay" class="ask-overlay" style="display:none;">
       <div class="ask-header">
         <button class="ask-close-btn" onclick="closeAskAnything()"><span class="mi">close</span></button>
@@ -3031,7 +3172,7 @@ body::before{
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.26'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.53'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -3128,6 +3269,15 @@ function getUserAge() {
   let age = now.getFullYear() - d.birth_year;
   if(d.birth_month && (now.getMonth() + 1) < d.birth_month) age--;
   return age;
+}
+
+function buildDoshaRules(dosha) {
+  const rules = {
+    Pitta: 'Pitta rules: avoid highly acidic/sour foods (lemon, vinegar, tamarind, fermented items), very spicy/hot foods, and excess salt. Sweet fruits in moderation (ripe mango, ripe pineapple, melons) are generally fine. Prioritise cooling, sweet, and bitter foods. Cooling herbs: mint, coriander, fennel.',
+    Vata:  'Vata rules: avoid cold, raw, dry, or light foods. Prioritise warm, oily, moist, grounding foods. Warm water or ginger tea preferred. Cooked vegetables over raw.',
+    Kapha: 'Kapha rules: avoid cold, heavy, oily, or very sweet foods. Prioritise warm, light, dry, spiced foods. Warm water with ginger or honey. Limit dairy and fried foods.'
+  };
+  return rules[dosha] || rules['Vata'];
 }
 
 // ── SCREENS ──
@@ -3261,6 +3411,12 @@ function initApp() {
   renderHistory();
   // Init quiz
   initQuiz();
+  // Restore tab after pull-to-refresh reload
+  const _reloadTab = sessionStorage.getItem('ayurai_reload_tab');
+  if (_reloadTab) {
+    sessionStorage.removeItem('ayurai_reload_tab');
+    switchTab(_reloadTab);
+  }
 }
 
 // ── TABS ──
@@ -3285,6 +3441,8 @@ function switchTab(name) {
 // ── ONBOARDING ──
 let _obSlide = 1;
 let _obParticlesInit = false;
+let _obSwipeInit = false;
+let _obOrigin = null; // 'home' | 'settings' | null (first-time user)
 
 function isFirstTimeUser() {
   const d = loadData();
@@ -3321,15 +3479,40 @@ function goToOnboardingSlide(n) {
   if(next) next.classList.add('active');
 }
 
-function skipOnboarding() { goToOnboardingSlide(5); }
+function skipOnboarding() {
+  if (_obOrigin) { closeOnboarding(); } else { goToOnboardingSlide(5); }
+}
 
-function replayOnboarding() {
+function closeOnboarding() {
+  showScreen('screen-app');
+  if (_obOrigin) switchTab(_obOrigin);
+  _obOrigin = null;
+}
+
+function replayOnboarding(origin) {
+  _obOrigin = origin || null;
   _obSlide = 1;
   _obParticlesInit = false;
   showScreen('screen-onboarding');
   goToOnboardingSlide(1);
   setTimeout(initOnboardingParticles, 50);
   initOnboardingSwipe();
+  const label = _obOrigin ? 'Close' : 'Skip';
+  document.querySelectorAll('.ob-skip-btn').forEach(btn => btn.textContent = label);
+  const ctaDesc = el('ob-cta-desc');
+  const ctaPrimary = el('ob-cta-primary');
+  const ctaSecondary = el('ob-cta-secondary');
+  if (_obOrigin && ctaDesc && ctaPrimary && ctaSecondary) {
+    ctaDesc.textContent = "You're all set! Head back to explore all features.";
+    ctaPrimary.textContent = 'Return to App';
+    ctaPrimary.onclick = closeOnboarding;
+    ctaSecondary.style.display = 'none';
+  } else if (ctaDesc && ctaPrimary && ctaSecondary) {
+    ctaDesc.textContent = "Create your free account to unlock your personalised Ayurvedic experience.";
+    ctaPrimary.textContent = 'Create Account';
+    ctaPrimary.onclick = () => showScreen('screen-signup');
+    ctaSecondary.style.display = '';
+  }
 }
 
 function nextOnboardingSlide() {
@@ -3337,6 +3520,8 @@ function nextOnboardingSlide() {
 }
 
 function initOnboardingSwipe() {
+  if(_obSwipeInit) return; // listeners already attached — don't stack duplicates
+  _obSwipeInit = true;
   const screen = el('screen-onboarding');
   if(!screen) return;
   let _touchStartX = 0;
@@ -4054,6 +4239,7 @@ User Profile:
 - City: ${city}
 - Meal context: ${timeContext}
 - Month: ${month} (infer the likely season and weather for this city and month)
+- Dosha dietary rules: ${buildDoshaRules(dosha)}
 
 Item to analyse: "${food}"
 
@@ -4351,7 +4537,7 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
     el('food-result-area').prepend(bannerDiv);
   }
 
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
 }
 
 function togglePersonalisePanel() {
@@ -4370,6 +4556,23 @@ async function refineBoostersWithContext() {
   const food = cache.food || '';
   const reason = cache.result.reason || '';
   const dosha = d.dosha?.primary || 'Vata';
+  const age = getUserAge();
+  const timingMode = window._mealTimingMode || 'now';
+  let timeContext;
+  if (timingMode === 'plan') {
+    const dateVal = el('meal-plan-date')?.value;
+    const hourVal = el('meal-plan-hour')?.value;
+    if (dateVal && hourVal !== undefined && hourVal !== '') {
+      const mealDate = new Date(dateVal + 'T' + String(hourVal).padStart(2,'0') + ':30:00');
+      const dayName = mealDate.toLocaleString('default',{weekday:'long'});
+      const dateStr = mealDate.toLocaleDateString([],{day:'numeric',month:'short',year:'numeric'});
+      const h = mealDate.getHours(), fmt = h => { const ampm=h>=12?'PM':'AM'; return (h%12||12)+':00 '+ampm; };
+      timeContext = `Planned meal on ${dayName}, ${dateStr} at ${fmt(h)}`;
+    }
+  }
+  if (!timeContext) {
+    timeContext = `Right now at ${new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+  }
   const originalBoosters = cache.result?.meal_boosters ? [...cache.result.meal_boosters] : [];
   const btn = el('btn-personalise-boosters');
   const link = el('booster-personalise-link');
@@ -4377,7 +4580,7 @@ async function refineBoostersWithContext() {
   if (btn) { btn.textContent = 'Generating…'; btn.disabled = true; }
   if (link) link.style.opacity = '0.4';
   if (list) list.innerHTML = '<div class="booster-shimmer"></div><div class="booster-shimmer" style="opacity:0.6"></div>';
-  const prompt =`You are an Ayurvedic nutritionist. The user ate "${food}" and got a YES verdict.\nOriginal reason: "${reason}"\nUser dosha: ${dosha}\nUser's personalisation request: "${userContext}"\n\nSuggest updated meal boosters that respect the user's preferences/restrictions.\nRespond ONLY in this JSON format (no markdown):\n{\n  "meal_boosters": [\n    { "nutrient": "e.g. Protein", "item": "Specific item", "why": "One short reason" }\n  ]\n}\nProvide 2-3 boosters.`;
+  const prompt =`You are an Ayurvedic nutritionist. The user ate "${food}" and got a YES verdict.\nOriginal reason: "${reason}"\nUser dosha: ${dosha}${age ? `\nUser age: ${age}` : ''}\nMeal time: ${timeContext}\nUser's personalisation request: "${userContext}"\n\nSuggest updated meal boosters that respect the user's preferences/restrictions and meal timing.\nRespond ONLY in this JSON format (no markdown):\n{\n  "meal_boosters": [\n    { "nutrient": "e.g. Protein", "item": "Specific item", "why": "One short reason" }\n  ]\n}\nProvide 2-3 boosters.`;
   try {
     const resp = await callOpenAI(prompt, d.settings.openaiApiKey);
     const parsed = JSON.parse(resp.replace(/```json|```/g, '').trim());
@@ -4704,6 +4907,33 @@ async function callOpenAIChat(messages, apiKey, maxTokens=1000) {
     logError('callOpenAIChat', e);
     throw e;
   }
+}
+
+async function callOpenAIChatStream(messages, apiKey, maxTokens, onChunk) {
+  const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},
+    body:JSON.stringify({model:'gpt-4o-mini',messages,stream:true,temperature:0.3,max_tokens:maxTokens})
+  });
+  if(!resp.ok){const err=await resp.json().catch(()=>({}));throw new Error(err.error?.message||`HTTP ${resp.status}`);}
+  setApiErrorState(false);
+  const reader=resp.body.getReader();
+  const decoder=new TextDecoder();
+  let buffer='',fullText='';
+  while(true){
+    const{done,value}=await reader.read();
+    if(done)break;
+    buffer+=decoder.decode(value,{stream:true});
+    const lines=buffer.split('\n');
+    buffer=lines.pop()||'';
+    for(const line of lines){
+      if(!line.startsWith('data: '))continue;
+      const chunk=line.slice(6).trim();
+      if(chunk==='[DONE]')return fullText;
+      try{const delta=JSON.parse(chunk).choices[0]?.delta?.content||'';if(delta){fullText+=delta;onChunk(fullText);}}catch{}
+    }
+  }
+  return fullText;
 }
 
 // ── API ERROR CLASSIFICATION ──
@@ -5130,7 +5360,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.26',
+      app_version: '1.53',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
@@ -5519,35 +5749,27 @@ function renderHerbChat() {
   herbState.chatHistory = herbState.chatHistory.length ? herbState.chatHistory : [
     {role:'ai', text:`Namaste 🙏 I'm your Ayurvedic herb advisor. You are a <strong>${d.dosha?.primary||'—'}</strong> type. Ask me anything about herbs, supplements, combinations, dosage, or any specific health concern.`}
   ];
-
-  el('herbs-wrap').innerHTML = `
-    <div class="top-bar" style="position:sticky;top:0;z-index:10;margin:-20px -16px 16px;padding:14px 16px;">
-      <div>
-        <div class="top-bar-title">Herb Chat</div>
-        <div class="top-bar-sub">Your Ayurvedic expert</div>
-      </div>
-      <button onclick="resetHerbAdvisor()" style="display:inline-flex;align-items:center;gap:4px;padding:7px 14px;background:var(--lotus-pale);border:1.5px solid var(--lotus);border-radius:20px;font-family:'Jost',sans-serif;font-size:12px;font-weight:600;color:var(--burgundy);cursor:pointer;"><span class="mi" style="font-size:15px;">arrow_back</span> Back</button>
-    </div>
-    <div class="herb-chat-card">
-      <div class="herb-chat-history" id="herb-chat-history">
-        ${renderChatBubbles()}
-      </div>
-      <div class="chat-input-row">
-        <input type="text" id="herb-chat-input"
-          placeholder="Ask about any herb or supplement..."
-          onkeydown="if(event.key==='Enter')sendHerbChat()"/>
-        <button class="chat-send-btn" id="herb-send-btn" onclick="sendHerbChat()">
-          <span class="mi" style="font-size:20px;">send</span>
-        </button>
-      </div>
-    </div>
-    <div class="herb-disclaimer">
-      <span class="mio" style="font-size:14px;vertical-align:-2px;margin-right:4px;">info</span> For serious conditions, always consult a qualified Vaidya or physician.
-    </div>
-  `;
   herbState.resultsShown = true;
   el('herb-reset-btn').style.display='flex';
+  openHerbChatOverlay();
+}
+
+function openHerbChatOverlay() {
+  const d = loadData();
+  const dosha = d.dosha?.primary || '—';
+  const city = d.city || 'Location not set';
+  el('herb-dosha-chip').innerHTML = `<span class="mio" style="font-size:14px;vertical-align:-2px;">eco</span> ${dosha} · ${city}`;
+  const overlay = el('herb-chat-overlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('open'));
+  updateChatDisplay();
   scrollChatToBottom();
+}
+
+function closeHerbChatOverlay() {
+  const overlay = el('herb-chat-overlay');
+  overlay.classList.remove('open');
+  overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
 }
 
 function renderChatBubbles() {
@@ -5578,38 +5800,35 @@ async function sendHerbChat() {
   const sendBtn = el('herb-send-btn');
   if(sendBtn) { sendBtn.disabled=true; sendBtn.innerHTML='<span class="loading-spinner" style="width:18px;height:18px;border-width:2px;margin:0;"></span>'; }
 
-  // Add loading bubble
-  herbState.chatHistory.push({role:'ai', text:'<span style="opacity:0.6">Consulting the Vaidya...</span>', loading:true});
   updateChatDisplay();
 
   const ctx = buildHerbContext();
   const history = herbState.chatHistory
-    .filter(m=>!m.loading)
     .slice(-8)
     .map(m=>({role: m.role==='user'?'user':'assistant', content: m.text.replace(/<[^>]+>/g,'')}));
 
   const systemPrompt = `You are an expert Ayurvedic Vaidya and herbalist. The user's profile:
 - Dosha: ${ctx.dosha} (Vata ${ctx.scores.Vata||0}%, Pitta ${ctx.scores.Pitta||0}%, Kapha ${ctx.scores.Kapha||0}%)
+- Age: ${ctx.age}
 - Ailments: ${ctx.ailments}
 - City: ${ctx.city}, Month: ${ctx.month}
 
 Answer herb and supplement questions from a classical Ayurvedic perspective. Be specific, practical, and always mention dosage, form, and timing. Flag any safety concerns. Keep answers concise (3-5 sentences). Never recommend stopping prescribed medications.`;
 
+  // Create streaming bubble directly in DOM
+  const chatEl = el('herb-chat-history');
+  const streamBubble = document.createElement('div');
+  streamBubble.className = 'chat-bubble ai streaming';
+  chatEl?.appendChild(streamBubble);
+  scrollChatToBottom();
+
   try {
-    const resp = await fetch('https://api.openai.com/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+ctx.apiKey},
-      body:JSON.stringify({
-        model:'gpt-4o-mini',
-        messages:[{role:'system',content:systemPrompt},...history],
-        temperature:0.4, max_tokens:500
-      })
-    });
-    if(!resp.ok){const e=await resp.json();throw new Error(e.error?.message||'API error');}
-    const data = await resp.json();
-    const aiText = data.choices[0].message.content;
-    // Replace loading bubble
-    herbState.chatHistory = herbState.chatHistory.filter(m=>!m.loading);
+    const aiText = await callOpenAIChatStream(
+      [{role:'system',content:systemPrompt},...history],
+      ctx.apiKey, 500,
+      (accumulated) => { streamBubble.textContent = accumulated; scrollChatToBottom(); }
+    );
+    streamBubble.remove();
     herbState.chatHistory.push({role:'ai', text: aiText});
   } catch(e) {
     const type = classifyApiError(e);
@@ -5622,7 +5841,7 @@ Answer herb and supplement questions from a classical Ayurvedic perspective. Be 
       network: 'No internet connection. Please check your network.',
       unknown: `Could not connect right now. (${e.message})`
     };
-    herbState.chatHistory = herbState.chatHistory.filter(m=>!m.loading);
+    streamBubble.remove();
     herbState.chatHistory.push({role:'ai', text: chatMsgs[type] || chatMsgs.unknown});
   } finally {
     herbState.chatLoading = false;
@@ -5637,6 +5856,7 @@ function updateChatDisplay() {
 }
 
 function resetHerbAdvisor() {
+  closeHerbChatOverlay();
   herbState = { mode:null, selectedConcerns:[], chatHistory:[], chatLoading:false, resultsShown:false };
   el('herb-reset-btn').style.display='none';
   const d = loadData();
@@ -6253,7 +6473,8 @@ let dinaFilterState = {
   wake: DINA_DEFAULT_WAKE,
   sleep: DINA_DEFAULT_SLEEP,
   symptoms: [],
-  diets: []   // persisted dietary preferences
+  diets: [],   // persisted dietary preferences
+  notes: ''    // transient — not persisted
 };
 
 function renderDinacharya_StartScreen(d) {
@@ -6361,6 +6582,17 @@ function renderDinacharya_StartScreen(d) {
             </div>`).join('')}
         </div>
       </div>
+
+      <!-- Special context -->
+      <div class="dina-filter-section">
+        <div class="dina-filter-label">
+          <span class="mi">edit_note</span> Anything special about today?
+          <span style="font-size:11px;font-weight:400;color:var(--text-light);">Optional</span>
+        </div>
+        <textarea id="dina-notes" class="dina-notes-input" rows="3"
+          placeholder="e.g. Birthday dinner tonight · Travelling to Mumbai · Might have a hangover · Indian food only"
+          oninput="dinaFilterState.notes=this.value.trim()">${dinaFilterState.notes || ''}</textarea>
+      </div>
     </div>
 
     <!-- What's included -->
@@ -6431,6 +6663,7 @@ async function generateDinacharya(forceRefresh=false) {
   const sleepVal = el('dina-sleep')?.value || dinaFilterState.sleep;
   dinaFilterState.wake = wakeVal;
   dinaFilterState.sleep = sleepVal;
+  dinaFilterState.notes = el('dina-notes')?.value.trim() || '';
 
   // Persist prefs
   saveDinaPrefs(wakeVal, sleepVal, dinaFilterState.dayOffset, dinaFilterState.diets);
@@ -6515,7 +6748,7 @@ Profile:
 - Chronic ailments: ${baseAilments.join(', ')||'None'}
 - Active symptoms today: ${activeSymptoms.join(', ')||'None'}
 - Dietary preferences: ${dietContext}
-- City: ${d.city||'unknown'}, Month: ${month}
+${dinaFilterState.notes ? `- Special context for today: ${dinaFilterState.notes}` : ''}- City: ${d.city||'unknown'}, Month: ${month}
 - Day: ${dayName} (${dateStr})
 - Wake up time: ${wakeDisplay}
 - Sleep time: ${sleepDisplay}
@@ -6527,6 +6760,11 @@ Rules:
 - Create exactly 8 time blocks covering their full day
 - If they have active symptoms, avoid activities that could aggravate those
 - Each block must be specific, actionable, personalised. No generic advice.
+- If "Special context for today" is provided, adapt the routine meaningfully — e.g. hangover → prioritise hydration, electrolytes, rest; travel → portable/minimal activities; heavy meal planned → keep earlier meals light, add digestive herbs in nearby blocks; food preference (e.g. Indian only) → all food suggestions must match that cuisine.
+- DOSHA DIETARY GUARDRAILS (strictly enforce in every food, drink and activity suggestion):
+  * Pitta: AVOID sour (lemon, citrus, vinegar), hot, spicy, salty; NO lemon water in morning drinks; use COOL or room-temp water, coconut water, mint/fennel/coriander infusions, cooling foods
+  * Vata: PREFER warm, oily, grounding foods; warm water, ginger tea, sesame; AVOID cold, raw, dry foods
+  * Kapha: PREFER warm, light, dry foods; warm water with ginger or honey; AVOID cold, heavy, oily, sweet foods
 ${fastingRules.length ? '- DIETARY RULES (strictly follow these):\n' + fastingRules.map(r=>'  * '+r).join('\n') : ''}
 
 Respond ONLY as valid JSON (no markdown, no trailing commas):
@@ -6710,15 +6948,14 @@ function renderDinacharya(data, targetDate, wakeDisplay, sleepDisplay, generated
 
 // ── PULL TO REFRESH ──
 function _refreshCurrentTab() {
-  switch(currentTab) {
-    case 'home':     renderHomeHistory(); loadDoshaInsights(); break;
-    case 'dina':     initDinacharya();    break;
-    case 'food':     initFoodCheck(); initMealTiming(); break;
-    case 'herbs':    initHerbAdvisor();   break;
-    case 'symptom':  initSymptomChecker(); break;
-    case 'history':  renderHistory();     break;
-    case 'settings': renderErrorLogs();   break;
-    default: break;
+  sessionStorage.setItem('ayurai_reload_tab', currentTab);
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready
+      .then(reg => reg.update())
+      .catch(() => {})
+      .finally(() => window.location.reload());
+  } else {
+    window.location.reload();
   }
 }
 
@@ -6765,26 +7002,40 @@ function initPullToRefresh() {
 
 // ── PWA ──
 let _deferredInstallPrompt = null;
+const PWA_BANNER_KEY = 'ayurai_pwa_banner';
+
+function _showInstalledState() {
+  const defaultHint = el('pwa-default-hint');
+  if(defaultHint) defaultHint.style.display = 'none';
+  const installBtn = el('pwa-install-btn');
+  if(installBtn) installBtn.style.display = 'none';
+  const iosHint = el('pwa-ios-hint');
+  if(iosHint) iosHint.style.display = 'none';
+  const installedHint = el('pwa-installed-hint');
+  if(installedHint) installedHint.style.display = 'flex';
+}
 
 function initPWA() {
-  // If already running as installed PWA — hide install section
-  if(window.matchMedia('(display-mode: standalone)').matches) {
-    const sec = el('pwa-install-section');
-    if(sec) sec.style.display = 'none';
-  }
   if('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(e => logError('sw', e));
+  }
+  // Already running as installed PWA — show installed confirmation
+  if(window.matchMedia('(display-mode: standalone)').matches) {
+    _showInstalledState();
   }
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     _deferredInstallPrompt = e;
     const btn = el('pwa-install-btn');
     if(btn) btn.style.display = 'flex';
+    const defaultHint = el('pwa-default-hint');
+    if(defaultHint) defaultHint.style.display = 'none';
+    initPWABanner(); // Only show banner when browser confirms app is installable
   });
   window.addEventListener('appinstalled', () => {
     _deferredInstallPrompt = null;
-    const sec = el('pwa-install-section');
-    if(sec) sec.style.display = 'none';
+    _showInstalledState();
+    hidePWAAll();
     showToast('AyurAI installed! 🎉');
   });
   window.addEventListener('offline', () => showToast('You\'re offline — AI features unavailable'));
@@ -6794,6 +7045,9 @@ function initPWA() {
   if(isIOS && !isStandalone) {
     const hint = el('pwa-ios-hint');
     if(hint) hint.style.display = 'flex';
+    const defaultHint = el('pwa-default-hint');
+    if(defaultHint) defaultHint.style.display = 'none';
+    initPWABanner(); // iOS has no beforeinstallprompt — show banner directly
   }
 }
 
@@ -6801,6 +7055,80 @@ function triggerPWAInstall() {
   if(_deferredInstallPrompt) {
     _deferredInstallPrompt.prompt();
     _deferredInstallPrompt.userChoice.then(() => { _deferredInstallPrompt = null; });
+  }
+}
+
+function isPWAInstalled() {
+  return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+}
+
+function initPWABanner() {
+  if (isPWAInstalled()) return;
+  const today = new Date().toISOString().slice(0, 10);
+  let stored = {};
+  try { stored = JSON.parse(localStorage.getItem(PWA_BANNER_KEY) || '{}'); } catch {}
+  if (stored.popupDate === today) {
+    const banner = el('pwa-mini-banner');
+    if (banner) {
+      banner.style.display = 'flex';
+      requestAnimationFrame(() => banner.classList.add('open'));
+      document.body.classList.add('has-pwa-banner');
+    }
+  } else {
+    showPWAPopup();
+  }
+}
+
+function showPWAPopup() {
+  const popup = el('pwa-popup');
+  if (!popup) return;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) {
+    const btn = el('pwa-popup-btn');
+    if (btn) btn.textContent = 'How to Install';
+    const sub = el('pwa-popup-sub');
+    if (sub) sub.textContent = 'Tap Share → "Add to Home Screen" for a better experience';
+  }
+  popup.style.display = 'flex';
+  document.body.classList.add('has-pwa-popup');
+  requestAnimationFrame(() => popup.classList.add('open'));
+}
+
+function dismissPWAPopup() {
+  const today = new Date().toISOString().slice(0, 10);
+  localStorage.setItem(PWA_BANNER_KEY, JSON.stringify({ popupDate: today }));
+  const popup = el('pwa-popup');
+  if (popup) {
+    popup.classList.remove('open');
+    popup.addEventListener('transitionend', () => { popup.style.display = 'none'; }, { once: true });
+    document.body.classList.remove('has-pwa-popup');
+  }
+  const banner = el('pwa-mini-banner');
+  if (banner) {
+    banner.style.display = 'flex';
+    requestAnimationFrame(() => banner.classList.add('open'));
+    document.body.classList.add('has-pwa-banner');
+  }
+}
+
+function hidePWAAll() {
+  localStorage.removeItem(PWA_BANNER_KEY);
+  document.body.classList.remove('has-pwa-popup', 'has-pwa-banner');
+  const popup = el('pwa-popup');
+  if (popup) { popup.classList.remove('open'); popup.style.display = 'none'; }
+  const banner = el('pwa-mini-banner');
+  if (banner) { banner.classList.remove('open'); banner.style.display = 'none'; }
+}
+
+function handlePWAInstall() {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) {
+    dismissPWAPopup();
+    showScreen('screen-app');
+    switchTab('settings');
+  } else {
+    triggerPWAInstall();
   }
 }
 
@@ -6880,10 +7208,19 @@ function getAskStarterPrompts(d) {
 
 function renderAskStarters(d) {
   const name = (d.user?.name || '').split(' ')[0] || 'there';
-  const dosha = d.dosha?.primary || 'your';
   const prompts = getAskStarterPrompts(d);
+  const now = new Date();
+  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const city = d.city || null;
+  const age = getUserAge();
+  const contextParts = [
+    `<span class="mi" style="font-size:12px;vertical-align:-2px;">schedule</span> ${time}`,
+    city ? `<span class="mi" style="font-size:12px;vertical-align:-2px;">location_on</span> ${city}` : null,
+    age ? `<span class="mi" style="font-size:12px;vertical-align:-2px;">person</span> Age ${age}` : null,
+  ].filter(Boolean).join('<span style="opacity:0.4"> · </span>');
   el('ask-chat').innerHTML = `
     <div class="ask-bubble ai">Hi ${name}! Namaste 🙏 I'm your Ayurvedic Advisor. Ask me anything.</div>
+    <div style="font-size:11px;color:var(--text-light);text-align:center;margin:-2px 0 8px;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;">${contextParts}</div>
     <div class="ask-starters" id="ask-starters">
       ${prompts.map(p => `<div class="ask-starter-card" onclick="sendAskMessage(this.dataset.p)" data-p="${p.replace(/"/g,'&quot;')}">${p}</div>`).join('')}
     </div>`;
@@ -6893,6 +7230,9 @@ function buildAskSystemPrompt(d) {
   const name = d.user?.name || 'the user';
   const age = getUserAge();
   const city = d.city || null;
+  const now = new Date();
+  const month = now.toLocaleString('default', { month: 'long' });
+  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const dosha = d.dosha || { primary: 'unknown', scores: {} };
   const ailments = (d.ailments?.length) ? d.ailments.join(', ') : 'none listed';
   const foods = (d.doshaInsights?.foods_to_avoid?.length)
@@ -6903,6 +7243,10 @@ function buildAskSystemPrompt(d) {
 Their dosha profile: ${dosha.primary} dominant (Vata ${dosha.scores?.Vata||0}%, Pitta ${dosha.scores?.Pitta||0}%, Kapha ${dosha.scores?.Kapha||0}%).
 Current ailments: ${ailments}.
 Foods they should avoid: ${foods}.
+Season context: ${city ? city + ', ' : ''}${month}. Current time: ${time}.
+
+${buildDoshaRules(dosha.primary)}
+Apply the above rules in every answer. Context matters — a food that is generally limited may be acceptable in small amounts at the right time or season; always explain the nuance.
 
 Answer ONLY Ayurvedic wellness questions — diet, dosha, herbs, lifestyle, and seasonal routines.
 If asked anything outside this scope, respond with a brief, warm decline and suggest 2 relevant Ayurvedic questions the user might actually want to ask. Format the suggestions as a JSON block at the end of your response in this exact format:
@@ -6947,29 +7291,47 @@ async function sendAskMessage(text) {
   try {
     const d = loadData();
     const apiKey = d.settings?.openaiApiKey;
-    if (!apiKey) { askAddMessage('ai', 'Please add your API key in Settings.'); askState.loading = false; return; }
+    if (!apiKey) { loadBubble.remove(); askAddMessage('ai', 'Please add your API key in Settings.'); askState.loading = false; return; }
     const systemPrompt = buildAskSystemPrompt(d);
     const messages = [
       { role: 'system', content: systemPrompt },
       ...askState.chatHistory
     ];
     const userTurns = askState.chatHistory.filter(m => m.role === 'user').length;
-    const raw = await callOpenAIChat(messages, apiKey, userTurns > 4 ? 1500 : 1000);
+    const maxTokens = userTurns > 4 ? 1500 : 1000;
 
-    loadBubble.remove();
+    // Convert loading bubble to streaming in-place
+    loadBubble.textContent = '';
+    loadBubble.classList.remove('loading');
+    loadBubble.classList.add('streaming');
 
-    let displayText = raw;
+    const fullText = await callOpenAIChatStream(messages, apiKey, maxTokens, (accumulated) => {
+      loadBubble.textContent = accumulated;
+      el('ask-chat').scrollTop = el('ask-chat').scrollHeight;
+    });
+
+    loadBubble.classList.remove('streaming');
+
+    let displayText = fullText;
     let suggestions = null;
-    const jsonMatch = raw.match(/\{"suggestions"\s*:\s*\[[\s\S]*?\]\}/);
+    const jsonMatch = fullText.match(/\{"suggestions"\s*:\s*\[[\s\S]*?\]\}/);
     if (jsonMatch) {
       try {
         suggestions = JSON.parse(jsonMatch[0]).suggestions;
-        displayText = raw.replace(jsonMatch[0], '').trim();
-      } catch(e) { /* fallback: show full text as-is */ }
+        displayText = fullText.replace(jsonMatch[0], '').trim();
+      } catch {}
     }
-
+    loadBubble.textContent = displayText;
     askState.chatHistory.push({ role: 'assistant', content: displayText });
-    askAddMessage('ai', displayText, suggestions);
+    if (suggestions?.length) {
+      const sugDiv = document.createElement('div');
+      sugDiv.className = 'ask-suggestions';
+      sugDiv.innerHTML = suggestions.map(s =>
+        `<div class="ask-suggestion-card" onclick="sendAskMessage(this.dataset.p)" data-p="${s.replace(/"/g,'&quot;')}">${s}</div>`
+      ).join('');
+      el('ask-chat').appendChild(sugDiv);
+      el('ask-chat').scrollTop = el('ask-chat').scrollHeight;
+    }
   } catch(e) {
     loadBubble.remove();
     logError('askAnything', e);

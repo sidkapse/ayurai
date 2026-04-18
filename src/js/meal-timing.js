@@ -66,35 +66,27 @@ function renderHerbChat() {
   herbState.chatHistory = herbState.chatHistory.length ? herbState.chatHistory : [
     {role:'ai', text:`Namaste 🙏 I'm your Ayurvedic herb advisor. You are a <strong>${d.dosha?.primary||'—'}</strong> type. Ask me anything about herbs, supplements, combinations, dosage, or any specific health concern.`}
   ];
-
-  el('herbs-wrap').innerHTML = `
-    <div class="top-bar" style="position:sticky;top:0;z-index:10;margin:-20px -16px 16px;padding:14px 16px;">
-      <div>
-        <div class="top-bar-title">Herb Chat</div>
-        <div class="top-bar-sub">Your Ayurvedic expert</div>
-      </div>
-      <button onclick="resetHerbAdvisor()" style="display:inline-flex;align-items:center;gap:4px;padding:7px 14px;background:var(--lotus-pale);border:1.5px solid var(--lotus);border-radius:20px;font-family:'Jost',sans-serif;font-size:12px;font-weight:600;color:var(--burgundy);cursor:pointer;"><span class="mi" style="font-size:15px;">arrow_back</span> Back</button>
-    </div>
-    <div class="herb-chat-card">
-      <div class="herb-chat-history" id="herb-chat-history">
-        ${renderChatBubbles()}
-      </div>
-      <div class="chat-input-row">
-        <input type="text" id="herb-chat-input"
-          placeholder="Ask about any herb or supplement..."
-          onkeydown="if(event.key==='Enter')sendHerbChat()"/>
-        <button class="chat-send-btn" id="herb-send-btn" onclick="sendHerbChat()">
-          <span class="mi" style="font-size:20px;">send</span>
-        </button>
-      </div>
-    </div>
-    <div class="herb-disclaimer">
-      <span class="mio" style="font-size:14px;vertical-align:-2px;margin-right:4px;">info</span> For serious conditions, always consult a qualified Vaidya or physician.
-    </div>
-  `;
   herbState.resultsShown = true;
   el('herb-reset-btn').style.display='flex';
+  openHerbChatOverlay();
+}
+
+function openHerbChatOverlay() {
+  const d = loadData();
+  const dosha = d.dosha?.primary || '—';
+  const city = d.city || 'Location not set';
+  el('herb-dosha-chip').innerHTML = `<span class="mio" style="font-size:14px;vertical-align:-2px;">eco</span> ${dosha} · ${city}`;
+  const overlay = el('herb-chat-overlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('open'));
+  updateChatDisplay();
   scrollChatToBottom();
+}
+
+function closeHerbChatOverlay() {
+  const overlay = el('herb-chat-overlay');
+  overlay.classList.remove('open');
+  overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
 }
 
 function renderChatBubbles() {
