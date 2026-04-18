@@ -485,7 +485,7 @@ function renderDinacharya_StartScreen(d) {
       </div>
 
       <!-- Special context -->
-      <div class="dina-filter-section" style="padding-bottom:18px;">
+      <div class="dina-filter-section">
         <div class="dina-filter-label">
           <span class="mi">edit_note</span> Anything special about today?
           <span style="font-size:11px;font-weight:400;color:var(--text-light);">Optional</span>
