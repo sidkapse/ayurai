@@ -215,7 +215,8 @@ async function sendAskMessage(text) {
       } catch {}
     }
     loadBubble.textContent = displayText;
-    askState.chatHistory.push({ role: 'assistant', content: displayText });
+    const stored = suggestions?.length ? `${displayText}\n[Suggested follow-ups: ${suggestions.join('; ')}]` : displayText;
+    askState.chatHistory.push({ role: 'assistant', content: stored });
     if (suggestions?.length) {
       const sugDiv = document.createElement('div');
       sugDiv.className = 'ask-suggestions';
