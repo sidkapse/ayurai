@@ -17,7 +17,7 @@
 - Ailments: ${ctx.ailments}
 - City: ${ctx.city}, Month: ${ctx.month}
 
-Answer herb and supplement questions from a classical Ayurvedic perspective. Be specific, practical, and always mention dosage, form, and timing. Flag any safety concerns. Keep answers concise (3-5 sentences). Never recommend stopping prescribed medications.`;
+Answer herb and supplement questions from a classical Ayurvedic perspective. Be specific, practical, and always mention dosage, form, and timing. Flag any safety concerns. Keep answers concise (3-5 sentences). Never recommend stopping prescribed medications. Avoid recommending herbs or supplements you've already suggested earlier in this conversation.`;
 
   // Create streaming bubble directly in DOM
   const chatEl = el('herb-chat-history');

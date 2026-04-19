@@ -3091,7 +3091,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.62 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.63 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -3172,7 +3172,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.62'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.63'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
@@ -5361,7 +5361,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.62',
+      app_version: '1.63',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
@@ -5814,7 +5814,7 @@ async function sendHerbChat() {
 - Ailments: ${ctx.ailments}
 - City: ${ctx.city}, Month: ${ctx.month}
 
-Answer herb and supplement questions from a classical Ayurvedic perspective. Be specific, practical, and always mention dosage, form, and timing. Flag any safety concerns. Keep answers concise (3-5 sentences). Never recommend stopping prescribed medications.`;
+Answer herb and supplement questions from a classical Ayurvedic perspective. Be specific, practical, and always mention dosage, form, and timing. Flag any safety concerns. Keep answers concise (3-5 sentences). Never recommend stopping prescribed medications. Avoid recommending herbs or supplements you've already suggested earlier in this conversation.`;
 
   // Create streaming bubble directly in DOM
   const chatEl = el('herb-chat-history');
@@ -7323,7 +7323,8 @@ async function sendAskMessage(text) {
       } catch {}
     }
     loadBubble.textContent = displayText;
-    askState.chatHistory.push({ role: 'assistant', content: displayText });
+    const stored = suggestions?.length ? `${displayText}\n[Suggested follow-ups: ${suggestions.join('; ')}]` : displayText;
+    askState.chatHistory.push({ role: 'assistant', content: stored });
     if (suggestions?.length) {
       const sugDiv = document.createElement('div');
       sugDiv.className = 'ask-suggestions';
