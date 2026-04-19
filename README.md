@@ -112,8 +112,24 @@ ayurai/
 ├── scripts/
 │   ├── build.js                # Assembles src/ → public/index.html (alt build workflow)
 │   ├── validate.js             # Validates docs/index.html (syntax, IDs, functions, coverage)
-│   └── stamp-version.js        # Bumps minor version + SW cache key across all files
+│   ├── stamp-version.js        # Bumps minor version + SW cache key across all files
+│   └── hooks/
+│       └── pre-push            # Git hook: stamps version, amends commit, force-pushes
 │
+├── .claude/                    # Claude Code configuration (shared via git)
+│   ├── settings.json           # Hooks: SessionStart (install git hook) + PreToolUse (guard)
+│   ├── hooks/
+│   │   ├── session-start.sh    # Installs git pre-push hook at session start
+│   │   └── validate-bash.sh    # Blocks destructive shell commands (rm -rf, git reset --hard…)
+│   ├── rules/
+│   │   ├── code-style.md       # Material Icons, CSS variables, DOM helpers, overlay patterns
+│   │   └── api-conventions.md  # OpenAI wrapper selection + response parsing conventions
+│   ├── commands/
+│   │   └── review.md           # /project:review — runs syntax check + full validator
+│   ├── skills/deploy/          # Deploy skill pattern (reference for future projects)
+│   └── agents/                 # Code reviewer & security auditor agents (reference docs)
+│
+├── .mcp.json                   # GitHub MCP server — connects Claude to sidkapse/ayurai repo
 ├── specs/                      # Feature design specs (mirrors docs/superpowers/specs/)
 ├── package.json                # devDependencies: gh-pages only
 └── README.md
@@ -171,13 +187,16 @@ All configuration is stored in `localStorage` under the key `ayurai_my_info`.
 
 ### OpenAI API Functions
 
-The app uses `gpt-4o-mini` for all calls via three wrapper functions:
+The app uses `gpt-4o-mini` for all calls via four wrapper functions defined in `core.js`:
 
 | Function | Signature | Used For |
 |---|---|---|
-| `callOpenAI()` | `(prompt, key)` → 1,000 tokens | Simple responses (remedy, dosha insights) |
+| `callOpenAI()` | `(prompt, key)` → ~1,000 tokens | Simple JSON responses (remedy, dosha insights) |
 | `callOpenAILarge()` | `(prompt, key, maxTokens)` → up to 3,500 | Complex responses (food check, herbs, symptoms, dinacharya) |
-| `callOpenAIChat()` | `(messages[], key, maxTokens)` → 1,000–1,500 | Multi-turn conversation (Ask Anything) |
+| `callOpenAIChat()` | `(messages[], key, maxTokens)` | Multi-turn conversation without streaming |
+| `callOpenAIChatStream()` | `(messages[], key, maxTokens, onChunk)` | Streaming responses — `onChunk(delta)` called per token (herb chat, Ask Anything) |
+
+> All AI responses are parsed with `.replace(/```json\|```/g, '').trim()` before `JSON.parse()` to strip markdown fences the model occasionally wraps around JSON output.
 
 ---
 
@@ -319,15 +338,24 @@ No environment variables. No build step. No node_modules at runtime. The file wo
 
 ---
 
-## 🔧 Scripts
+## 🔧 Scripts & Commands
+
+### CLI Scripts
 
 | Command | Purpose |
 |---|---|
 | `node scripts/validate.js` | Full validation of `docs/index.html` — JS syntax, required functions, HTML IDs, `el()` integrity, duplicate declarations, API error handling coverage |
 | `node scripts/stamp-version.js` | Bumps minor version number and SW cache key across `docs/index.html`, `src/`, and `docs/sw.js` |
 | `node scripts/build.js` | Assembles `src/` files into `public/index.html` (alternative build workflow; `docs/index.html` is still primary) |
+| `python3 -m http.server 8080 --directory docs` | Serve the app locally at `http://localhost:8080` |
 
-Run `node scripts/validate.js` before every commit. All checks must pass.
+### Claude Code Slash Commands
+
+| Command | Purpose |
+|---|---|
+| `/project:review` | Runs JS syntax check + `node scripts/validate.js` and reports pass/fail. Use before every commit. |
+
+Run `node scripts/validate.js` (or `/project:review`) before every commit. All checks must pass.
 
 ---
 
@@ -335,17 +363,28 @@ Run `node scripts/validate.js` before every commit. All checks must pass.
 
 1. Edit `docs/index.html` directly (it is the source of truth for deployment)
 2. Mirror changes into the corresponding `src/` file for readability
-3. Run `node scripts/validate.js` — all checks must pass
+3. Run `/project:review` or `node scripts/validate.js` — all checks must pass
 4. Test by serving `docs/` locally: `python3 -m http.server 8080 --directory docs`
 
 ### Code Conventions
 
+Full rules are in `.claude/rules/` (loaded automatically by Claude Code). Key points:
+
 - **No frameworks** — vanilla JS only
 - **No build tools required** — `docs/index.html` is edited directly and deployed as-is
-- **CSS variables** for all colours — defined in `:root` at the top of `main.css`
+- **CSS variables** for all colours — defined in `:root` at the top of `main.css` (see `.claude/rules/code-style.md` for the full variable reference)
 - **Material Icons** for all icons — `<span class="mi">icon_name</span>` (filled) or `<span class="mio">icon_name</span>` (outlined). Never use emoji for UI icons.
 - **Error handling** — all async functions must call `logError(context, e)` in their catch block
-- **Token efficiency** — `callOpenAI()` for ≤1k token responses, `callOpenAILarge()` for larger ones, `callOpenAIChat()` for multi-turn conversations
+- **API wrapper selection** — `callOpenAI()` for ≤1k token JSON responses, `callOpenAILarge()` for larger, `callOpenAIChat()` for multi-turn, `callOpenAIChatStream()` for streaming (see `.claude/rules/api-conventions.md`)
+
+### Claude Code Setup (for AI-assisted development)
+
+The `.claude/` directory configures Claude Code for this project:
+
+- **Hooks** — `validate-bash.sh` blocks destructive commands; `session-start.sh` installs the git pre-push hook
+- **Rules** — `code-style.md` and `api-conventions.md` are loaded every session
+- **Commands** — `/project:review` validates the codebase end-to-end
+- **MCP** — `.mcp.json` connects Claude to the GitHub repository for PR/issue management
 
 ---
 
