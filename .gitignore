@@ -48,6 +48,18 @@ temp/
 !.claude/settings.json
 !.claude/hooks
 !.claude/hooks/session-start.sh
+!.claude/hooks/validate-bash.sh
+!.claude/rules
+!.claude/rules/**
+!.claude/commands
+!.claude/commands/**
+!.claude/skills
+!.claude/skills/**
+!.claude/agents
+!.claude/agents/**
+# Local-only overrides — never commit
+.claude/settings.local.json
+CLAUDE.local.md
 
 # ── Never commit these ──
 # API keys should never be in source — they are stored in localStorage by the user

@@ -1,0 +1,12 @@
+{
+  "_doc": "PURPOSE: Stores MCP (Model Context Protocol) server configurations. Shared via git so Claude Code has consistent external tool access in every session — no manual setup required. BENEFIT: GitHub MCP tools (mcp__github__*) are available automatically for the sidkapse/ayurai repository without configuring them each session. EXAMPLE: mcp__github__pull_request_read, mcp__github__add_issue_comment, mcp__github__list_branches all work out-of-the-box. Set GITHUB_TOKEN in your shell environment (export GITHUB_TOKEN=ghp_...).",
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  }
+}
