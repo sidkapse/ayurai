@@ -23,6 +23,9 @@ python3 -m http.server 8080 --directory docs
 # Bump version + SW cache key across all files
 node scripts/stamp-version.js
 
+# Run validator via npm alias
+npm run validate
+
 # Assemble src/ → public/index.html (dev/testing use only, NOT the deployment artifact)
 node scripts/build.js
 ```
@@ -205,7 +208,7 @@ setData('settings.openaiApiKey', key) // dot-path setter, auto-saves
 - [ ] Add HTML tab panel in `src/html/app.html`
 - [ ] Add tab nav item in `<nav id="tab-bar">` (max 5 tabs on mobile)
 - [ ] Add `if(name==='feature') initFeature();` in `switchTab()` in `core.js`
-- [ ] Add new top-level functions to `REQUIRED_FUNCTIONS` array in `scripts/validate.js` (~line 37)
+- [ ] Add new top-level functions to `REQUIRED_FUNCTIONS` array in `scripts/validate.js` (~line 37, 80+ functions + 60+ HTML ID checks)
 - [ ] Mirror all changes into `docs/index.html`
 - [ ] Run `node scripts/validate.js` — all checks must pass
 
@@ -213,8 +216,8 @@ setData('settings.openaiApiKey', key) // dot-path setter, auto-saves
 
 | Variable | Module | Purpose |
 |---|---|---|
-| `dinaCache` | dinacharya.js | Today's routine (keyed by date string) |
-| `dinaFilterState` | dinacharya.js | Day offset, wake/sleep times, diet prefs, active symptoms |
+| `dinaCache` | dinacharya.js | Today's routine — `{ data, targetDateStr, wakeDisplay, sleepDisplay, generatedAt }` |
+| `dinaFilterState` | dinacharya.js | `{ dayOffset: 1, selectedSymptoms: [], selectedDiets: [] }` — wake/sleep stored separately in `ayurai_dina_prefs` |
 | `herbState` | herbs.js | Mode, selected concerns, chat history |
 | `symptomState` | symptoms.js | Selected areas, duration, severity, description |
 | `quizState` | quiz.js | Phase, question index, scores, ailments |
@@ -234,8 +237,12 @@ setData('settings.openaiApiKey', key) // dot-path setter, auto-saves
 | `ERROR_LOG_KEY` | core.js | `'ayurai_error_log'` |
 | `API_ERR_STORAGE_KEY` | food.js | `'ayurai_api_err'` — persists API error state |
 | `FOOD_CACHE_KEY` | food.js | `'ayurai_food_cache'` |
-| `DINA_CACHE_KEY` | dinacharya.js | `'ayurai_dina_cache'` |
-| `APP_VERSION` | core.js | Current version string (auto-bumped by stamp-version.js) |
+| `DINA_CACHE_KEY` | dinacharya.js | `'ayurai_dina_cache'` — cached generated routine |
+| `DINA_DEFAULT_WAKE` | dinacharya.js | `'06:30'` |
+| `DINA_DEFAULT_SLEEP` | dinacharya.js | `'22:30'` |
+| `APP_VERSION` | core.js | Current version string (auto-bumped by stamp-version.js) — currently `v1.76` |
+
+> **Note:** Wake/sleep times and day offset are persisted separately under `ayurai_dina_prefs` (not inside `ayurai_my_info`).
 
 ## CSS Variables
 
@@ -256,10 +263,11 @@ setData('settings.openaiApiKey', key) // dot-path setter, auto-saves
 - Cache key format: `ayurai-YYYYMMDD-HHMMSS` (updated by `stamp-version.js`)
 - `initPWA()` — registers service worker, handles `beforeinstallprompt`, shows iOS install hint
 - `triggerPWAInstall()` — fires the deferred install prompt on user tap
+- `shareApp()` — shares the app URL via `navigator.share()` or copies to clipboard (Settings tab)
 
 ## Version Management
 
-`scripts/stamp-version.js` bumps the minor version (e.g. `v1.26` → `v1.27`) and updates `docs/index.html`, `src/html/app.html`, `src/js/core.js`, `src/js/herbs.js`, and `docs/sw.js`. Run manually before a release; the pre-push hook runs it automatically on every push.
+`scripts/stamp-version.js` bumps the minor version (e.g. `v1.76` → `v1.77`) and updates these 5 files: `docs/index.html`, `src/html/app.html`, `src/js/core.js`, `src/js/herbs.js`, and `docs/sw.js` (cache key). Run manually before a release; the pre-push hook runs it automatically on every push.
 
 ## Known Intentional Decisions
 
