@@ -182,8 +182,9 @@ All configuration is stored in `localStorage` under the key `ayurai_my_info`.
 | Setting | Where to set | Description |
 |---|---|---|
 | OpenAI API Key | Settings → AI Configuration | Required for all AI features. Uses `gpt-4o-mini`. |
-| City | Settings → Location | Used for seasonal inference in all AI prompts |
-| Date of birth | Settings → Profile | Used to include age in AI prompts |
+| City | Settings → Location & Profile | Used for seasonal inference in all AI prompts |
+| Date of birth | Settings → Location & Profile | Used to include age in AI prompts |
+| Gender | Settings → Location & Profile | Used in all AI prompts for personalised recommendations |
 | Wake/Sleep time | Routine tab → filters | Persisted in `ayurai_dina_prefs` |
 
 ### OpenAI API Functions
@@ -226,6 +227,7 @@ All app data lives in `localStorage`. Full schema in [`docs/DATA_MODEL.md`](docs
   "city": "Singapore",
   "birth_month": 3,                   // optional — used for age in AI prompts
   "birth_year": 1990,                 // optional
+  "gender": "Male",                   // optional — Male|Female|Non-binary|"" (Prefer not to say)
   "foodHistory": [                    // last 10 food checks (FIFO)
     { "food": "Chicken biryani", "verdict": "YES", "reason": "...", "timestamp": "..." }
   ],
