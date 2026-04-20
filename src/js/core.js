@@ -1,7 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.77'; // kept in sync by pre-push hook (scripts/stamp-version.js)
-
+const APP_VERSION = '1.81'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -127,7 +126,7 @@ function doSignup() {
   if(existing.user) { err.textContent='An account already exists on this device.'; err.style.display='block'; return; }
   const data = {
     user: { name, email, password: pass, createdAt: new Date().toISOString() },
-    dosha: null, ailments: [], city: '', foodHistory: [],
+    dosha: null, ailments: [], city: '', gender: '', foodHistory: [],
     settings: { openaiApiKey: '' },
     meta: { appVersion: '1.0', lastLogin: new Date().toISOString() }
   };
@@ -178,6 +177,7 @@ function initApp() {
   el('settings-city').value = d.city || '';
   if(el('settings-birth-month')) el('settings-birth-month').value = d.birth_month || '';
   if(el('settings-birth-year'))  el('settings-birth-year').value  = d.birth_year  || '';
+  if(el('settings-gender'))      el('settings-gender').value      = d.gender       || '';
   el('settings-apikey').value = d.settings?.openaiApiKey || '';
   // Dosha badge + card
   if(d.dosha) {
