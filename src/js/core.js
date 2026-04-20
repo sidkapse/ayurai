@@ -1,6 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.85'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.86'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -193,6 +193,61 @@ function verifyRecoveryCode() {
   el('new-password-section').style.display = 'block';
 }
 
+function renderRecoveryCodeSettings() {
+  const body = el('settings-recovery-body');
+  if(!body) return;
+  const d = loadData();
+  if(d.user && d.user.recoveryCode) {
+    body.innerHTML = `
+      <div class="settings-row-label">Recovery Code</div>
+      <div class="settings-row-sub" style="display:flex;align-items:center;gap:6px;">
+        <span class="mi" style="font-size:15px;color:#4A7C59;">check_circle</span>
+        Recovery code is set
+      </div>
+      <button class="settings-action-btn" onclick="showChangeRecoveryCode()" style="margin-top:12px;">
+        <span class="mi" style="font-size:15px;">edit</span> Change Recovery Code
+      </button>
+      <div id="settings-recovery-change" style="display:none;margin-top:14px;">
+        <div class="error-msg" id="settings-recovery-error" style="display:none;"></div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>New 4-digit Recovery Code</label>
+          <input type="number" id="settings-recovery-input" class="settings-input" placeholder="Enter new code" min="1000" max="9999"/>
+        </div>
+        <button class="settings-save-btn" onclick="saveRecoveryCodeSettings()"><span class="mi" style="font-size:15px;">check</span> Save</button>
+      </div>`;
+  } else {
+    body.innerHTML = `
+      <div class="settings-row-label">Recovery Code</div>
+      <div class="settings-row-sub">Set a 4-digit code to recover your password if you forget it.</div>
+      <div class="error-msg" id="settings-recovery-error" style="display:none;margin-top:10px;"></div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <input type="number" id="settings-recovery-input" class="settings-input" placeholder="4-digit code" min="1000" max="9999" style="flex:1;"/>
+        <button class="settings-save-btn" onclick="saveRecoveryCodeSettings()"><span class="mi" style="font-size:15px;">check</span> Save</button>
+      </div>`;
+  }
+}
+
+function showChangeRecoveryCode() {
+  const section = el('settings-recovery-change');
+  if(section) section.style.display = 'block';
+}
+
+function saveRecoveryCodeSettings() {
+  const input = el('settings-recovery-input');
+  const errEl = el('settings-recovery-error');
+  const code = String(input ? input.value : '').trim();
+  if(errEl) errEl.style.display = 'none';
+  if(!/^\d{4}$/.test(code)) {
+    if(errEl) { errEl.textContent = 'Enter a valid 4-digit code.'; errEl.style.display = 'block'; }
+    return;
+  }
+  const d = loadData();
+  d.user.recoveryCode = code;
+  saveData(d);
+  showToast('Recovery code saved.');
+  renderRecoveryCodeSettings();
+}
+
 function doPasswordReset() {
   const newPass = el('new-password-input').value;
   const errEl = el('recovery-error');
@@ -334,7 +389,7 @@ function switchTab(name) {
   if(name==='symptom') initSymptomChecker();
   if(name==='food') { initFoodCheck(); setTimeout(initMealTiming, 50); }
   if(name==='dina') initDinacharya();
-  if(name==='settings') { renderErrorLogs(); setApiErrorState(false); }
+  if(name==='settings') { renderErrorLogs(); setApiErrorState(false); renderRecoveryCodeSettings(); }
 }
 
 // ── ONBOARDING ──

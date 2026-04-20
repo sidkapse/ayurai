@@ -751,6 +751,12 @@
           </div>
         </div>
 
+        <!-- Account Security -->
+        <div class="settings-group">
+          <div class="settings-group-title"><span class="mi">lock</span><span class="settings-group-title-text">Account Security</span></div>
+          <div class="settings-group-body" id="settings-recovery-body"></div>
+        </div>
+
         <!-- Account -->
         <div class="settings-group">
           <div class="settings-group-title"><span class="mi">manage_accounts</span><span class="settings-group-title-text">Account</span></div>
@@ -762,7 +768,7 @@
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.85 · Ancient Wisdom, Modern Intelligence        </div>
+          AyurAI v1.86 · Ancient Wisdom, Modern Intelligence        </div>
 
       </div>
     </div>
@@ -886,7 +892,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.85',    error_count: logs.length,
+    app_version: '1.86',    error_count: logs.length,
     errors: logs
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
@@ -2717,7 +2723,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.85',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.86',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
