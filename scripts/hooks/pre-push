@@ -24,6 +24,9 @@ fi
 # Bump version and SW cache key
 node "$REPO_ROOT/scripts/stamp-version.js" || exit 1
 
+# Read the new version so we can update the commit message
+NEW_VERSION=$(grep -o "APP_VERSION = '[^']*'" "$REPO_ROOT/src/js/core.js" | grep -o "'[^']*'" | tr -d "'")
+
 # Stage the modified version files
 git add \
   "$REPO_ROOT/docs/index.html" \
@@ -32,13 +35,17 @@ git add \
   "$REPO_ROOT/src/js/core.js" \
   "$REPO_ROOT/src/js/herbs.js"
 
-# Amend last commit to bake in the version bump
+# Amend last commit — replace any vX.XX in the message with the bumped version
 if ! git diff --cached --quiet; then
-  git commit --amend --no-edit -q || exit 1
+  OLD_MSG=$(git log -1 --format=%B)
+  NEW_MSG=$(echo "$OLD_MSG" | sed "s/v[0-9][0-9]*\.[0-9][0-9]*/v$NEW_VERSION/g")
+  git commit --amend -m "$NEW_MSG" -q || exit 1
 fi
 
 # Push the amended commit (--no-verify prevents hook recursion)
-git push --force-with-lease --no-verify "$REMOTE" "$BRANCH"
+# --force used instead of --force-with-lease to avoid stale tracking-ref failures
+# on newly created branches that haven't been pushed yet.
+git push --force --no-verify "$REMOTE" "$BRANCH"
 PUSH_STATUS=$?
 
 if [ $PUSH_STATUS -eq 0 ]; then
