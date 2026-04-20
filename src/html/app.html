@@ -555,8 +555,36 @@
               <span class="mi" style="font-size:16px;">arrow_forward</span>
             </button>
             <div class="pwa-ios-hint" id="pwa-ios-hint" style="display:none;">
-              <span class="mio" style="font-size:22px;color:var(--gold);flex-shrink:0;">ios_share</span>
-              <div>Tap <b>Share</b> <span class="mio" style="font-size:14px;vertical-align:middle;">ios_share</span> then <b>"Add to Home Screen"</b> to install AyurAI</div>
+              <div class="ios-hint-header">
+                <span class="mio" style="font-size:20px;color:var(--gold);flex-shrink:0;">phone_iphone</span>
+                <div>
+                  <div style="font-weight:600;font-size:13px;color:var(--charcoal);">Install on iPhone / iPad</div>
+                  <div style="font-size:11px;color:var(--text-muted);margin-top:1px;">Works in Safari &amp; Chrome</div>
+                </div>
+              </div>
+              <ol class="ios-install-steps">
+                <li class="ios-install-step">
+                  <div class="ios-step-num">1</div>
+                  <div class="ios-step-body">
+                    <div class="ios-step-title">Tap the Share button <span class="mio" style="font-size:14px;vertical-align:middle;color:var(--burgundy);">ios_share</span></div>
+                    <div class="ios-step-desc">Find it at the bottom of your browser — the box with an arrow pointing up.</div>
+                  </div>
+                </li>
+                <li class="ios-install-step">
+                  <div class="ios-step-num">2</div>
+                  <div class="ios-step-body">
+                    <div class="ios-step-title">Tap "Add to Home Screen"</div>
+                    <div class="ios-step-desc">Scroll down in the menu that appears and tap this option.</div>
+                  </div>
+                </li>
+                <li class="ios-install-step">
+                  <div class="ios-step-num">3</div>
+                  <div class="ios-step-body">
+                    <div class="ios-step-title">Tap "Add"</div>
+                    <div class="ios-step-desc">Confirm by tapping Add in the top-right corner.</div>
+                  </div>
+                </li>
+              </ol>
             </div>
           </div>
         </div>
@@ -695,7 +723,7 @@
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.83 · Ancient Wisdom, Modern Intelligence        </div>
+          AyurAI v1.84 · Ancient Wisdom, Modern Intelligence        </div>
 
       </div>
     </div>
@@ -819,7 +847,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.83',    error_count: logs.length,
+    app_version: '1.84',    error_count: logs.length,
     errors: logs
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
@@ -2650,7 +2678,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.83',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.84',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
