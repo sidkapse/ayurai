@@ -34,6 +34,7 @@ A fully client-side Ayurvedic wellness web application. No backend required. Run
 | **Daily Routine** | AI-generated Dinacharya with 8 personalised time blocks |
 | **Dosha Insights** | Home card with foods to avoid, best meal times, top 3 care tips |
 | **PWA / Installable** | Works offline (app shell cached), installable on mobile and desktop |
+| **Share App** | One-tap share via native Web Share API (mobile) or clipboard copy (desktop) from Settings |
 | **Error Diagnostics** | Last 5 errors logged locally; exportable as `<username>_error_logs.json` |
 | **Data Portability** | Full profile export/import as `my_info.json` |
 
@@ -266,6 +267,7 @@ Data layer, error logging, auth (signup/login/logout), app initialisation, tab r
 - `showToast(msg)` — bottom notification
 - `el(id)` / `setText(id, text)` / `setHTML(id, html)` — safe DOM helpers
 - `initPWA()` / `triggerPWAInstall()` — PWA install prompt handling
+- `shareApp()` — native Web Share API with clipboard-copy fallback for desktop
 - `initPullToRefresh()` — pull-to-refresh gesture on the app scroller
 
 ### `src/js/quiz.js`
@@ -365,6 +367,9 @@ Run `node scripts/validate.js` (or `/project:review`) before every commit. All c
 2. Mirror changes into the corresponding `src/` file for readability
 3. Run `/project:review` or `node scripts/validate.js` — all checks must pass
 4. Test by serving `docs/` locally: `python3 -m http.server 8080 --directory docs`
+5. Commit messages **and PR titles** must end with the app version: `feat: description v1.XX`
+   — read the current version: `grep -o "APP_VERSION = '[^']*'" src/js/core.js | grep -o "'[^']*'" | tr -d "'"`
+   — the pre-push hook bumps the version on push, so use the post-push version in the PR title
 
 ### Code Conventions
 
@@ -381,7 +386,7 @@ Full rules are in `.claude/rules/` (loaded automatically by Claude Code). Key po
 
 The `.claude/` directory configures Claude Code for this project:
 
-- **Hooks** — `validate-bash.sh` blocks destructive commands; `session-start.sh` installs the git pre-push hook
+- **Hooks** — `validate-bash.sh` blocks destructive commands; `session-start.sh` installs the git pre-push hook (bumps version, rewrites commit message version, force-pushes amended commit)
 - **Rules** — `code-style.md` and `api-conventions.md` are loaded every session
 - **Commands** — `/project:review` validates the codebase end-to-end
 - **MCP** — `.mcp.json` connects Claude to the GitHub repository for PR/issue management

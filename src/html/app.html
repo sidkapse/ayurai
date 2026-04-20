@@ -684,7 +684,7 @@
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.75 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.76 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -809,7 +809,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.75',
+    app_version: '1.76',
     error_count: logs.length,
     errors: logs
   };
@@ -2641,7 +2641,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.75',
+      app_version: '1.76',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
