@@ -51,7 +51,7 @@ const REQUIRED_FUNCTIONS = [
   'isFirstTimeUser', 'goToOnboardingSlide', 'skipOnboarding', 'nextOnboardingSlide',
   'replayOnboarding', 'closeOnboarding', 'initOnboardingSwipe', 'initOnboardingParticles',
   // Core — PWA & pull-to-refresh
-  'initPWA', 'triggerPWAInstall', 'initPullToRefresh',
+  'initPWA', 'triggerPWAInstall', 'shareApp', 'initPullToRefresh',
   'isPWAInstalled', 'initPWABanner', 'showPWAPopup', 'dismissPWAPopup', 'hidePWAAll', 'handlePWAInstall',
   // Quiz
   'initQuiz', 'startQuiz', 'nextQuestion', 'saveStage1', 'finalizeStage2',
