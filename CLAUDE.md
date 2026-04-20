@@ -78,6 +78,9 @@ The `error: failed to push some refs` message printed after every push is **cosm
 ## Git Conventions
 
 - Commit messages must end with the app version: `feat: description v1.XX`
+- **PR titles must also end with the app version** (same format): `feat: description v1.XX`
+  — read the current version with: `grep -o "APP_VERSION = '[^']*'" src/js/core.js | grep -o "'[^']*'" | tr -d "'"`
+  — the pre-push hook bumps the version on push, so use the post-push version in the PR title
 - Always branch from latest main: `git checkout -b claude/feature-name origin/main`
 - Never develop directly on `main`
 
