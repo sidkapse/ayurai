@@ -252,6 +252,9 @@ body::before{
   color:var(--text-light);
 }
 .auth-import a{color:var(--text-muted);font-weight:500;cursor:pointer;text-decoration:underline;text-decoration-color:rgba(139,111,94,0.3);}
+.forgot-link{text-align:right;margin:6px 0 0;font-size:13px;}
+.forgot-link a{color:var(--burgundy);font-weight:500;cursor:pointer;}
+.form-hint{font-size:12px;color:var(--text-light);margin:6px 0 0;line-height:1.4;}
 .error-msg{
   background:rgba(180,30,30,0.08);
   border:1px solid rgba(180,30,30,0.2);
