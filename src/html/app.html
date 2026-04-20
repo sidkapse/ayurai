@@ -514,6 +514,20 @@
           </div>
         </div>
 
+        <!-- Share App -->
+        <div class="settings-group">
+          <div class="settings-group-title"><span class="mio">share</span><span class="settings-group-title-text">Share AyurAI</span></div>
+          <div class="settings-group-body">
+            <div class="settings-row-label">Spread the Wellness</div>
+            <div class="settings-row-sub">Share AyurAI with friends and family to help them discover their dosha and live in balance</div>
+            <button class="settings-tour-btn" onclick="shareApp()">
+              <span class="mio" style="font-size:18px;">share</span>
+              <span>Share AyurAI</span>
+              <span class="mi" style="font-size:16px;margin-left:auto;">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Install App -->
         <div class="settings-group" id="pwa-install-section">
           <div class="settings-group-title"><span class="mio">install_mobile</span><span class="settings-group-title-text">Install App</span></div>
@@ -670,7 +684,7 @@
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.69 · Ancient Wisdom, Modern Intelligence
+          AyurAI v1.72 · Ancient Wisdom, Modern Intelligence
         </div>
 
       </div>
@@ -795,7 +809,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.69',
+    app_version: '1.72',
     error_count: logs.length,
     errors: logs
   };
@@ -2627,7 +2641,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.69',
+      app_version: '1.72',
       features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
