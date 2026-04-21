@@ -1,6 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.84'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.86'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -118,14 +118,14 @@ function doSignup() {
   const name = document.getElementById('signup-name').value.trim();
   const email = document.getElementById('signup-email').value.trim();
   const pass = document.getElementById('signup-password').value;
+  const recovery = String(document.getElementById('signup-recovery').value).trim();
   const err = document.getElementById('signup-error');
   err.style.display='none';
   if(!name || !email || !pass) { err.textContent='Please fill in all fields.'; err.style.display='block'; return; }
   if(pass.length < 6) { err.textContent='Password must be at least 6 characters.'; err.style.display='block'; return; }
-  const existing = loadData();
-  if(existing.user) { err.textContent='An account already exists on this device.'; err.style.display='block'; return; }
+  if(!/^\d{4}$/.test(recovery)) { err.textContent='Enter a valid 4-digit recovery code.'; err.style.display='block'; return; }
   const data = {
-    user: { name, email, password: pass, createdAt: new Date().toISOString() },
+    user: { name, email, password: pass, recoveryCode: recovery, createdAt: new Date().toISOString() },
     dosha: null, ailments: [], city: '', gender: '', foodHistory: [],
     settings: { openaiApiKey: '' },
     meta: { appVersion: '1.0', lastLogin: new Date().toISOString() }
@@ -135,6 +135,132 @@ function doSignup() {
   initApp();
   showScreen('screen-app');
   switchTab('quiz');
+}
+
+function handleCreateAccount() {
+  const d = loadData();
+  if(d.user) {
+    showModal('modal-account-exists');
+  } else {
+    showScreen('screen-signup');
+  }
+}
+
+function showModal(id) {
+  const m = el(id);
+  m.style.display = 'flex';
+  requestAnimationFrame(() => m.classList.add('open'));
+}
+
+function closeModal(id) {
+  const m = el(id);
+  m.classList.remove('open');
+  m.addEventListener('transitionend', () => { m.style.display = 'none'; }, { once: true });
+}
+
+function eraseAndStartFresh() {
+  localStorage.removeItem(STORAGE_KEY);
+  const me = el('modal-account-exists');
+  if(me) { me.classList.remove('open'); me.style.display = 'none'; }
+  const mf = el('modal-forgot-password');
+  if(mf) { mf.classList.remove('open'); mf.style.display = 'none'; }
+  showScreen('screen-signup');
+  showToast('Account erased. Create a new one below.');
+}
+
+function showForgotPassword() {
+  el('recovery-code-input').value = '';
+  el('recovery-error').style.display = 'none';
+  el('new-password-section').style.display = 'none';
+  showModal('modal-forgot-password');
+}
+
+function verifyRecoveryCode() {
+  const code = el('recovery-code-input').value.trim();
+  const d = loadData();
+  const errEl = el('recovery-error');
+  if(!d.user || !d.user.recoveryCode) {
+    errEl.textContent = 'No recovery code was set. Use "Clear data and start fresh" below.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if(String(d.user.recoveryCode) !== code) {
+    errEl.textContent = 'Incorrect recovery code.';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+  el('new-password-section').style.display = 'block';
+}
+
+function renderRecoveryCodeSettings() {
+  const body = el('settings-recovery-body');
+  if(!body) return;
+  const d = loadData();
+  if(d.user && d.user.recoveryCode) {
+    body.innerHTML = `
+      <div class="settings-row-label">Recovery Code</div>
+      <div class="settings-row-sub" style="display:flex;align-items:center;gap:6px;">
+        <span class="mi" style="font-size:15px;color:#4A7C59;">check_circle</span>
+        Recovery code is set
+      </div>
+      <button class="settings-action-btn" onclick="showChangeRecoveryCode()" style="margin-top:12px;">
+        <span class="mi" style="font-size:15px;">edit</span> Change Recovery Code
+      </button>
+      <div id="settings-recovery-change" style="display:none;margin-top:14px;">
+        <div class="error-msg" id="settings-recovery-error" style="display:none;"></div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>New 4-digit Recovery Code</label>
+          <input type="number" id="settings-recovery-input" class="settings-input" placeholder="Enter new code" min="1000" max="9999"/>
+        </div>
+        <button class="settings-save-btn" onclick="saveRecoveryCodeSettings()"><span class="mi" style="font-size:15px;">check</span> Save</button>
+      </div>`;
+  } else {
+    body.innerHTML = `
+      <div class="settings-row-label">Recovery Code</div>
+      <div class="settings-row-sub">Set a 4-digit code to recover your password if you forget it.</div>
+      <div class="error-msg" id="settings-recovery-error" style="display:none;margin-top:10px;"></div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <input type="number" id="settings-recovery-input" class="settings-input" placeholder="4-digit code" min="1000" max="9999" style="flex:1;"/>
+        <button class="settings-save-btn" onclick="saveRecoveryCodeSettings()"><span class="mi" style="font-size:15px;">check</span> Save</button>
+      </div>`;
+  }
+}
+
+function showChangeRecoveryCode() {
+  const section = el('settings-recovery-change');
+  if(section) section.style.display = 'block';
+}
+
+function saveRecoveryCodeSettings() {
+  const input = el('settings-recovery-input');
+  const errEl = el('settings-recovery-error');
+  const code = String(input ? input.value : '').trim();
+  if(errEl) errEl.style.display = 'none';
+  if(!/^\d{4}$/.test(code)) {
+    if(errEl) { errEl.textContent = 'Enter a valid 4-digit code.'; errEl.style.display = 'block'; }
+    return;
+  }
+  const d = loadData();
+  d.user.recoveryCode = code;
+  saveData(d);
+  showToast('Recovery code saved.');
+  renderRecoveryCodeSettings();
+}
+
+function doPasswordReset() {
+  const newPass = el('new-password-input').value;
+  const errEl = el('recovery-error');
+  if(newPass.length < 6) {
+    errEl.textContent = 'Password must be at least 6 characters.';
+    errEl.style.display = 'block';
+    return;
+  }
+  const d = loadData();
+  d.user.password = newPass;
+  saveData(d);
+  closeModal('modal-forgot-password');
+  showToast('Password updated. Please sign in.');
 }
 
 function doLogin() {
@@ -263,7 +389,7 @@ function switchTab(name) {
   if(name==='symptom') initSymptomChecker();
   if(name==='food') { initFoodCheck(); setTimeout(initMealTiming, 50); }
   if(name==='dina') initDinacharya();
-  if(name==='settings') { renderErrorLogs(); setApiErrorState(false); }
+  if(name==='settings') { renderErrorLogs(); setApiErrorState(false); renderRecoveryCodeSettings(); }
 }
 
 // ── ONBOARDING ──
