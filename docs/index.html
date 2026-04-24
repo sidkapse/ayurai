@@ -2873,7 +2873,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
       </div>
       <div class="coming-soon-wrap">
-        <span class="mio" style="font-size:64px;color:var(--lotus);">face_retouching_natural</span>
+        <span class="mio" id="face-placeholder-icon" style="font-size:64px;color:var(--lotus);">face_6</span>
         <div class="coming-soon-title">Coming Soon</div>
         <div class="coming-soon-msg">Personalized Ayurvedic facial skincare routines tailored to your dosha.</div>
       </div>
@@ -2888,7 +2888,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
       </div>
       <div class="coming-soon-wrap">
-        <span class="mio" style="font-size:64px;color:var(--lotus);">grass</span>
+        <span class="mio" id="hair-placeholder-icon" style="font-size:64px;color:var(--lotus);">face_retouching_natural</span>
         <div class="coming-soon-title">Coming Soon</div>
         <div class="coming-soon-msg">Personalized Ayurvedic hair care routines tailored to your dosha.</div>
       </div>
@@ -3153,11 +3153,11 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
       <span class="tab-label">Routine</span>
     </div>
     <div class="tab-item" id="tabn-face" onclick="switchTab('face')">
-      <span class="tab-icon"><span class="mio">face_retouching_natural</span></span>
+      <span class="tab-icon"><span class="mio" id="face-nav-icon">face_6</span></span>
       <span class="tab-label">Face</span>
     </div>
     <div class="tab-item" id="tabn-hair" onclick="switchTab('hair')">
-      <span class="tab-icon"><span class="mio">grass</span></span>
+      <span class="tab-icon"><span class="mio" id="hair-nav-icon">face_retouching_natural</span></span>
       <span class="tab-label">Hair</span>
     </div>
     <div class="tab-item" id="tabn-settings" onclick="switchTab('settings')">
@@ -3656,6 +3656,7 @@ function initApp() {
   if(el('settings-birth-month')) el('settings-birth-month').value = d.birth_month || '';
   if(el('settings-birth-year'))  el('settings-birth-year').value  = d.birth_year  || '';
   if(el('settings-gender'))      el('settings-gender').value      = d.gender       || '';
+  updateTabIcons();
   el('settings-apikey').value = d.settings?.openaiApiKey || '';
   // Dosha badge + card
   if(d.dosha) {
@@ -3742,6 +3743,16 @@ function switchTab(name) {
   if(name==='face') {}
   if(name==='hair') {}
   if(name==='settings') { renderErrorLogs(); setApiErrorState(false); renderRecoveryCodeSettings(); }
+}
+
+function updateTabIcons() {
+  const female = loadData().gender === 'female';
+  const faceIcon = female ? 'face' : 'face_6';
+  const hairIcon = female ? 'face_2' : 'face_retouching_natural';
+  if(el('face-nav-icon')) el('face-nav-icon').textContent = faceIcon;
+  if(el('hair-nav-icon')) el('hair-nav-icon').textContent = hairIcon;
+  if(el('face-placeholder-icon')) el('face-placeholder-icon').textContent = faceIcon;
+  if(el('hair-placeholder-icon')) el('hair-placeholder-icon').textContent = hairIcon;
 }
 
 // ── ONBOARDING ──
@@ -5468,6 +5479,7 @@ function saveBirthDate() {
 function saveGender() {
   const gender = el('settings-gender')?.value || '';
   setData('gender', gender);
+  updateTabIcons();
   showToast(gender ? 'Gender saved: ' + gender : 'Gender cleared');
 }
 

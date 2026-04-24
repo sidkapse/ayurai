@@ -996,6 +996,7 @@ function saveBirthDate() {
 function saveGender() {
   const gender = el('settings-gender')?.value || '';
   setData('gender', gender);
+  updateTabIcons();
   showToast(gender ? 'Gender saved: ' + gender : 'Gender cleared');
 }
 
