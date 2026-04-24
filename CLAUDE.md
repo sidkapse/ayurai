@@ -87,6 +87,15 @@ The `error: failed to push some refs` message printed after every push is **cosm
 - Always branch from latest main: `git checkout -b claude/feature-name origin/main`
 - Never develop directly on `main`
 
+### Pre-Push Checklist
+
+Before pushing code to the feature branch, update the following files if the change warrants it:
+
+- **`CLAUDE.md`** — reflect any new tabs, overlays, functions, state variables, constants, or architectural decisions
+- **`README.md`** — update the Features table, Module Reference, and Key Design Decisions to match
+- **`scripts/validate.js`** — add new top-level functions and HTML IDs to `REQUIRED_FUNCTIONS` / the ID check list
+- Any other shared reference files (e.g. `docs/DATA_MODEL.md` for localStorage schema changes, `.claude/rules/` for new coding patterns)
+
 ## Architecture
 
 ```
