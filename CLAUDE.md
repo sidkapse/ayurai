@@ -103,6 +103,8 @@ OpenAI API (gpt-4o-mini)
 
 **Ask Anything** is a full-screen overlay (not a tab) opened via `openAskAnything()` from the Home tab.
 
+**Food Check** and **Herb Advisor** are full-screen overlays opened via `openFoodOverlay()` / `openHerbsOverlay()` from the Home quick-action grid.
+
 ## Screens
 
 | Screen ID | When shown |
@@ -110,22 +112,36 @@ OpenAI API (gpt-4o-mini)
 | `#screen-onboarding` | First-time visitors (no `d.user` in localStorage). 5 slides + CTA. |
 | `#screen-login` | Returning users who are not logged in. |
 | `#screen-signup` | New users after completing/skipping onboarding. |
-| `#screen-app` | Authenticated users — 8-tab main app. |
+| `#screen-app` | Authenticated users — 5-tab main app + overlays. |
 
 JS functions: `isFirstTimeUser()`, `goToOnboardingSlide(n)`, `skipOnboarding()`, `nextOnboardingSlide()`, `replayOnboarding()`, `closeOnboarding()`, `initOnboardingSwipe()`, `initOnboardingParticles()`. CSS classes use `ob-` prefix.
 
-## Tabs (8 total)
+## Nav Tabs (5 in nav bar)
 
 | Tab ID | Nav ID | Feature |
 |---|---|---|
 | `tab-home` | `tabn-home` | Home dashboard, dosha insights, quick actions |
-| `tab-food` | `tabn-food` | Food check + meal timing |
-| `tab-herbs` | `tabn-herbs` | Herb advisor + herb chat |
 | `tab-dina` | `tabn-dina` | Daily routine (Dinacharya) |
+| `tab-face` | `tabn-face` | Face Care (in progress) — gender-aware icon |
+| `tab-hair` | `tabn-hair` | Hair Care (in progress) — gender-aware icon |
 | `tab-settings` | `tabn-settings` | Profile, API key, export/import, error logs |
-| `tab-quiz` | `tabn-quiz` | Dosha quiz (2-stage) |
-| `tab-symptom` | `tabn-symptom` | Symptom checker |
-| `tab-history` | `tabn-history` | Food check history |
+
+## Hidden Tabs (no nav item — accessed via quick actions or settings)
+
+| Tab ID | How Accessed |
+|---|---|
+| `tab-symptom` | Home quick-action card → `switchTab('symptom')` |
+| `tab-quiz` | Settings → Retake Quiz; or `switchTab('quiz')` |
+| `tab-history` | Home → "View All →" link → `switchTab('history')` |
+
+## Full-Screen Overlays
+
+| Overlay ID | Open Function | Close Function | Accessed From |
+|---|---|---|---|
+| `food-overlay` | `openFoodOverlay()` | `closeFoodOverlay()` | Home quick-action grid |
+| `herbs-overlay` | `openHerbsOverlay()` | `closeHerbsOverlay()` | Home quick-action grid |
+| `herb-chat-overlay` | `openHerbChatOverlay()` | `closeHerbChatOverlay()` | Herb Advisor overlay |
+| `ask-overlay` | `openAskAnything()` | `closeAskAnything()` | Home quick-action grid |
 
 `switchTab(name)` handles all tab navigation. Add `if(name==='feature') initFeature();` there for new tabs.
 
@@ -176,7 +192,7 @@ overlay.classList.remove('open');
 overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
 ```
 
-**Android keyboard + fixed overlay:** Use `top:0; left:0; right:0; bottom:0` — **not** `height:100dvh`. Add `overflow:hidden` to overlay, `min-height:0` to the scrollable flex child (`.ask-chat`). Both `#ask-overlay` and `#herb-chat-overlay` use `.ask-overlay` and inherit this fix.
+**Android keyboard + fixed overlay:** Use `top:0; left:0; right:0; bottom:0` — **not** `height:100dvh`. Add `overflow:hidden` to overlay, `min-height:0` to the scrollable flex child (`.ask-chat`). All overlays (`#ask-overlay`, `#food-overlay`, `#herbs-overlay`, `#herb-chat-overlay`) use `.ask-overlay` and inherit this fix.
 
 **`#herb-chat-overlay` reuses element IDs** from the old inline herb chat: `herb-chat-history`, `herb-chat-input`, `herb-send-btn`. This lets `sendHerbChat()`, `updateChatDisplay()`, and `scrollChatToBottom()` work unmodified.
 
@@ -240,7 +256,7 @@ setData('settings.openaiApiKey', key) // dot-path setter, auto-saves
 | `DINA_CACHE_KEY` | dinacharya.js | `'ayurai_dina_cache'` — cached generated routine |
 | `DINA_DEFAULT_WAKE` | dinacharya.js | `'06:30'` |
 | `DINA_DEFAULT_SLEEP` | dinacharya.js | `'22:30'` |
-| `APP_VERSION` | core.js | Current version string (auto-bumped by stamp-version.js) — currently `v1.76` |
+| `APP_VERSION` | core.js | Current version string (auto-bumped by stamp-version.js) — currently `v1.87` |
 
 > **Note:** Wake/sleep times and day offset are persisted separately under `ayurai_dina_prefs` (not inside `ayurai_my_info`).
 
@@ -275,6 +291,9 @@ setData('settings.openaiApiKey', key) // dot-path setter, auto-saves
 - **API key in localStorage** — intentional. For shared use, proxy through a backend.
 - **Single HTML file** — maximum portability; the monolithic approach is a feature.
 - **Ask Anything is overlay, not a tab** — keeps tab bar uncluttered; accessed from Home quick-actions.
+- **Food Check and Herbs are overlays** — moved out of the nav bar to keep it to 5 tabs; accessed from the Home quick-action grid.
+- **Symptom, Quiz, History have no nav items** — accessed via Home quick-action (Symptom), Settings (Quiz retake), and Home "View All" link (History).
+- **Face/Hair tabs are gender-aware** — icons update at login based on gender (`face`/`face_6` for face, `face_2`/`face_retouching_natural` for hair).
 - **Ask AI suggestions JSON** — when the AI declines an off-topic question, it appends `{"suggestions":["...", "..."]}`. `sendAskMessage` strips this before displaying and renders suggestions as clickable cards.
 
 ## Deployment

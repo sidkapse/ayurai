@@ -24,13 +24,15 @@ A fully client-side Ayurvedic wellness web application. No backend required. Run
 |---|---|
 | **Onboarding** | 5-slide introduction shown to first-time visitors — covers Dosha, Food, Herbs & Daily Routine before reaching sign-up |
 | **Dosha Quiz** | Two-stage quiz (10Q + 10Q deep-dive) to determine Vata/Pitta/Kapha constitution |
-| **Food Check** | AI verdict on whether a food suits your dosha, time, season & ailments |
+| **Food Check** | AI verdict on whether a food suits your dosha, time, season & ailments — full-screen overlay from Home |
 | **Meal Planner** | Plan meals in advance with date/time window selector |
 | **Damage Control** | If food is not ideal, get remedies to reduce its negative effect |
 | **Ask Anything** | Personalised Ayurvedic chat assistant — full-screen overlay with multi-turn conversation, starter prompts, and profile-aware responses |
-| **Herb Advisor** | Personalised herb recommendations by dosha, concern, or season |
+| **Herb Advisor** | Personalised herb recommendations by dosha, concern, or season — full-screen overlay from Home |
 | **Herb Chat** | Free-form conversation with an Ayurvedic herb expert |
-| **Symptom Checker** | Root-cause Ayurvedic diagnosis with food, herb & lifestyle guidance |
+| **Symptom Checker** | Root-cause Ayurvedic diagnosis with food, herb & lifestyle guidance — accessed from Home quick-action |
+| **Face Care** | Personalised Ayurvedic face care routines — gender-aware tab (in progress) |
+| **Hair Care** | Personalised Ayurvedic hair care routines — gender-aware tab (in progress) |
 | **Daily Routine** | AI-generated Dinacharya with 8 personalised time blocks |
 | **Dosha Insights** | Home card with foods to avoid, best meal times, top 3 care tips |
 | **PWA / Installable** | Works offline (app shell cached), installable on mobile and desktop |
@@ -75,7 +77,9 @@ A fully client-side Ayurvedic wellness web application. No backend required. Run
 | OpenAI key in browser | Intended for personal use — user owns their key |
 | No framework | Vanilla JS keeps the bundle size minimal and the app framework-agnostic |
 | Module split in source | Source files are split by feature for maintainability; assembled into one file for deployment |
-| Ask Anything as overlay | Full-screen chat without adding a 9th tab — accessed from Home quick-actions |
+| Food/Herbs/Ask as overlays | Full-screen overlays keep the nav bar to 5 tabs — all accessed from Home quick-actions |
+| Symptom/Quiz/History as hidden tabs | No nav item needed; reached via quick-action card (Symptom), Settings (Quiz), Home link (History) |
+| Gender-aware Face/Hair icons | `face`/`face_6` and `face_2`/`face_retouching_natural` swap at login based on stored gender |
 
 ---
 
@@ -264,13 +268,15 @@ Data layer, error logging, auth (signup/login/logout), app initialisation, tab r
 - `loadData()` / `saveData()` / `getData(path)` / `setData(path, value)` — localStorage CRUD
 - `logError(context, error)` — appends to `ayurai_error_log` (max 5 entries)
 - `callOpenAI(prompt, key)` / `callOpenAILarge(prompt, key, maxTokens)` — API wrappers
-- `initApp()` — populates all UI after login
+- `initApp()` — populates all UI after login; also updates gender-aware Face/Hair tab icons
 - `switchTab(name)` — tab navigation and lazy init
 - `showToast(msg)` — bottom notification
 - `el(id)` / `setText(id, text)` / `setHTML(id, html)` — safe DOM helpers
 - `initPWA()` / `triggerPWAInstall()` — PWA install prompt handling
 - `shareApp()` — native Web Share API with clipboard-copy fallback for desktop
 - `initPullToRefresh()` — pull-to-refresh gesture on the app scroller
+- `openFoodOverlay()` / `closeFoodOverlay()` — Food Check full-screen overlay
+- `openHerbsOverlay()` / `closeHerbsOverlay()` — Herb Advisor full-screen overlay
 
 ### `src/js/quiz.js`
 Two-stage Dosha Quiz. Stage 1 (10 questions) → Ailment selection → Save → offer Stage 2 (10 questions) → merge scores and update profile.
