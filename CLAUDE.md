@@ -86,6 +86,7 @@ The `error: failed to push some refs` message printed after every push is **cosm
   — the pre-push hook bumps the version on push, so use the post-push version in the PR title
 - Always branch from latest main: `git checkout -b claude/feature-name origin/main`
 - Never develop directly on `main`
+- **All PRs from feature branches must target `origin/uat` by default** — only target a different branch if explicitly instructed
 - **All PRs from feature branches must target `origin/uat`** — never open a PR directly to `main`
 
 ### Pre-Push Checklist
