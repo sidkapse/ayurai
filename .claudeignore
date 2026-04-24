@@ -1,0 +1,46 @@
+# --- Dependencies & Build Artifacts ---
+node_modules/
+dist/
+build/
+.next/
+out/
+.vercel/
+*.log
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# --- Media & Assets ---
+public/assets/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+*.mp4
+*.pdf
+
+# --- Environment & Secrets ---
+.env*
+.secrets/
+*.pem
+*.key
+
+# --- Git & System ---
+.git/
+.github/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Testing & Coverage ---
+coverage/
+*.test.js.snap
+*.spec.js.snap
+.nyc_output/
+
+# --- Documentation (Optional: keep if you need Claude to read docs) ---
+# README.md
+# CONTRIBUTING.md
