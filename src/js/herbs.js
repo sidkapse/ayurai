@@ -146,7 +146,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.86',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.87',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
@@ -465,3 +465,17 @@ async function getHerbsByConcern() {
   }
   const ctx = buildHerbContext();
   if(!ctx.apiKey) { showToast('Please add your OpenAI API key in Settings'); return; }
+}
+
+function openHerbsOverlay() {
+  const overlay = el('herbs-overlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('open'));
+  initHerbAdvisor();
+}
+
+function closeHerbsOverlay() {
+  const overlay = el('herbs-overlay');
+  overlay.classList.remove('open');
+  overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
+}

@@ -180,7 +180,7 @@ function renderSymptomResult(r) {
       <span>This Ayurvedic analysis is for informational purposes only and does not replace professional medical advice. If symptoms are severe or worsening, please consult a qualified physician or Ayurvedic Vaidya.</span>
     </div>
 
-    <button class="btn-secondary" style="margin-top:14px;margin-bottom:32px;display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%;" onclick="switchTab('herbs')">
+    <button class="btn-secondary" style="margin-top:14px;margin-bottom:32px;display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%;" onclick="openHerbsOverlay()">
       <span class="mio" style="font-size:17px;">spa</span> Explore Herbs for These Symptoms
     </button>
   `;

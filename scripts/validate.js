@@ -78,6 +78,10 @@ const REQUIRED_FUNCTIONS = [
   'openAskAnything', 'closeAskAnything', 'sendAskMessage', 'buildAskSystemPrompt', 'renderAskStarters',
   // Herb Chat overlay
   'openHerbChatOverlay', 'closeHerbChatOverlay',
+  // Food & Herbs overlays
+  'openFoodOverlay', 'closeFoodOverlay', 'openHerbsOverlay', 'closeHerbsOverlay',
+  // Gender-based tab icons
+  'updateTabIcons',
 ];
 REQUIRED_FUNCTIONS.forEach(fn => check(fn + '()', js.includes('function ' + fn)));
 
@@ -99,11 +103,11 @@ const REQUIRED_IDS = [
   'tab-home', 'tab-food', 'tab-herbs', 'tab-dina',
   'tab-settings', 'tab-quiz', 'tab-symptom', 'tab-history',
   // Tab nav items
-  'tabn-home', 'tabn-food', 'tabn-herbs', 'tabn-dina', 'tabn-settings',
+  'tabn-home', 'tabn-dina', 'tabn-settings',
   // Home tab
   'home-greeting', 'home-name',
   'home-dosha-badge', 'home-dosha-val', 'home-dosha-desc',
-  'home-dosha-pills', 'home-dosha-insights', 'home-recent-checks',
+  'home-dosha-pills', 'home-dosha-insights',
   // Food tab
   'food-hero', 'food-hero-chips', 'food-input', 'food-input-card',
   'food-result-area', 'food-alt-area', 'food-api-warning',
@@ -143,6 +147,9 @@ const REQUIRED_IDS = [
   'ob-cta-desc', 'ob-cta-primary', 'ob-cta-secondary',
   // PWA install banner
   'pwa-popup', 'pwa-popup-sub', 'pwa-popup-btn', 'pwa-mini-banner',
+  // Face & Hair tabs
+  'tab-face', 'tab-hair', 'tabn-face', 'tabn-hair',
+  'face-nav-icon', 'hair-nav-icon', 'face-placeholder-icon', 'hair-placeholder-icon',
 ];
 REQUIRED_IDS.forEach(id => check('id="' + id + '"', html.includes('id="' + id + '"')));
 
