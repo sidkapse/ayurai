@@ -385,10 +385,10 @@ function switchTab(name) {
   currentTab = name;
   el('app-content').scrollTop = 0;
   if(name==='history') renderHistory();
-  if(name==='herbs') initHerbAdvisor();
   if(name==='symptom') initSymptomChecker();
-  if(name==='food') { initFoodCheck(); setTimeout(initMealTiming, 50); }
   if(name==='dina') initDinacharya();
+  if(name==='face') {}
+  if(name==='hair') {}
   if(name==='settings') { renderErrorLogs(); setApiErrorState(false); renderRecoveryCodeSettings(); }
 }
 

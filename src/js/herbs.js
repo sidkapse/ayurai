@@ -465,3 +465,17 @@ async function getHerbsByConcern() {
   }
   const ctx = buildHerbContext();
   if(!ctx.apiKey) { showToast('Please add your OpenAI API key in Settings'); return; }
+}
+
+function openHerbsOverlay() {
+  const overlay = el('herbs-overlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('open'));
+  initHerbAdvisor();
+}
+
+function closeHerbsOverlay() {
+  const overlay = el('herbs-overlay');
+  overlay.classList.remove('open');
+  overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
+}
