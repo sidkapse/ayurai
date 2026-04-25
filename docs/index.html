@@ -2768,7 +2768,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 
         <!-- Quick Actions -->
         <div class="quick-actions">
-          <div class="quick-card" onclick="switchTab('symptom')">
+          <div class="quick-card" onclick="openSymptomOverlay()">
             <div class="qc-icon"><span class="mio" style="font-size:30px;color:var(--burgundy);">personal_injury</span></div>
             <div class="qc-title">Symptom Check</div>
             <div class="qc-desc">Root-cause Ayurvedic analysis</div>
@@ -2834,21 +2834,8 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
       <div id="quiz-container" class="quiz-wrap"></div>
     </div>
 
-    <!-- SYMPTOM CHECKER TAB -->
-    <div id="tab-symptom" class="tab-panel" style="display:none;">
-      <div class="top-bar">
-        <div>
-          <div class="top-bar-title">Symptom Checker</div>
-          <div class="top-bar-sub">Ayurvedic root-cause analysis</div>
-        </div>
-        <div class="top-bar-right">
-          <button class="new-check-btn" id="symptom-reset-btn" onclick="resetSymptomChecker()" style="display:none;">
-            <span class="mi">add_circle</span> New Check
-          </button>
-        </div>
-      </div>
-      <div class="symptom-wrap" id="symptom-wrap"></div>
-    </div>
+    <!-- SYMPTOM CHECKER TAB (shell only — content lives in #symptom-overlay) -->
+    <div id="tab-symptom" class="tab-panel" style="display:none;"></div>
 
     <!-- HISTORY TAB (kept, accessed via Home) -->
     <div id="tab-history" class="tab-panel" style="display:none;">
@@ -3135,7 +3122,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.91 · Ancient Wisdom, Modern Intelligence        </div>
+          AyurAI v1.92 · Ancient Wisdom, Modern Intelligence        </div>
 
       </div>
     </div>
@@ -3343,6 +3330,22 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         <button class="ask-send-btn" onclick="var t=el('ask-input').value.trim();if(t)sendAskMessage(t);"><span class="mi">send</span></button>
       </div>
     </div>
+    <!-- ── Symptom Check Overlay ── -->
+    <div id="symptom-overlay" class="ask-overlay" style="display:none;">
+      <div class="ask-header">
+        <button class="ask-close-btn" onclick="closeSymptomOverlay()"><span class="mi">close</span></button>
+        <div style="text-align:center;">
+          <div class="ask-header-title">Symptom Check</div>
+          <div class="ask-header-sub">Ayurvedic root-cause analysis</div>
+        </div>
+        <button class="new-check-btn" id="symptom-reset-btn" onclick="resetSymptomChecker()" style="display:none;">
+          <span class="mi">add_circle</span> New
+        </button>
+      </div>
+      <div class="ask-chat" id="symptom-overlay-content">
+        <div class="symptom-wrap" id="symptom-wrap"></div>
+      </div>
+    </div>
 <div class="toast" id="toast"></div>
 <input type="file" id="import-file-input" accept=".json" onchange="importJSON(event)" style="display:none;position:absolute;"/>
 
@@ -3352,7 +3355,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.91'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.92'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -3738,7 +3741,7 @@ function switchTab(name) {
   currentTab = name;
   el('app-content').scrollTop = 0;
   if(name==='history') renderHistory();
-  if(name==='symptom') initSymptomChecker();
+  if(name==='symptom') openSymptomOverlay();
   if(name==='dina') initDinacharya();
   if(name==='face') {}
   if(name==='hair') {}
@@ -5703,7 +5706,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.91',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.92',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
@@ -6358,6 +6361,20 @@ let symptomState = {
   resultShown:false
 };
 
+function openSymptomOverlay() {
+  const overlay = el('symptom-overlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('open'));
+  if (!symptomState.resultShown) renderSymptomHome();
+}
+
+function closeSymptomOverlay() {
+  const overlay = el('symptom-overlay');
+  overlay.classList.remove('open');
+  overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
+  symptomState = { selectedAreas: [], duration: null, severity: 5, description: '', resultShown: false };
+}
+
 function initSymptomChecker() {
   if(!symptomState.resultShown) renderSymptomHome();
 }
@@ -6629,14 +6646,14 @@ function renderSymptomResult(r) {
       <span class="mio" style="font-size:17px;">spa</span> Explore Herbs for These Symptoms
     </button>
   `;
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('symptom-overlay-content').scrollTop = 0; });
 }
 
 function resetSymptomChecker() {
   symptomState = {selectedAreas:[],duration:null,severity:5,description:'',resultShown:false};
   el('symptom-reset-btn').style.display = 'none';
   renderSymptomHome();
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('symptom-overlay-content').scrollTop = 0; });
   showToast('Ready for a new symptom check');
 }
 

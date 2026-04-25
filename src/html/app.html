@@ -311,7 +311,7 @@
 
         <!-- Quick Actions -->
         <div class="quick-actions">
-          <div class="quick-card" onclick="switchTab('symptom')">
+          <div class="quick-card" onclick="openSymptomOverlay()">
             <div class="qc-icon"><span class="mio" style="font-size:30px;color:var(--burgundy);">personal_injury</span></div>
             <div class="qc-title">Symptom Check</div>
             <div class="qc-desc">Root-cause Ayurvedic analysis</div>
@@ -377,21 +377,8 @@
       <div id="quiz-container" class="quiz-wrap"></div>
     </div>
 
-    <!-- SYMPTOM CHECKER TAB -->
-    <div id="tab-symptom" class="tab-panel" style="display:none;">
-      <div class="top-bar">
-        <div>
-          <div class="top-bar-title">Symptom Checker</div>
-          <div class="top-bar-sub">Ayurvedic root-cause analysis</div>
-        </div>
-        <div class="top-bar-right">
-          <button class="new-check-btn" id="symptom-reset-btn" onclick="resetSymptomChecker()" style="display:none;">
-            <span class="mi">add_circle</span> New Check
-          </button>
-        </div>
-      </div>
-      <div class="symptom-wrap" id="symptom-wrap"></div>
-    </div>
+    <!-- SYMPTOM CHECKER TAB (shell only — content lives in #symptom-overlay) -->
+    <div id="tab-symptom" class="tab-panel" style="display:none;"></div>
 
     <!-- HISTORY TAB (kept, accessed via Home) -->
     <div id="tab-history" class="tab-panel" style="display:none;">
@@ -678,7 +665,7 @@
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.91 · Ancient Wisdom, Modern Intelligence        </div>
+          AyurAI v1.92 · Ancient Wisdom, Modern Intelligence        </div>
 
       </div>
     </div>
@@ -886,6 +873,22 @@
         <button class="ask-send-btn" onclick="var t=el('ask-input').value.trim();if(t)sendAskMessage(t);"><span class="mi">send</span></button>
       </div>
     </div>
+    <!-- ── Symptom Check Overlay ── -->
+    <div id="symptom-overlay" class="ask-overlay" style="display:none;">
+      <div class="ask-header">
+        <button class="ask-close-btn" onclick="closeSymptomOverlay()"><span class="mi">close</span></button>
+        <div style="text-align:center;">
+          <div class="ask-header-title">Symptom Check</div>
+          <div class="ask-header-sub">Ayurvedic root-cause analysis</div>
+        </div>
+        <button class="new-check-btn" id="symptom-reset-btn" onclick="resetSymptomChecker()" style="display:none;">
+          <span class="mi">add_circle</span> New
+        </button>
+      </div>
+      <div class="ask-chat" id="symptom-overlay-content">
+        <div class="symptom-wrap" id="symptom-wrap"></div>
+      </div>
+    </div>
 <div class="toast" id="toast"></div>
 <input type="file" id="import-file-input" accept=".json" onchange="importJSON(event)" style="display:none;position:absolute;"/>
 
@@ -939,7 +942,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.91',    error_count: logs.length,
+    app_version: '1.92',    error_count: logs.length,
     errors: logs
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
@@ -2770,7 +2773,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.91',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.92',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
