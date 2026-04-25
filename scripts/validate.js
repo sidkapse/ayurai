@@ -70,6 +70,7 @@ const REQUIRED_FUNCTIONS = [
   // Herb advisor
   'initHerbAdvisor', 'getHerbsByDosha', 'getHerbsByConcern', 'getSeasonalHerbs', 'sendHerbChat',
   // Symptom checker
+  'openSymptomOverlay', 'closeSymptomOverlay',
   'initSymptomChecker', 'runSymptomCheck', 'renderSymptomResult',
   // Dinacharya
   'initDinacharya', 'generateDinacharya', 'renderDinacharya', 'renderDinacharya_StartScreen',
