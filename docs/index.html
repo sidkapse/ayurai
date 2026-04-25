@@ -3122,7 +3122,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.92 · Ancient Wisdom, Modern Intelligence        </div>
+          AyurAI v1.93 · Ancient Wisdom, Modern Intelligence        </div>
 
       </div>
     </div>
@@ -3158,8 +3158,8 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 
     <!-- ── Food Check Overlay ── -->
     <div id="food-overlay" class="ask-overlay" style="display:none;">
-      <div style="flex:1;overflow-y:auto;min-height:0;">
-        <div id="tab-food" class="tab-panel" style="display:block;">
+      <div id="food-overlay-content" style="flex:1;overflow-y:auto;min-height:0;">
+        <div id="tab-food" style="display:block;">
           <div class="top-bar">
             <button class="icon-btn" onclick="closeFoodOverlay()" style="margin-right:8px;flex-shrink:0;"><span class="mi">arrow_back</span></button>
             <div>
@@ -3275,7 +3275,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
     <!-- ── Herbs Overlay ── -->
     <div id="herbs-overlay" class="ask-overlay" style="display:none;">
       <div style="flex:1;overflow-y:auto;min-height:0;">
-        <div id="tab-herbs" class="tab-panel" style="display:block;">
+        <div id="tab-herbs" style="display:block;">
           <div class="top-bar">
             <button class="icon-btn" onclick="closeHerbsOverlay()" style="margin-right:8px;flex-shrink:0;"><span class="mi">arrow_back</span></button>
             <div>
@@ -3355,7 +3355,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.92'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.93'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -4686,7 +4686,7 @@ function showFoodInput() {
   const chevron = el('adv-chevron');
   if(panel) panel.style.display = 'none';
   if(chevron) chevron.style.transform = '';
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('food-overlay-content').scrollTop = 0; });
 }
 
 function showFoodResult(food, result, timeContext, isPlanned, generatedAt) {
@@ -4708,7 +4708,7 @@ function showFoodResult(food, result, timeContext, isPlanned, generatedAt) {
       b.innerHTML = '<span class="mi" style="font-size:16px;">refresh</span> Refresh Remedies';
     }
   }
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('food-overlay-content').scrollTop = 0; });
 }
 
 
@@ -5706,7 +5706,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.92',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.93',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
