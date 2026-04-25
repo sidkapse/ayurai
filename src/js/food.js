@@ -194,20 +194,6 @@ function clearFoodCache() {
   localStorage.removeItem(FOOD_CACHE_KEY);
 }
 
-function openFoodOverlay() {
-  const overlay = el('food-overlay');
-  overlay.style.display = 'flex';
-  requestAnimationFrame(() => overlay.classList.add('open'));
-  initFoodCheck();
-  setTimeout(initMealTiming, 50);
-}
-
-function closeFoodOverlay() {
-  const overlay = el('food-overlay');
-  overlay.classList.remove('open');
-  overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
-}
-
 function initFoodCheck() {
   const cache = loadFoodCache();
   if(cache && cache.result && cache.food) {
@@ -232,7 +218,7 @@ function showFoodInput() {
   const chevron = el('adv-chevron');
   if(panel) panel.style.display = 'none';
   if(chevron) chevron.style.transform = '';
-  requestAnimationFrame(() => { el('food-overlay-content').scrollTop = 0; });
+  el('app-content').scrollTop = 0;
 }
 
 function showFoodResult(food, result, timeContext, isPlanned, generatedAt) {
@@ -254,7 +240,7 @@ function showFoodResult(food, result, timeContext, isPlanned, generatedAt) {
       b.innerHTML = '<span class="mi" style="font-size:16px;">refresh</span> Refresh Remedies';
     }
   }
-  requestAnimationFrame(() => { el('food-overlay-content').scrollTop = 0; });
+  el('app-content').scrollTop = 0;
 }
 
 
@@ -417,7 +403,7 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
     el('food-result-area').prepend(bannerDiv);
   }
 
-  requestAnimationFrame(() => { el('food-overlay-content').scrollTop = 0; });
+  requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
 }
 
 function togglePersonalisePanel() {
