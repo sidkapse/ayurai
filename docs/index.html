@@ -2746,7 +2746,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 
         <!-- Quick Actions -->
         <div class="quick-actions">
-          <div class="quick-card" onclick="switchTab('symptom')">
+          <div class="quick-card" onclick="openSymptomOverlay()">
             <div class="qc-icon"><span class="mio" style="font-size:30px;color:var(--burgundy);">personal_injury</span></div>
             <div class="qc-title">Symptom Check</div>
             <div class="qc-desc">Root-cause Ayurvedic analysis</div>
@@ -2755,6 +2755,16 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
             <div class="qc-icon"><span class="mio" style="font-size:30px;color:var(--burgundy);">chat</span></div>
             <div class="qc-title">Ask AI Vaidya</div>
             <div class="qc-desc">Your personal Ayurvedic advisor</div>
+          </div>
+          <div class="quick-card" onclick="openFoodOverlay()">
+            <div class="qc-icon"><span class="mio" style="font-size:30px;color:var(--burgundy);">restaurant</span></div>
+            <div class="qc-title">Food Check</div>
+            <div class="qc-desc">AI-powered Ayurvedic analysis</div>
+          </div>
+          <div class="quick-card" onclick="openHerbChatOverlay()">
+            <div class="qc-icon"><span class="mio" style="font-size:30px;color:var(--burgundy);">spa</span></div>
+            <div class="qc-title">Herb Advisor</div>
+            <div class="qc-desc">Your Ayurvedic herb expert</div>
           </div>
         </div>
 
@@ -2805,116 +2815,8 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
       <div id="quiz-container" class="quiz-wrap"></div>
     </div>
 
-    <!-- FOOD CHECK TAB -->
-    <div id="tab-food" class="tab-panel" style="display:none;">
-      <div class="top-bar">
-        <div>
-          <div class="top-bar-title">Food Check</div>
-          <div class="top-bar-sub">AI-powered Ayurvedic analysis</div>
-        </div>
-        <div class="top-bar-right">
-          <button id="food-reset-btn" onclick="resetFoodCheck()" title="Start new check"
-            class="new-check-btn" style="display:none;">
-            <span class="mi">add_circle</span> New Check
-          </button>
-        </div>
-      </div>
-      <div class="food-wrap">
-
-        <!-- ── FOOD HERO ── -->
-        <div class="food-hero" id="food-hero">
-          <div class="food-hero-label">Ayurvedic Food Analysis</div>
-          <div class="food-hero-title">What are you<br>planning to eat?</div>
-          <div class="food-hero-sub">Get an instant Yes/No based on your dosha, season and current time — with meal boosters and do's & don'ts.</div>
-          <div class="food-hero-chips" id="food-hero-chips"></div>
-        </div>
-
-        <div id="food-api-warning" class="api-warning" style="display:none;">
-          <span class="mi" style="font-size:16px;vertical-align:-3px;margin-right:4px;">warning</span>
-          <strong>OpenAI API key not set.</strong> Go to Settings → API Configuration to add your key.
-        </div>
-
-        <!-- ── INPUT CARD ── -->
-        <div class="food-input-card" id="food-input-card">
-          <label class="food-input-label">
-            <span class="mi">edit_note</span> Describe your food
-          </label>
-          <p>E.g. "chicken biryani with raita", "avocado toast", "dal chawal"</p>
-          <textarea class="food-textarea" id="food-input" placeholder="Type your food here..."></textarea>
-
-          <!-- ── ADVANCED FILTERS TOGGLE ── -->
-          <button class="adv-filters-btn" id="adv-filters-btn" onclick="toggleAdvFilters()">
-            <span class="mi" style="font-size:16px;">tune</span>
-            Advanced Filters
-            <span class="mi adv-filters-chevron" id="adv-chevron" style="font-size:16px;margin-left:auto;transition:transform 0.25s;">expand_more</span>
-          </button>
-
-          <!-- ── ADVANCED FILTERS PANEL ── -->
-          <div class="adv-filters-panel" id="adv-filters-panel" style="display:none;">
-
-            <!-- Meal Timing -->
-            <div class="adv-filter-section">
-              <div class="adv-filter-label">
-                <span class="mi">schedule</span> When will you eat this?
-              </div>
-              <div class="meal-timing-toggle">
-                <button class="mtt-btn active" id="mtt-now" onclick="setTimingMode('now')">
-                  <span class="mi" style="font-size:15px;">bolt</span> Now
-                </button>
-                <button class="mtt-btn" id="mtt-plan" onclick="setTimingMode('plan')">
-                  <span class="mi" style="font-size:15px;">event</span> Plan Ahead
-                </button>
-              </div>
-              <div class="meal-timing-now" id="meal-timing-now-preview">
-                <span class="mi" style="font-size:15px;color:var(--text-muted);">check_circle</span>
-                <span id="meal-now-time-display" style="font-size:13px;color:var(--text-muted);">Using current time</span>
-              </div>
-              <div class="meal-timing-plan" id="meal-timing-plan-picker" style="display:none;">
-                <div class="meal-plan-row">
-                  <div class="meal-plan-field">
-                    <label class="meal-field-label"><span class="mi">calendar_today</span> Date</label>
-                    <input type="date" id="meal-plan-date" class="meal-field-input" oninput="updatePlanPreview()"/>
-                  </div>
-                  <div class="meal-plan-field">
-                    <label class="meal-field-label"><span class="mi">access_time</span> Time Window</label>
-                    <select id="meal-plan-hour" class="meal-field-input" onchange="updatePlanPreview()"></select>
-                  </div>
-                </div>
-                <div class="meal-plan-preview" id="meal-plan-preview">
-                  <span class="mi" style="font-size:15px;">event</span>
-                  <span id="meal-plan-preview-text">Select a date and time above</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Active Symptoms -->
-            <div class="adv-filter-section">
-              <div class="adv-filter-label">
-                <span class="mi">health_and_safety</span> Any active symptoms today?
-                <span class="adv-filter-hint">Optional</span>
-              </div>
-              <div class="adv-ailment-chips" id="adv-ailment-chips"></div>
-            </div>
-
-          </div><!-- end adv-filters-panel -->
-
-          <button class="btn-primary" style="margin-top:14px;" onclick="checkFood()">
-            <span class="mi" style="font-size:17px;vertical-align:-4px;margin-right:6px;">search</span>Analyse Food
-          </button>
-        </div>
-        <div id="food-result-area" style="padding:0 16px;"></div>
-        <div id="food-alt-area" style="padding:0 16px;"></div>
-        <div id="cuisine-pref-area" style="padding:0 16px;">
-          <div class="cuisine-pref-card" id="cuisine-section" style="display:none;">
-            <h4><span class="mi" style="font-size:18px;vertical-align:-4px;margin-right:5px;color:var(--gold);">public</span>Get Personalised Alternatives</h4>
-            <p>Describe your cuisine preference — North Indian, South Indian, veg/non-veg, Japanese, Korean, Chinese, salads etc.</p>
-            <textarea class="food-textarea" id="cuisine-input" placeholder="e.g. South Indian vegetarian, or Japanese light food..."></textarea>
-            <button class="btn-gold" style="margin-top:12px;" onclick="getCuisineAlts()"><span class="mi" style="font-size:16px;vertical-align:-3px;margin-right:5px;">format_list_numbered</span>Get My Best 5 Options</button>
-            <div id="cuisine-result-area" style="margin-top:14px;"></div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- FOOD CHECK TAB (shell only — content lives in #food-overlay) -->
+    <div id="tab-food" class="tab-panel" style="display:none;"></div>
 
     <!-- HERBS TAB -->
     <div id="tab-herbs" class="tab-panel" style="display:none;">
@@ -2932,21 +2834,8 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
       </div>
     </div>
 
-    <!-- SYMPTOM CHECKER TAB -->
-    <div id="tab-symptom" class="tab-panel" style="display:none;">
-      <div class="top-bar">
-        <div>
-          <div class="top-bar-title">Symptom Checker</div>
-          <div class="top-bar-sub">Ayurvedic root-cause analysis</div>
-        </div>
-        <div class="top-bar-right">
-          <button class="new-check-btn" id="symptom-reset-btn" onclick="resetSymptomChecker()" style="display:none;">
-            <span class="mi">add_circle</span> New Check
-          </button>
-        </div>
-      </div>
-      <div class="symptom-wrap" id="symptom-wrap"></div>
-    </div>
+    <!-- SYMPTOM CHECKER TAB (shell only — content lives in #symptom-overlay) -->
+    <div id="tab-symptom" class="tab-panel" style="display:none;"></div>
 
     <!-- HISTORY TAB (kept, accessed via Home) -->
     <div id="tab-history" class="tab-panel" style="display:none;">
@@ -3203,7 +3092,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.86 · Ancient Wisdom, Modern Intelligence        </div>
+          AyurAI v1.87 · Ancient Wisdom, Modern Intelligence        </div>
 
       </div>
     </div>
@@ -3274,6 +3163,132 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         <button class="ask-send-btn" onclick="var t=el('ask-input').value.trim();if(t)sendAskMessage(t);"><span class="mi">send</span></button>
       </div>
     </div>
+    <!-- ── Symptom Check Overlay ── -->
+    <div id="symptom-overlay" class="ask-overlay" style="display:none;">
+      <div class="ask-header">
+        <button class="ask-close-btn" onclick="closeSymptomOverlay()"><span class="mi">close</span></button>
+        <div style="text-align:center;">
+          <div class="ask-header-title">Symptom Check</div>
+          <div class="ask-header-sub">Ayurvedic root-cause analysis</div>
+        </div>
+        <button class="new-check-btn" id="symptom-reset-btn" onclick="resetSymptomChecker()" style="display:none;">
+          <span class="mi">add_circle</span> New
+        </button>
+      </div>
+      <div class="ask-chat" id="symptom-overlay-content">
+        <div class="symptom-wrap" id="symptom-wrap"></div>
+      </div>
+    </div>
+    <!-- ── Food Check Overlay ── -->
+    <div id="food-overlay" class="ask-overlay" style="display:none;">
+      <div class="ask-header">
+        <button class="ask-close-btn" onclick="closeFoodOverlay()"><span class="mi">close</span></button>
+        <div style="text-align:center;">
+          <div class="ask-header-title">Food Check</div>
+          <div class="ask-header-sub">AI-powered Ayurvedic analysis</div>
+        </div>
+        <button id="food-reset-btn" onclick="resetFoodCheck()" class="new-check-btn" style="display:none;">
+          <span class="mi">add_circle</span> New
+        </button>
+      </div>
+      <div class="ask-chat" id="food-overlay-content">
+        <div class="food-wrap">
+
+          <!-- ── FOOD HERO ── -->
+          <div class="food-hero" id="food-hero">
+            <div class="food-hero-label">Ayurvedic Food Analysis</div>
+            <div class="food-hero-title">What are you<br>planning to eat?</div>
+            <div class="food-hero-sub">Get an instant Yes/No based on your dosha, season and current time — with meal boosters and do's & don'ts.</div>
+            <div class="food-hero-chips" id="food-hero-chips"></div>
+          </div>
+
+          <div id="food-api-warning" class="api-warning" style="display:none;">
+            <span class="mi" style="font-size:16px;vertical-align:-3px;margin-right:4px;">warning</span>
+            <strong>OpenAI API key not set.</strong> Go to Settings → API Configuration to add your key.
+          </div>
+
+          <!-- ── INPUT CARD ── -->
+          <div class="food-input-card" id="food-input-card">
+            <label class="food-input-label">
+              <span class="mi">edit_note</span> Describe your food
+            </label>
+            <p>E.g. "chicken biryani with raita", "avocado toast", "dal chawal"</p>
+            <textarea class="food-textarea" id="food-input" placeholder="Type your food here..."></textarea>
+
+            <!-- ── ADVANCED FILTERS TOGGLE ── -->
+            <button class="adv-filters-btn" id="adv-filters-btn" onclick="toggleAdvFilters()">
+              <span class="mi" style="font-size:16px;">tune</span>
+              Advanced Filters
+              <span class="mi adv-filters-chevron" id="adv-chevron" style="font-size:16px;margin-left:auto;transition:transform 0.25s;">expand_more</span>
+            </button>
+
+            <!-- ── ADVANCED FILTERS PANEL ── -->
+            <div class="adv-filters-panel" id="adv-filters-panel" style="display:none;">
+
+              <!-- Meal Timing -->
+              <div class="adv-filter-section">
+                <div class="adv-filter-label">
+                  <span class="mi">schedule</span> When will you eat this?
+                </div>
+                <div class="meal-timing-toggle">
+                  <button class="mtt-btn active" id="mtt-now" onclick="setTimingMode('now')">
+                    <span class="mi" style="font-size:15px;">bolt</span> Now
+                  </button>
+                  <button class="mtt-btn" id="mtt-plan" onclick="setTimingMode('plan')">
+                    <span class="mi" style="font-size:15px;">event</span> Plan Ahead
+                  </button>
+                </div>
+                <div class="meal-timing-now" id="meal-timing-now-preview">
+                  <span class="mi" style="font-size:15px;color:var(--text-muted);">check_circle</span>
+                  <span id="meal-now-time-display" style="font-size:13px;color:var(--text-muted);">Using current time</span>
+                </div>
+                <div class="meal-timing-plan" id="meal-timing-plan-picker" style="display:none;">
+                  <div class="meal-plan-row">
+                    <div class="meal-plan-field">
+                      <label class="meal-field-label"><span class="mi">calendar_today</span> Date</label>
+                      <input type="date" id="meal-plan-date" class="meal-field-input" oninput="updatePlanPreview()"/>
+                    </div>
+                    <div class="meal-plan-field">
+                      <label class="meal-field-label"><span class="mi">access_time</span> Time Window</label>
+                      <select id="meal-plan-hour" class="meal-field-input" onchange="updatePlanPreview()"></select>
+                    </div>
+                  </div>
+                  <div class="meal-plan-preview" id="meal-plan-preview">
+                    <span class="mi" style="font-size:15px;">event</span>
+                    <span id="meal-plan-preview-text">Select a date and time above</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Active Symptoms -->
+              <div class="adv-filter-section">
+                <div class="adv-filter-label">
+                  <span class="mi">health_and_safety</span> Any active symptoms today?
+                  <span class="adv-filter-hint">Optional</span>
+                </div>
+                <div class="adv-ailment-chips" id="adv-ailment-chips"></div>
+              </div>
+
+            </div><!-- end adv-filters-panel -->
+
+            <button class="btn-primary" style="margin-top:14px;" onclick="checkFood()">
+              <span class="mi" style="font-size:17px;vertical-align:-4px;margin-right:6px;">search</span>Analyse Food
+            </button>
+          </div>
+          <div id="food-result-area" style="padding:0 16px;"></div>
+          <div id="food-alt-area" style="padding:0 16px;"></div>
+          <div id="cuisine-pref-area" style="padding:0 16px;">
+            <div class="cuisine-pref-card" id="cuisine-section" style="display:none;">
+              <h4><span class="mi" style="font-size:18px;vertical-align:-4px;margin-right:5px;color:var(--gold);">public</span>Get Personalised Alternatives</h4>
+              <p>Describe your cuisine preference — North Indian, South Indian, veg/non-veg, Japanese, Korean, Chinese, salads etc.</p>
+              <textarea class="food-textarea" id="cuisine-input" placeholder="e.g. South Indian vegetarian, or Japanese light food..."></textarea>
+              <button class="btn-gold" style="margin-top:12px;" onclick="getCuisineAlts()"><span class="mi" style="font-size:16px;vertical-align:-3px;margin-right:5px;">format_list_numbered</span>Get My Best 5 Options</button>
+              <div id="cuisine-result-area" style="margin-top:14px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 <div class="toast" id="toast"></div>
 <input type="file" id="import-file-input" accept=".json" onchange="importJSON(event)" style="display:none;position:absolute;"/>
 
@@ -3283,7 +3298,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.86'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.87'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -3669,8 +3684,8 @@ function switchTab(name) {
   el('app-content').scrollTop = 0;
   if(name==='history') renderHistory();
   if(name==='herbs') initHerbAdvisor();
-  if(name==='symptom') initSymptomChecker();
-  if(name==='food') { initFoodCheck(); setTimeout(initMealTiming, 50); }
+  if(name==='symptom') openSymptomOverlay();
+  if(name==='food') openFoodOverlay();
   if(name==='dina') initDinacharya();
   if(name==='settings') { renderErrorLogs(); setApiErrorState(false); renderRecoveryCodeSettings(); }
 }
@@ -4579,6 +4594,20 @@ function clearFoodCache() {
   localStorage.removeItem(FOOD_CACHE_KEY);
 }
 
+function openFoodOverlay() {
+  const overlay = el('food-overlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('open'));
+  initFoodCheck();
+  setTimeout(initMealTiming, 50);
+}
+
+function closeFoodOverlay() {
+  const overlay = el('food-overlay');
+  overlay.classList.remove('open');
+  overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
+}
+
 function initFoodCheck() {
   const cache = loadFoodCache();
   if(cache && cache.result && cache.food) {
@@ -4603,7 +4632,7 @@ function showFoodInput() {
   const chevron = el('adv-chevron');
   if(panel) panel.style.display = 'none';
   if(chevron) chevron.style.transform = '';
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('food-overlay-content').scrollTop = 0; });
 }
 
 function showFoodResult(food, result, timeContext, isPlanned, generatedAt) {
@@ -4625,7 +4654,7 @@ function showFoodResult(food, result, timeContext, isPlanned, generatedAt) {
       b.innerHTML = '<span class="mi" style="font-size:16px;">refresh</span> Refresh Remedies';
     }
   }
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('food-overlay-content').scrollTop = 0; });
 }
 
 
@@ -4788,7 +4817,7 @@ function renderFoodResult(r, food, timeContext, isPlanned, generatedAt) {
     el('food-result-area').prepend(bannerDiv);
   }
 
-  requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
+  requestAnimationFrame(() => { el('food-overlay-content').scrollTop = 0; });
 }
 
 function togglePersonalisePanel() {
@@ -5623,7 +5652,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.86',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.87',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
@@ -6278,6 +6307,20 @@ let symptomState = {
   resultShown:false
 };
 
+function openSymptomOverlay() {
+  const overlay = el('symptom-overlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('open'));
+  if (!symptomState.resultShown) renderSymptomHome();
+}
+
+function closeSymptomOverlay() {
+  const overlay = el('symptom-overlay');
+  overlay.classList.remove('open');
+  overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
+  symptomState = { selectedAreas: [], duration: null, severity: 5, description: '', resultShown: false };
+}
+
 function initSymptomChecker() {
   if(!symptomState.resultShown) renderSymptomHome();
 }
@@ -6549,14 +6592,14 @@ function renderSymptomResult(r) {
       <span class="mio" style="font-size:17px;">spa</span> Explore Herbs for These Symptoms
     </button>
   `;
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('symptom-overlay-content').scrollTop = 0; });
 }
 
 function resetSymptomChecker() {
   symptomState = {selectedAreas:[],duration:null,severity:5,description:'',resultShown:false};
   el('symptom-reset-btn').style.display = 'none';
   renderSymptomHome();
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('symptom-overlay-content').scrollTop = 0; });
   showToast('Ready for a new symptom check');
 }
 

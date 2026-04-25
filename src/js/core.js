@@ -1,6 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.86'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.87'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -386,8 +386,8 @@ function switchTab(name) {
   el('app-content').scrollTop = 0;
   if(name==='history') renderHistory();
   if(name==='herbs') initHerbAdvisor();
-  if(name==='symptom') initSymptomChecker();
-  if(name==='food') { initFoodCheck(); setTimeout(initMealTiming, 50); }
+  if(name==='symptom') openSymptomOverlay();
+  if(name==='food') openFoodOverlay();
   if(name==='dina') initDinacharya();
   if(name==='settings') { renderErrorLogs(); setApiErrorState(false); renderRecoveryCodeSettings(); }
 }
