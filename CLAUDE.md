@@ -42,7 +42,7 @@ src/js/                ← JS split by feature for readability (mirror of docs/i
 src/css/main.css       ← All CSS (~2300 lines)
 src/html/app.html      ← HTML markup only (~4100 lines)
 scripts/build.js       ← Assembles src/ → public/index.html (NOT docs/)
-scripts/validate.js    ← Validates docs/index.html (~262 required function checks)
+scripts/validate.js    ← Validates docs/index.html (~278 required function checks)
 scripts/stamp-version.js ← Bumps version + SW cache key across all files
 ```
 
@@ -59,6 +59,7 @@ scripts/stamp-version.js ← Bumps version + SW cache key across all files
    | `sendHerbChat()` — signature + first 8 lines | `meal-timing.js` | herbs.js |
    | `sendHerbChat()` — body (rest of function) | `symptoms.js` | herbs.js |
    | `updateChatDisplay()`, `resetHerbAdvisor()` | `symptoms.js` | herbs.js |
+   | `renderSymptomResult()`, `resetSymptomChecker()` | `dinacharya.js` | symptoms.js |
 
    ```bash
    grep -rn "function functionName" src/js/
@@ -84,9 +85,8 @@ The `error: failed to push some refs` message printed after every push is **cosm
 - **PR titles must also end with the app version** (same format): `feat: description v1.XX`
   — read the current version with: `grep -o "APP_VERSION = '[^']*'" src/js/core.js | grep -o "'[^']*'" | tr -d "'"`
   — the pre-push hook bumps the version on push, so use the post-push version in the PR title
-- Always branch from latest main: `git checkout -b claude/feature-name origin/main`
-- Never develop directly on `main`
-- **All PRs from feature branches must target `origin/uat` by default** — only target a different branch if explicitly instructed
+- Branch from the base that matches the target — **always `origin/uat`** for normal feature/fix work: `git checkout -b claude/feature-name origin/uat`
+- Never develop directly on `main` or `uat`
 - **All PRs from feature branches must target `origin/uat`** — never open a PR directly to `main`
 
 ### Pre-Push Checklist
@@ -141,7 +141,7 @@ JS functions: `isFirstTimeUser()`, `goToOnboardingSlide(n)`, `skipOnboarding()`,
 
 | Tab ID | How Accessed |
 |---|---|
-| `tab-symptom` | Home quick-action card → `switchTab('symptom')` |
+| `tab-symptom` | Empty shell — Home quick-action card → `openSymptomOverlay()` |
 | `tab-quiz` | Settings → Retake Quiz; or `switchTab('quiz')` |
 | `tab-history` | Home → "View All →" link → `switchTab('history')` |
 
@@ -149,6 +149,7 @@ JS functions: `isFirstTimeUser()`, `goToOnboardingSlide(n)`, `skipOnboarding()`,
 
 | Overlay ID | Open Function | Close Function | Accessed From |
 |---|---|---|---|
+| `symptom-overlay` | `openSymptomOverlay()` | `closeSymptomOverlay()` | Home quick-action grid |
 | `food-overlay` | `openFoodOverlay()` | `closeFoodOverlay()` | Home quick-action grid |
 | `herbs-overlay` | `openHerbsOverlay()` | `closeHerbsOverlay()` | Home quick-action grid |
 | `herb-chat-overlay` | `openHerbChatOverlay()` | `closeHerbChatOverlay()` | Herb Advisor overlay |
@@ -203,15 +204,20 @@ overlay.classList.remove('open');
 overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
 ```
 
-**Android keyboard + fixed overlay:** Use `top:0; left:0; right:0; bottom:0` — **not** `height:100dvh`. Add `overflow:hidden` to overlay, `min-height:0` to the scrollable flex child (`.ask-chat`). All overlays (`#ask-overlay`, `#food-overlay`, `#herbs-overlay`, `#herb-chat-overlay`) use `.ask-overlay` and inherit this fix.
+**Android keyboard + fixed overlay:** Use `top:0; left:0; right:0; bottom:0` — **not** `height:100dvh`. Add `overflow:hidden` to overlay, `min-height:0` to the scrollable flex child (`.ask-chat`). All overlays (`#ask-overlay`, `#symptom-overlay`, `#food-overlay`, `#herbs-overlay`, `#herb-chat-overlay`) use `.ask-overlay` and inherit this fix.
 
 **`#herb-chat-overlay` reuses element IDs** from the old inline herb chat: `herb-chat-history`, `herb-chat-input`, `herb-send-btn`. This lets `sendHerbChat()`, `updateChatDisplay()`, and `scrollChatToBottom()` work unmodified.
 
 ### scrollTop after innerHTML
 Always use `requestAnimationFrame` — synchronous `scrollTop = 0` fires before the browser paints:
 ```js
-requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
+requestAnimationFrame(() => { el('container-id').scrollTop = 0; });
 ```
+
+Scroll the correct container — overlays have their own scrollable div, not `#app-content`:
+- Main tab content → `el('app-content')`
+- Symptom Check overlay → `el('symptom-overlay-content')`
+- Food Check overlay → `el('food-overlay-content')`
 
 ### Shared dosha rules
 `buildDoshaRules(dosha)` in `core.js` returns per-dosha dietary rules used by both Food Check and Ask Anything. Edit only this function to change Ayurvedic rules globally. Key nuance: ripe pineapple/mango are classified as sweet fruits (acceptable for Pitta in moderation), not sour/acidic.
@@ -267,7 +273,7 @@ setData('settings.openaiApiKey', key) // dot-path setter, auto-saves
 | `DINA_CACHE_KEY` | dinacharya.js | `'ayurai_dina_cache'` — cached generated routine |
 | `DINA_DEFAULT_WAKE` | dinacharya.js | `'06:30'` |
 | `DINA_DEFAULT_SLEEP` | dinacharya.js | `'22:30'` |
-| `APP_VERSION` | core.js | Current version string (auto-bumped by stamp-version.js) — currently `v1.87` |
+| `APP_VERSION` | core.js | Current version string (auto-bumped by stamp-version.js) — currently `v1.95` |
 
 > **Note:** Wake/sleep times and day offset are persisted separately under `ayurai_dina_prefs` (not inside `ayurai_my_info`).
 
@@ -303,7 +309,8 @@ setData('settings.openaiApiKey', key) // dot-path setter, auto-saves
 - **Single HTML file** — maximum portability; the monolithic approach is a feature.
 - **Ask Anything is overlay, not a tab** — keeps tab bar uncluttered; accessed from Home quick-actions.
 - **Food Check and Herbs are overlays** — moved out of the nav bar to keep it to 5 tabs; accessed from the Home quick-action grid.
-- **Symptom, Quiz, History have no nav items** — accessed via Home quick-action (Symptom), Settings (Quiz retake), and Home "View All" link (History).
+- **Symptom Check is an overlay** — `#tab-symptom` is an empty shell; content lives in `#symptom-overlay`. Accessed via Home quick-action (`openSymptomOverlay()`). Quiz and History remain hidden tabs.
+- **`#tab-food` and `#tab-herbs` do NOT have `class="tab-panel"`** — intentional. `switchTab()` hides all `.tab-panel` elements; adding that class to overlay inner divs would blank them out on every tab navigation.
 - **Face/Hair tabs are gender-aware** — icons update at login based on gender (`face`/`face_6` for face, `face_2`/`face_retouching_natural` for hair).
 - **Ask AI suggestions JSON** — when the AI declines an off-topic question, it appends `{"suggestions":["...", "..."]}`. `sendAskMessage` strips this before displaying and renders suggestions as clickable cards.
 
