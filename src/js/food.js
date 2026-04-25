@@ -218,7 +218,7 @@ function showFoodInput() {
   const chevron = el('adv-chevron');
   if(panel) panel.style.display = 'none';
   if(chevron) chevron.style.transform = '';
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('food-overlay-content').scrollTop = 0; });
 }
 
 function showFoodResult(food, result, timeContext, isPlanned, generatedAt) {
@@ -240,7 +240,7 @@ function showFoodResult(food, result, timeContext, isPlanned, generatedAt) {
       b.innerHTML = '<span class="mi" style="font-size:16px;">refresh</span> Refresh Remedies';
     }
   }
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('food-overlay-content').scrollTop = 0; });
 }
 
 

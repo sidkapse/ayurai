@@ -109,6 +109,7 @@ const REQUIRED_IDS = [
   'home-dosha-badge', 'home-dosha-val', 'home-dosha-desc',
   'home-dosha-pills', 'home-dosha-insights',
   // Food tab
+  'food-overlay-content',
   'food-hero', 'food-hero-chips', 'food-input', 'food-input-card',
   'food-result-area', 'food-alt-area', 'food-api-warning',
   'food-reset-btn', 'remedy-area', 'rescue-btn',

@@ -678,7 +678,7 @@
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.91 · Ancient Wisdom, Modern Intelligence        </div>
+          AyurAI v1.92 · Ancient Wisdom, Modern Intelligence        </div>
 
       </div>
     </div>
@@ -714,8 +714,8 @@
 
     <!-- ── Food Check Overlay ── -->
     <div id="food-overlay" class="ask-overlay" style="display:none;">
-      <div style="flex:1;overflow-y:auto;min-height:0;">
-        <div id="tab-food" class="tab-panel" style="display:block;">
+      <div id="food-overlay-content" style="flex:1;overflow-y:auto;min-height:0;">
+        <div id="tab-food" style="display:block;">
           <div class="top-bar">
             <button class="icon-btn" onclick="closeFoodOverlay()" style="margin-right:8px;flex-shrink:0;"><span class="mi">arrow_back</span></button>
             <div>
@@ -831,7 +831,7 @@
     <!-- ── Herbs Overlay ── -->
     <div id="herbs-overlay" class="ask-overlay" style="display:none;">
       <div style="flex:1;overflow-y:auto;min-height:0;">
-        <div id="tab-herbs" class="tab-panel" style="display:block;">
+        <div id="tab-herbs" style="display:block;">
           <div class="top-bar">
             <button class="icon-btn" onclick="closeHerbsOverlay()" style="margin-right:8px;flex-shrink:0;"><span class="mi">arrow_back</span></button>
             <div>
@@ -939,7 +939,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.91',    error_count: logs.length,
+    app_version: '1.92',    error_count: logs.length,
     errors: logs
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
@@ -2770,7 +2770,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.91',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.92',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
