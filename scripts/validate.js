@@ -58,6 +58,7 @@ const REQUIRED_FUNCTIONS = [
   'renderQuizResult', 'retakeQuiz',
   // Food check
   'checkFood', 'renderFoodResult', 'initFoodCheck', 'resetFoodCheck',
+  'openFoodOverlay', 'closeFoodOverlay',
   'getRemedy', 'renderRemedyCard', 'getCuisineAlts',
   'togglePersonalisePanel', 'refineBoostersWithContext',
   // Food history & settings
@@ -70,6 +71,7 @@ const REQUIRED_FUNCTIONS = [
   // Herb advisor
   'initHerbAdvisor', 'getHerbsByDosha', 'getHerbsByConcern', 'getSeasonalHerbs', 'sendHerbChat',
   // Symptom checker
+  'openSymptomOverlay', 'closeSymptomOverlay',
   'initSymptomChecker', 'runSymptomCheck', 'renderSymptomResult',
   // Dinacharya
   'initDinacharya', 'generateDinacharya', 'renderDinacharya', 'renderDinacharya_StartScreen',
