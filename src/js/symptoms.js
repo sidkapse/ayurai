@@ -218,20 +218,6 @@ let symptomState = {
   resultShown:false
 };
 
-function openSymptomOverlay() {
-  const overlay = el('symptom-overlay');
-  overlay.style.display = 'flex';
-  requestAnimationFrame(() => overlay.classList.add('open'));
-  if (!symptomState.resultShown) renderSymptomHome();
-}
-
-function closeSymptomOverlay() {
-  const overlay = el('symptom-overlay');
-  overlay.classList.remove('open');
-  overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
-  symptomState = { selectedAreas: [], duration: null, severity: 5, description: '', resultShown: false };
-}
-
 function initSymptomChecker() {
   if(!symptomState.resultShown) renderSymptomHome();
 }

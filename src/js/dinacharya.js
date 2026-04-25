@@ -184,14 +184,14 @@ function renderSymptomResult(r) {
       <span class="mio" style="font-size:17px;">spa</span> Explore Herbs for These Symptoms
     </button>
   `;
-  requestAnimationFrame(() => { el('symptom-overlay-content').scrollTop = 0; });
+  el('app-content').scrollTop = 0;
 }
 
 function resetSymptomChecker() {
   symptomState = {selectedAreas:[],duration:null,severity:5,description:'',resultShown:false};
   el('symptom-reset-btn').style.display = 'none';
   renderSymptomHome();
-  requestAnimationFrame(() => { el('symptom-overlay-content').scrollTop = 0; });
+  el('app-content').scrollTop = 0;
   showToast('Ready for a new symptom check');
 }
 

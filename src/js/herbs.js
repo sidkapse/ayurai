@@ -146,7 +146,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.87',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.86',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
