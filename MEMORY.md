@@ -10,6 +10,8 @@ The `src/js/` files were split from the monolith at byte boundaries, not functio
 
 | Function | Actual File | Expected File |
 |----------|-------------|---------------|
+| `renderSymptomResult()` | `src/js/dinacharya.js` | symptoms.js |
+| `resetSymptomChecker()` | `src/js/dinacharya.js` | symptoms.js |
 | `renderHerbChat()` | `src/js/meal-timing.js` | herbs.js |
 | `renderChatBubbles()` | `src/js/meal-timing.js` | herbs.js |
 | `scrollChatToBottom()` | `src/js/meal-timing.js` | herbs.js |
@@ -75,8 +77,14 @@ Both `#ask-overlay` and `#herb-chat-overlay` use the `.ask-overlay` class and in
 Setting `scrollTop = 0` synchronously after `innerHTML =` fires before the browser paints, so it has no effect. Always wrap:
 
 ```js
-requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
+requestAnimationFrame(() => { el('container-id').scrollTop = 0; });
 ```
+
+**Overlay scroll target:** For features inside overlays, scroll the overlay's own scrollable container — **not** `#app-content`. Each overlay's inner scrollable div has its own ID:
+- Food Check → `#food-overlay-content`
+- Symptom Check → `#symptom-overlay-content`
+
+`#app-content` is only correct for content inside the main tab panels (Dinacharya, Settings, etc.).
 
 ---
 
@@ -125,13 +133,30 @@ The pre-push hook bumps the version further (e.g., v1.47 → v1.48), so the vers
 
 ## Branch Naming Convention
 
-Always create a new branch from latest main for each feature:
+Always branch from the base that matches the target:
 
 ```bash
+# For UAT fixes / features targeting origin/uat:
+git checkout -b claude/feature-name origin/uat
+
+# For main-targeted work:
 git checkout -b claude/feature-name origin/main
 ```
 
-Never develop directly on `main`. The standing instruction is: "moving forward make sure if any new changes are asked a new branch should be created from latest main branch".
+Never develop directly on `main` or `uat`. **All PRs target `origin/uat`** unless explicitly told otherwise.
+
+---
+
+## `class="tab-panel"` Must Not Appear Inside Overlays
+
+`switchTab()` hides every element matching `.tab-panel` via:
+```js
+document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+```
+
+If any div inside an overlay carries `class="tab-panel"`, it will be hidden whenever the user taps any nav tab — making the overlay show a blank screen on the next open.
+
+**Rule:** Never add `class="tab-panel"` to any element inside `.ask-overlay`. Use a plain `<div>` or a custom class instead. The inner content divs in `#food-overlay` (`#tab-food`) and `#herbs-overlay` (`#tab-herbs`) deliberately do NOT have this class.
 
 ---
 
@@ -141,3 +166,5 @@ Never develop directly on `main`. The standing instruction is: "moving forward m
 - **Contradictory AI advice (pineapple + Pitta)**: Root cause was missing `buildDoshaRules()` in Food Check prompt and missing time context in Ask Anything. Fixed in PRs #49 and #50.
 - **Herb chat streaming**: `sendHerbChat` in `symptoms.js` creates a direct DOM `streamBubble`, streams into it, then removes it and re-renders via `updateChatDisplay()` — the bubble is never stored in `herbState`.
 - **Ask AI suggestions JSON**: When AI declines an off-topic question, it appends `{"suggestions":["...", "..."]}` at the end of the response. `sendAskMessage` strips this JSON before displaying the text and renders the suggestions as clickable cards.
+- **Food/Herb overlay blank screen**: Root cause was `class="tab-panel"` on `#tab-food` and `#tab-herbs` inside overlays — `switchTab()` was hiding them on every tab navigation. Fixed by removing that class. See the section above for the full rule.
+- **Symptom Check converted to overlay**: `#tab-symptom` is now an empty shell; content lives in `#symptom-overlay`. `openSymptomOverlay()` / `closeSymptomOverlay()` are in `src/js/symptoms.js`. Scroll calls in `renderSymptomResult()` and `resetSymptomChecker()` (both in `src/js/dinacharya.js`) target `#symptom-overlay-content`.
