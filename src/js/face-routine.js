@@ -243,7 +243,7 @@ function renderFaceStep(step) {
   </div>`;
 
   if (document.activeElement) document.activeElement.blur();
-  const _ac = el('app-content');
+  const _ac = el('face-q-container').closest('[id="app-content"]');
   _ac.style.scrollBehavior = 'auto';
   el('face-q-container').innerHTML = html;
   _ac.scrollTop = 0;
@@ -310,9 +310,11 @@ async function generateFaceRoutine() {
 
   el('face-q-container').innerHTML = `
     <div class="loading-card">
-      <div class="loading-spinner"></div>
+      <div class="face-load-aura">
+        <span class="mio loading-lotus" style="color:var(--lotus);margin:0;">spa</span>
+      </div>
       <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--charcoal);margin:16px 0 6px;">Crafting your routine…</div>
-      <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Analysing your dosha and skin profile</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Personalising for your dosha and skin type</div>
       <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
       <div class="loading-steps" style="margin-top:16px;">
         <div class="loading-step active"><div class="ls-icon"><span class="mi">psychology</span></div><div>Reading your dosha</div></div>
@@ -320,6 +322,14 @@ async function generateFaceRoutine() {
         <div class="loading-step"><div class="ls-icon"><span class="mi">auto_awesome</span></div><div>Building routine</div></div>
       </div>
     </div>`;
+
+  const _lSteps = el('face-q-container').querySelectorAll('.loading-step');
+  const _advStep = (i) => _lSteps.forEach((s, j) => {
+    s.classList.toggle('done', j < i);
+    s.classList.toggle('active', j === i);
+  });
+  const _lt1 = setTimeout(() => _advStep(1), 3500);
+  const _lt2 = setTimeout(() => _advStep(2), 8000);
 
   const month = new Date().toLocaleString('default', { month: 'long' });
   const dosha = d.dosha.primary;
@@ -369,11 +379,13 @@ Tailor all recommendations to the user's dosha, skin type, concerns, and current
 
   try {
     const resp = await callOpenAILarge(prompt, d.settings.openaiApiKey, 2000);
+    clearTimeout(_lt1); clearTimeout(_lt2);
     const data = JSON.parse(resp.replace(/```json|```/g, '').trim());
     setData('faceRoutine', { inputs: Object.assign({}, faceState), result: data, generatedAt: new Date().toISOString() });
     if (el('face-reset-btn')) el('face-reset-btn').style.display = 'block';
     renderFaceRoutine(data);
   } catch(e) {
+    clearTimeout(_lt1); clearTimeout(_lt2);
     logError('generateFaceRoutine', e);
     showToast('Error generating routine: ' + e.message);
     renderFaceQuestionnaire();
@@ -436,7 +448,7 @@ function renderFaceRoutine(data) {
       <span class="mi">refresh</span> Start Over
     </button>`;
 
-  requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
+  requestAnimationFrame(() => { el('face-wrap').closest('[id="app-content"]').scrollTop = 0; });
 }
 
 function resetFaceRoutine() {

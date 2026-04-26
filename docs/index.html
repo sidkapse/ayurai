@@ -2452,6 +2452,17 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
   cursor:pointer;flex-shrink:0;white-space:nowrap;font-family:'Jost',sans-serif;
 }
 /* ── FACIAL SKIN ROUTINE ── */
+.face-load-aura{
+  width:88px;height:88px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(212,117,138,0.18),rgba(201,168,76,0.1));
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 4px;
+  animation:faceAuraPulse 2.4s ease-in-out infinite;
+}
+@keyframes faceAuraPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(212,117,138,0.28);}
+  50%{box-shadow:0 0 0 14px rgba(212,117,138,0);}
+}
 .face-welcome-feature{
   display:flex;
   align-items:center;
@@ -3385,7 +3396,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.102 · Ancient Wisdom, Modern Intelligence        </div>
+          AyurAI v1.104 · Ancient Wisdom, Modern Intelligence        </div>
 
       </div>
     </div>
@@ -3618,7 +3629,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.102'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.104'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -5966,7 +5977,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.102',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.104',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
@@ -8225,7 +8236,7 @@ function renderFaceStep(step) {
   </div>`;
 
   if (document.activeElement) document.activeElement.blur();
-  const _ac = el('app-content');
+  const _ac = el('face-q-container').closest('[id="app-content"]');
   _ac.style.scrollBehavior = 'auto';
   el('face-q-container').innerHTML = html;
   _ac.scrollTop = 0;
@@ -8292,9 +8303,11 @@ async function generateFaceRoutine() {
 
   el('face-q-container').innerHTML = `
     <div class="loading-card">
-      <div class="loading-spinner"></div>
+      <div class="face-load-aura">
+        <span class="mio loading-lotus" style="color:var(--lotus);margin:0;">spa</span>
+      </div>
       <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--charcoal);margin:16px 0 6px;">Crafting your routine…</div>
-      <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Analysing your dosha and skin profile</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Personalising for your dosha and skin type</div>
       <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
       <div class="loading-steps" style="margin-top:16px;">
         <div class="loading-step active"><div class="ls-icon"><span class="mi">psychology</span></div><div>Reading your dosha</div></div>
@@ -8302,6 +8315,14 @@ async function generateFaceRoutine() {
         <div class="loading-step"><div class="ls-icon"><span class="mi">auto_awesome</span></div><div>Building routine</div></div>
       </div>
     </div>`;
+
+  const _lSteps = el('face-q-container').querySelectorAll('.loading-step');
+  const _advStep = (i) => _lSteps.forEach((s, j) => {
+    s.classList.toggle('done', j < i);
+    s.classList.toggle('active', j === i);
+  });
+  const _lt1 = setTimeout(() => _advStep(1), 3500);
+  const _lt2 = setTimeout(() => _advStep(2), 8000);
 
   const month = new Date().toLocaleString('default', { month: 'long' });
   const dosha = d.dosha.primary;
@@ -8351,11 +8372,13 @@ Tailor all recommendations to the user's dosha, skin type, concerns, and current
 
   try {
     const resp = await callOpenAILarge(prompt, d.settings.openaiApiKey, 2000);
+    clearTimeout(_lt1); clearTimeout(_lt2);
     const data = JSON.parse(resp.replace(/```json|```/g, '').trim());
     setData('faceRoutine', { inputs: Object.assign({}, faceState), result: data, generatedAt: new Date().toISOString() });
     if (el('face-reset-btn')) el('face-reset-btn').style.display = 'block';
     renderFaceRoutine(data);
   } catch(e) {
+    clearTimeout(_lt1); clearTimeout(_lt2);
     logError('generateFaceRoutine', e);
     showToast('Error generating routine: ' + e.message);
     renderFaceQuestionnaire();
@@ -8418,7 +8441,7 @@ function renderFaceRoutine(data) {
       <span class="mi">refresh</span> Start Over
     </button>`;
 
-  requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
+  requestAnimationFrame(() => { el('face-wrap').closest('[id="app-content"]').scrollTop = 0; });
 }
 
 function resetFaceRoutine() {
