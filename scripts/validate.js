@@ -84,7 +84,7 @@ const REQUIRED_FUNCTIONS = [
   // Gender-based tab icons
   'updateTabIcons',
   // Face Routine
-  'initFaceRoutine', 'renderFaceQuestionnaire', 'renderFaceStep',
+  'initFaceRoutine', 'renderFaceWelcome', 'renderFaceQuestionnaire', 'renderFaceStep',
   'selectFaceSkinType', 'toggleFaceConcern', 'toggleFaceLifestyle',
   'selectFacePulse', 'selectFaceFrequency',
   'faceNextStep', 'facePrevStep', 'generateFaceRoutine',

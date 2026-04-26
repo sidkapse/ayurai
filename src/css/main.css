@@ -2436,6 +2436,24 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 }
 
 /* ── FACIAL SKIN ROUTINE ── */
+.face-welcome-feature{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid var(--cream-dark);
+  font-size:14px;
+  color:var(--charcoal);
+  line-height:1.4;
+}
+.face-welcome-feature:last-child{
+  border-bottom:none;
+  padding-bottom:0;
+}
+.face-welcome-feature .mio{
+  font-size:22px;
+  flex-shrink:0;
+}
 .face-step-container{
   animation:fadeIn 0.2s ease;
 }

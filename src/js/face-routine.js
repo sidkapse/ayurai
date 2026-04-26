@@ -26,7 +26,41 @@ function initFaceRoutine() {
     return;
   }
   faceState = { step: 1, skinType: null, concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null };
-  renderFaceQuestionnaire();
+  renderFaceWelcome();
+}
+
+function renderFaceWelcome() {
+  if (el('face-reset-btn')) el('face-reset-btn').style.display = 'none';
+  el('face-wrap').innerHTML = `
+    <div class="face-hero-card" style="text-align:center;padding:28px 20px 24px;">
+      <span class="mio" style="font-size:40px;color:var(--lotus);">spa</span>
+      <h2 style="margin:12px 0 8px;">Ayurvedic Skincare Blueprint</h2>
+      <p>A personalised routine crafted for your dosha and skin type — morning, evening &amp; weekly.</p>
+    </div>
+
+    <div class="symptom-section-card" style="margin-top:14px;padding:18px 20px;">
+      <div class="face-welcome-feature">
+        <span class="mio" style="color:var(--lotus);">spa</span>
+        <span>Dosha-matched ingredients &amp; application methods</span>
+      </div>
+      <div class="face-welcome-feature">
+        <span class="mio" style="color:var(--lotus);">wb_sunny</span>
+        <span>Morning · Evening · Weekly step-by-step plans</span>
+      </div>
+      <div class="face-welcome-feature">
+        <span class="mio" style="color:var(--lotus);">restaurant</span>
+        <span>Skin-supporting diet tips &amp; ingredients to avoid</span>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin:16px 0 4px;font-size:13px;color:var(--text-muted);">
+      <span class="mio" style="font-size:14px;vertical-align:middle;margin-right:4px;">timer</span>
+      Just 5 quick questions
+    </div>
+
+    <button class="btn-primary" onclick="renderFaceQuestionnaire()" style="width:100%;margin-top:10px;">
+      Get Started →
+    </button>`;
 }
 
 function renderFaceQuestionnaire() {
