@@ -2452,6 +2452,24 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
   cursor:pointer;flex-shrink:0;white-space:nowrap;font-family:'Jost',sans-serif;
 }
 /* ── FACIAL SKIN ROUTINE ── */
+.face-welcome-feature{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid var(--cream-dark);
+  font-size:14px;
+  color:var(--charcoal);
+  line-height:1.4;
+}
+.face-welcome-feature:last-child{
+  border-bottom:none;
+  padding-bottom:0;
+}
+.face-welcome-feature .mio{
+  font-size:22px;
+  flex-shrink:0;
+}
 .face-step-container{
   animation:fadeIn 0.2s ease;
 }
@@ -3367,7 +3385,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.97 · Ancient Wisdom, Modern Intelligence        </div>
+          AyurAI v1.98 · Ancient Wisdom, Modern Intelligence        </div>
 
       </div>
     </div>
@@ -3600,7 +3618,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.97'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.98'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -5950,7 +5968,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.97',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.98',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
@@ -7992,7 +8010,41 @@ function initFaceRoutine() {
     return;
   }
   faceState = { step: 1, skinType: null, concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null };
-  renderFaceQuestionnaire();
+  renderFaceWelcome();
+}
+
+function renderFaceWelcome() {
+  if (el('face-reset-btn')) el('face-reset-btn').style.display = 'none';
+  el('face-wrap').innerHTML = `
+    <div class="face-hero-card" style="text-align:center;padding:28px 20px 24px;">
+      <span class="mio" style="font-size:40px;color:var(--lotus);">spa</span>
+      <h2 style="margin:12px 0 8px;">Ayurvedic Skincare Blueprint</h2>
+      <p>A personalised routine crafted for your dosha and skin type — morning, evening &amp; weekly.</p>
+    </div>
+
+    <div class="symptom-section-card" style="margin-top:14px;padding:18px 20px;">
+      <div class="face-welcome-feature">
+        <span class="mio" style="color:var(--lotus);">spa</span>
+        <span>Dosha-matched ingredients &amp; application methods</span>
+      </div>
+      <div class="face-welcome-feature">
+        <span class="mio" style="color:var(--lotus);">wb_sunny</span>
+        <span>Morning · Evening · Weekly step-by-step plans</span>
+      </div>
+      <div class="face-welcome-feature">
+        <span class="mio" style="color:var(--lotus);">restaurant</span>
+        <span>Skin-supporting diet tips &amp; ingredients to avoid</span>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin:16px 0 4px;font-size:13px;color:var(--text-muted);">
+      <span class="mio" style="font-size:14px;vertical-align:middle;margin-right:4px;">timer</span>
+      Just 5 quick questions
+    </div>
+
+    <button class="btn-primary" onclick="renderFaceQuestionnaire()" style="width:100%;margin-top:10px;">
+      Get Started →
+    </button>`;
 }
 
 function renderFaceQuestionnaire() {
