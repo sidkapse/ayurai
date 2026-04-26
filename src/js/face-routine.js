@@ -243,8 +243,11 @@ function renderFaceStep(step) {
   </div>`;
 
   if (document.activeElement) document.activeElement.blur();
+  const _ac = el('app-content');
+  _ac.style.scrollBehavior = 'auto';
   el('face-q-container').innerHTML = html;
-  requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
+  _ac.scrollTop = 0;
+  requestAnimationFrame(() => { _ac.scrollTop = 0; _ac.style.scrollBehavior = ''; });
 }
 
 function _faceNextDisabled(step) {
