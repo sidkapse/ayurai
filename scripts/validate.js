@@ -83,6 +83,12 @@ const REQUIRED_FUNCTIONS = [
   'openFoodOverlay', 'closeFoodOverlay', 'openHerbsOverlay', 'closeHerbsOverlay',
   // Gender-based tab icons
   'updateTabIcons',
+  // Face Routine
+  'initFaceRoutine', 'renderFaceQuestionnaire', 'renderFaceStep',
+  'selectFaceSkinType', 'toggleFaceConcern', 'toggleFaceLifestyle',
+  'selectFacePulse', 'selectFaceFrequency',
+  'faceNextStep', 'facePrevStep', 'generateFaceRoutine',
+  'renderFaceRoutine', 'resetFaceRoutine',
 ];
 REQUIRED_FUNCTIONS.forEach(fn => check(fn + '()', js.includes('function ' + fn)));
 
@@ -151,7 +157,8 @@ const REQUIRED_IDS = [
   'pwa-popup', 'pwa-popup-sub', 'pwa-popup-btn', 'pwa-mini-banner',
   // Face & Hair tabs
   'tab-face', 'tab-hair', 'tabn-face', 'tabn-hair',
-  'face-nav-icon', 'hair-nav-icon', 'face-placeholder-icon', 'hair-placeholder-icon',
+  'face-nav-icon', 'hair-nav-icon', 'hair-placeholder-icon',
+  'face-wrap', 'face-reset-btn',
 ];
 REQUIRED_IDS.forEach(id => check('id="' + id + '"', html.includes('id="' + id + '"')));
 

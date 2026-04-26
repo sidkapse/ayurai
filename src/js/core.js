@@ -1,6 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.96'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.97'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -388,7 +388,7 @@ function switchTab(name) {
   if(name==='history') renderHistory();
   if(name==='symptom') openSymptomOverlay();
   if(name==='dina') initDinacharya();
-  if(name==='face') {}
+  if(name==='face') initFaceRoutine();
   if(name==='hair') {}
   if(name==='settings') { renderErrorLogs(); setApiErrorState(false); renderRecoveryCodeSettings(); }
 }
@@ -399,7 +399,6 @@ function updateTabIcons() {
   const hairIcon = female ? 'face_2' : 'face_retouching_natural';
   if(el('face-nav-icon')) el('face-nav-icon').textContent = faceIcon;
   if(el('hair-nav-icon')) el('hair-nav-icon').textContent = hairIcon;
-  if(el('face-placeholder-icon')) el('face-placeholder-icon').textContent = faceIcon;
   if(el('hair-placeholder-icon')) el('hair-placeholder-icon').textContent = hairIcon;
 }
 

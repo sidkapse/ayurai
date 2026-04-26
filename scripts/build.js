@@ -25,6 +25,7 @@ const JS_MODULES = [
   'herbs.js',
   'symptoms.js',
   'dinacharya.js',
+  'face-routine.js',
 ];
 
 function read(filePath) {

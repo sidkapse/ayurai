@@ -401,12 +401,14 @@
           <div class="top-bar-title">Facial Skin Routine</div>
           <div class="top-bar-sub">Ayurvedic skincare for your dosha</div>
         </div>
+        <div class="top-bar-right">
+          <button class="new-check-btn" id="face-reset-btn"
+                  onclick="resetFaceRoutine()" style="display:none;">
+            <span class="mi">add_circle</span> New
+          </button>
+        </div>
       </div>
-      <div class="coming-soon-wrap">
-        <span class="mio" id="face-placeholder-icon" style="font-size:64px;color:var(--lotus);">face_6</span>
-        <div class="coming-soon-title">Coming Soon</div>
-        <div class="coming-soon-msg">Personalized Ayurvedic facial skincare routines tailored to your dosha.</div>
-      </div>
+      <div class="quiz-wrap" id="face-wrap"></div>
     </div>
 
     <!-- HAIR TAB -->
@@ -665,7 +667,7 @@
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.96 · Ancient Wisdom, Modern Intelligence        </div>
+          AyurAI v1.97 · Ancient Wisdom, Modern Intelligence        </div>
 
       </div>
     </div>
@@ -942,7 +944,7 @@ function exportErrorLogs() {
   const payload = {
     exported_at: new Date().toISOString(),
     user: username,
-    app_version: '1.96',    error_count: logs.length,
+    app_version: '1.97',    error_count: logs.length,
     errors: logs
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
@@ -2773,7 +2775,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.96',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.97',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
