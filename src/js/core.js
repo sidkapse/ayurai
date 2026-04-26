@@ -1,6 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.99'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.102'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -366,12 +366,10 @@ function initApp() {
   renderHistory();
   // Init quiz
   initQuiz();
-  // Restore tab after pull-to-refresh reload
+  // Always switch explicitly: restores PTR tab or defaults home so no tab flashes unexpectedly
   const _reloadTab = sessionStorage.getItem('ayurai_reload_tab');
-  if (_reloadTab) {
-    sessionStorage.removeItem('ayurai_reload_tab');
-    switchTab(_reloadTab);
-  }
+  sessionStorage.removeItem('ayurai_reload_tab');
+  switchTab(_reloadTab || 'home');
 }
 
 // ── TABS ──
