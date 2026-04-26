@@ -3385,7 +3385,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.100 · Ancient Wisdom, Modern Intelligence        </div>
+          AyurAI v1.102 · Ancient Wisdom, Modern Intelligence        </div>
 
       </div>
     </div>
@@ -3618,7 +3618,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.100'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.102'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -3984,12 +3984,10 @@ function initApp() {
   renderHistory();
   // Init quiz
   initQuiz();
-  // Restore tab after pull-to-refresh reload
+  // Always switch explicitly: restores PTR tab or defaults home so no tab flashes unexpectedly
   const _reloadTab = sessionStorage.getItem('ayurai_reload_tab');
-  if (_reloadTab) {
-    sessionStorage.removeItem('ayurai_reload_tab');
-    switchTab(_reloadTab);
-  }
+  sessionStorage.removeItem('ayurai_reload_tab');
+  switchTab(_reloadTab || 'home');
 }
 
 // ── TABS ──
@@ -5968,7 +5966,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.100',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.102',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
