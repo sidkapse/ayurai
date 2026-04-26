@@ -3396,7 +3396,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
         </div>
 
         <div style="padding:12px 0 24px;text-align:center;font-size:11px;color:var(--text-light);">
-          AyurAI v1.103 · Ancient Wisdom, Modern Intelligence        </div>
+          AyurAI v1.104 · Ancient Wisdom, Modern Intelligence        </div>
 
       </div>
     </div>
@@ -3629,7 +3629,7 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
 <script>
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.103'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.104'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -5977,7 +5977,7 @@ function exportJSON() {
     ...d,
     _export_meta: {
       exported_at: new Date().toISOString(),
-      app_version: '1.103',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
+      app_version: '1.104',      features_included: ['profile','dosha','ailments','foodHistory','doshaInsights','city','settings','dinacharya']
     }
   };
   const blob = new Blob([JSON.stringify(exportData,null,2)],{type:'application/json'});
@@ -8236,7 +8236,7 @@ function renderFaceStep(step) {
   </div>`;
 
   if (document.activeElement) document.activeElement.blur();
-  const _ac = el('app-content');
+  const _ac = el('face-q-container').closest('[id="app-content"]');
   _ac.style.scrollBehavior = 'auto';
   el('face-q-container').innerHTML = html;
   _ac.scrollTop = 0;
@@ -8441,7 +8441,7 @@ function renderFaceRoutine(data) {
       <span class="mi">refresh</span> Start Over
     </button>`;
 
-  requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
+  requestAnimationFrame(() => { el('face-wrap').closest('[id="app-content"]').scrollTop = 0; });
 }
 
 function resetFaceRoutine() {

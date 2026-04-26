@@ -243,7 +243,7 @@ function renderFaceStep(step) {
   </div>`;
 
   if (document.activeElement) document.activeElement.blur();
-  const _ac = el('app-content');
+  const _ac = el('face-q-container').closest('[id="app-content"]');
   _ac.style.scrollBehavior = 'auto';
   el('face-q-container').innerHTML = html;
   _ac.scrollTop = 0;
@@ -448,7 +448,7 @@ function renderFaceRoutine(data) {
       <span class="mi">refresh</span> Start Over
     </button>`;
 
-  requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
+  requestAnimationFrame(() => { el('face-wrap').closest('[id="app-content"]').scrollTop = 0; });
 }
 
 function resetFaceRoutine() {
