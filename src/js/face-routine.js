@@ -238,10 +238,11 @@ function renderFaceStep(step) {
   html += `
     <div class="face-nav">
       ${step > 1 ? '<button class="btn-back" onclick="facePrevStep()"><span class="mi">arrow_back</span></button>' : ''}
-      <button class="btn-primary" id="face-next-btn" onclick="faceNextStep()"${disabled}>${nextLabel}</button>
+      <button class="btn-primary" onclick="faceNextStep()"${disabled}>${nextLabel}</button>
     </div>
   </div>`;
 
+  if (document.activeElement) document.activeElement.blur();
   el('face-q-container').innerHTML = html;
   requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
 }
