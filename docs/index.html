@@ -8073,7 +8073,7 @@ function renderFaceQuestionnaire() {
   renderFaceStep(faceState.step);
 }
 
-function renderFaceStep(step) {
+function renderFaceStep(step, scrollToTop = true) {
   const pct = Math.round((step / 5) * 100);
   let html = `
     <div class="face-step-container">
@@ -8246,12 +8246,16 @@ function renderFaceStep(step) {
     </div>
   </div>`;
 
-  if (document.activeElement) document.activeElement.blur();
-  const _ac = el('face-q-container').closest('[id="app-content"]');
-  _ac.style.scrollBehavior = 'auto';
-  el('face-q-container').innerHTML = html;
-  _ac.scrollTop = 0;
-  requestAnimationFrame(() => { _ac.scrollTop = 0; _ac.style.scrollBehavior = ''; });
+  if (scrollToTop) {
+    if (document.activeElement) document.activeElement.blur();
+    const _ac = el('face-q-container').closest('[id="app-content"]');
+    _ac.style.scrollBehavior = 'auto';
+    el('face-q-container').innerHTML = html;
+    _ac.scrollTop = 0;
+    requestAnimationFrame(() => { _ac.scrollTop = 0; _ac.style.scrollBehavior = ''; });
+  } else {
+    el('face-q-container').innerHTML = html;
+  }
 }
 
 function _faceNextDisabled(step) {
@@ -8263,29 +8267,29 @@ function _faceNextDisabled(step) {
 
 function selectFaceSkinType(type) {
   faceState.skinType = type;
-  renderFaceStep(1);
+  renderFaceStep(1, false);
 }
 
 function toggleFaceConcern(concern) {
   const idx = faceState.concerns.indexOf(concern);
   if (idx === -1) faceState.concerns.push(concern);
   else faceState.concerns.splice(idx, 1);
-  renderFaceStep(2);
+  renderFaceStep(2, false);
 }
 
 function toggleFaceLifestyle(key) {
   faceState.lifestyle[key] = !faceState.lifestyle[key];
-  renderFaceStep(4);
+  renderFaceStep(4, false);
 }
 
 function selectFacePulse(key, value) {
   faceState.pulse[key] = value;
-  renderFaceStep(3);
+  renderFaceStep(3, false);
 }
 
 function selectFaceFrequency(val) {
   faceState.frequency = val;
-  renderFaceStep(5);
+  renderFaceStep(5, false);
 }
 
 function facePrevStep() {
