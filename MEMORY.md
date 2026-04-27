@@ -51,7 +51,7 @@ The `error: failed to push some refs` message printed after every push is **cosm
 
 ## Validator — Adding New Required Functions
 
-`scripts/validate.js` maintains a `REQUIRED_FUNCTIONS` array (~line 37). When adding a new top-level function that must always exist in `docs/index.html`, add it there. Currently 262 checks. Run with:
+`scripts/validate.js` maintains a `REQUIRED_FUNCTIONS` array (~line 37). When adding a new top-level function that must always exist in `docs/index.html`, add it there. Currently **294 checks**. Run with:
 
 ```bash
 node scripts/validate.js
@@ -84,7 +84,9 @@ requestAnimationFrame(() => { el('container-id').scrollTop = 0; });
 - Food Check → `#food-overlay-content`
 - Symptom Check → `#symptom-overlay-content`
 
-`#app-content` is only correct for content inside the main tab panels (Dinacharya, Settings, etc.).
+**Duplicate `#app-content` IDs:** Two elements in `docs/index.html` carry `id="app-content"` — one inside `#screen-login` (first in DOM, ~line 2902) and one inside `#screen-app` (the real tab scroller, ~line 3006). `getElementById` / `el()` always returns the first (the login screen element). For face-routine and any code running inside `#screen-app`, use `el('face-wrap').closest('[id="app-content"]')` to reach the correct scroller.
+
+`#app-content` via plain `el()` is only correct for overlays that sit inside `#screen-app` directly and don't traverse past the login screen element.
 
 ---
 
@@ -160,6 +162,54 @@ If any div inside an overlay carries `class="tab-panel"`, it will be hidden when
 
 ---
 
+## Face Routine — Navigation Scroll vs. Selection Scroll
+
+`renderFaceStep(step, scrollToTop = true)` has an optional second parameter. When a user selects an option within a step (skin type, concern, pulse answer, etc.), the selection function calls `renderFaceStep(N, false)` to re-render in-place without resetting scroll position. Navigation (Next/Back buttons) calls `renderFaceStep(N)` with the default `true` so the user sees the top of the new step.
+
+---
+
+## Face Routine — `alternateFaceStep` In-Place DOM Update
+
+`alternateFaceStep(section, idx)` updates only the targeted step card without re-rendering the whole routine. It:
+1. Finds the card by ID (`face-m-N` for morning, `face-e-N` for evening, `face-w-N` for weekly)
+2. Uses `document.getElementById(cardId)` — **not** `el(cardId)` — because these IDs are dynamic (generated inside `innerHTML`) and are not in the static HTML the validator checks
+3. Updates `.face-ingredients`, `.face-method`, `.face-dosha-note` child elements directly
+4. Saves the updated `faceRoutine` object back via `setData('faceRoutine', ...)`
+
+Never call `renderFaceRoutine()` from inside `alternateFaceStep` — it would re-render the whole page and cause a scroll jump.
+
+---
+
+## Face Routine — Loading Animation
+
+`generateFaceRoutine()` replaces the questionnaire container with a loading card that has three `.loading-step` divs. Two `setTimeout` calls advance through them:
+- `setTimeout(() => _advStep(1), 3500)` — moves to "Reading your profile"
+- `setTimeout(() => _advStep(2), 8000)` — moves to "Finalising your routine"
+
+Both timers are stored as `_lt1` / `_lt2` and cleared with `clearTimeout` in both `try` and `catch` branches to prevent dangling state updates after the response arrives.
+
+---
+
+## Rebase Conflicts — Version Stamp Strategy
+
+When a PR is merged into uat, the pre-push hook bumps `APP_VERSION` in five files (`docs/index.html`, `src/html/app.html`, `src/js/core.js`, `src/js/herbs.js`, `docs/sw.js`). Feature branches that were created before the merge will conflict on these version lines when rebasing.
+
+**Fix pattern:**
+```bash
+# If the branch has commits that were already merged into uat, drop them:
+git rebase --onto origin/uat <last-already-merged-commit-hash>
+
+# If only version conflicts remain (no logic conflicts), resolve each by keeping HEAD (uat):
+# — docs/sw.js: keep the newer CACHE timestamp
+# — src/js/core.js, src/html/app.html, docs/index.html, src/js/herbs.js: keep uat's version number
+# Then: git add <files> && git rebase --continue
+git push --force-with-lease
+```
+
+The hook will bump the version again on push, so the exact version kept during conflict resolution doesn't matter.
+
+---
+
 ## Key Discoveries
 
 - **Food Check scroll bug**: `renderFoodResult` was calling `el('app-content').scrollTop = 0` synchronously — fixed with `requestAnimationFrame`.
@@ -168,3 +218,5 @@ If any div inside an overlay carries `class="tab-panel"`, it will be hidden when
 - **Ask AI suggestions JSON**: When AI declines an off-topic question, it appends `{"suggestions":["...", "..."]}` at the end of the response. `sendAskMessage` strips this JSON before displaying the text and renders the suggestions as clickable cards.
 - **Food/Herb overlay blank screen**: Root cause was `class="tab-panel"` on `#tab-food` and `#tab-herbs` inside overlays — `switchTab()` was hiding them on every tab navigation. Fixed by removing that class. See the section above for the full rule.
 - **Symptom Check converted to overlay**: `#tab-symptom` is now an empty shell; content lives in `#symptom-overlay`. `openSymptomOverlay()` / `closeSymptomOverlay()` are in `src/js/symptoms.js`. Scroll calls in `renderSymptomResult()` and `resetSymptomChecker()` (both in `src/js/dinacharya.js`) target `#symptom-overlay-content`.
+- **Face routine welcome card**: `initFaceRoutine()` → `renderFaceWelcome()` (orientation screen with feature bullets + "Get Started →") → `renderFaceQuestionnaire()` → 5 steps → `generateFaceRoutine()` → `renderFaceRoutine()`. `resetFaceRoutine()` skips the welcome card and goes directly to `renderFaceQuestionnaire()` — correct by design.
+- **Face loading stuck on step 1**: Original loading card had no JS to advance `.loading-step` indicators. Fixed by adding `setTimeout` at 3.5 s and 8 s with matching `clearTimeout` in both try and catch.
