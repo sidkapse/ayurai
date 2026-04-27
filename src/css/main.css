@@ -2646,6 +2646,17 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
   color:var(--charcoal);
   line-height:1.6;
 }
+.face-alt-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:none;border:1px solid var(--cream-dark);
+  border-radius:20px;padding:5px 12px;
+  font-size:12px;color:var(--text-muted);
+  cursor:pointer;margin-top:10px;
+  transition:border-color 0.2s,color 0.2s;
+}
+.face-alt-btn:active{border-color:var(--lotus);color:var(--lotus);}
+.face-alt-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.face-alt-btn .mio{font-size:15px;}
 .face-frequency-options{
   display:flex;
   flex-direction:column;

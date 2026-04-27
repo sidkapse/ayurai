@@ -395,8 +395,8 @@ Tailor all recommendations to the user's dosha, skin type, concerns, and current
 function renderFaceRoutine(data) {
   const mkChips = (arr) => (arr || []).map(i => `<span class="face-ingredient-chip">${i}</span>`).join('');
 
-  const mkSteps = (steps) => (steps || []).map(s => `
-    <div class="face-step-card">
+  const mkSteps = (steps, section) => (steps || []).map((s, i) => `
+    <div class="face-step-card" id="face-${section[0]}-${i}">
       <div class="face-step-header">
         <div class="face-step-num">${s.step}</div>
         <div class="face-step-name">${s.name}</div>
@@ -405,15 +405,17 @@ function renderFaceRoutine(data) {
       ${s.ingredients && s.ingredients.length ? `<div class="face-ingredients">${mkChips(s.ingredients)}</div>` : ''}
       <div class="face-method">${s.method}</div>
       ${s.doshaNote ? `<div class="face-dosha-note"><span class="mio" style="font-size:14px;vertical-align:middle;margin-right:4px;">info</span>${s.doshaNote}</div>` : ''}
+      <button class="face-alt-btn" onclick="alternateFaceStep('${section}',${i})"><span class="mio">swap_horiz</span> Find alternatives</button>
     </div>`).join('');
 
-  const mkWeekly = (treatments) => (treatments || []).map(t => `
-    <div class="face-weekly-card">
+  const mkWeekly = (treatments) => (treatments || []).map((t, i) => `
+    <div class="face-weekly-card" id="face-w-${i}">
       <div class="face-weekly-name">${t.name}</div>
       <div class="face-weekly-freq"><span class="mio" style="font-size:13px;vertical-align:middle;margin-right:3px;">schedule</span>${t.frequency}</div>
       ${t.ingredients && t.ingredients.length ? `<div class="face-ingredients" style="margin-bottom:8px;">${mkChips(t.ingredients)}</div>` : ''}
       <div class="face-method">${t.method}</div>
       ${t.benefit ? `<div class="face-dosha-note">${t.benefit}</div>` : ''}
+      <button class="face-alt-btn" onclick="alternateFaceStep('weekly',${i})"><span class="mio">swap_horiz</span> Find alternatives</button>
     </div>`).join('');
 
   el('face-wrap').innerHTML = `
@@ -424,10 +426,10 @@ function renderFaceRoutine(data) {
     </div>
 
     <div class="face-routine-section"><span class="mio">wb_sunny</span> Morning Routine</div>
-    ${mkSteps(data.morningRoutine)}
+    ${mkSteps(data.morningRoutine, 'morning')}
 
     <div class="face-routine-section"><span class="mio">nights_stay</span> Evening Routine</div>
-    ${mkSteps(data.eveningRoutine)}
+    ${mkSteps(data.eveningRoutine, 'evening')}
 
     <div class="face-routine-section"><span class="mio">spa</span> Weekly Treatments</div>
     ${mkWeekly(data.weeklyTreatments)}
@@ -456,4 +458,60 @@ function resetFaceRoutine() {
   faceState = { step: 1, skinType: null, concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null };
   if (el('face-reset-btn')) el('face-reset-btn').style.display = 'none';
   renderFaceQuestionnaire();
+}
+
+async function alternateFaceStep(section, idx) {
+  const d = loadData();
+  if (!d.settings?.openaiApiKey) { showToast('Add API key in Settings'); return; }
+  const cached = getData('faceRoutine');
+  if (!cached?.result) return;
+
+  const cardId = 'face-' + section[0] + '-' + idx;
+  const card = document.getElementById(cardId);
+  if (!card) return;
+
+  const btn = card.querySelector('.face-alt-btn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="mio" style="font-size:14px;animation:spin 0.8s linear infinite;display:inline-block;">autorenew</span> Finding…'; }
+
+  const routine = cached.result;
+  const step = section === 'morning' ? routine.morningRoutine[idx]
+             : section === 'evening' ? routine.eveningRoutine[idx]
+             : routine.weeklyTreatments[idx];
+  if (!step) { if (btn) { btn.disabled = false; btn.innerHTML = '<span class="mio">swap_horiz</span> Find alternatives'; } return; }
+
+  const dosha = routine.dominantSkinDosha || d.dosha?.primary || 'Vata';
+  const ingList = (step.ingredients || []).join(', ') || 'the listed ingredients';
+
+  const prompt = `You are an Ayurvedic skincare expert. A ${dosha}-skin user cannot find these ingredients: ${ingList}
+
+Suggest easily available alternatives for the "${step.name}" step. Keep the same Ayurvedic therapeutic purpose. Use ingredients available at a grocery store or pharmacy.
+
+Return ONLY valid JSON (no markdown, no code fences):
+{"ingredients":["item1","item2"],"method":"brief application method","doshaNote":"why these work for ${dosha} skin"}
+
+Maximum 3 ingredients.`;
+
+  try {
+    const resp = await callOpenAI(prompt, d.settings.openaiApiKey);
+    const alts = JSON.parse(resp.replace(/```json|```/g, '').trim());
+
+    if (alts.ingredients) step.ingredients = alts.ingredients;
+    if (alts.method) step.method = alts.method;
+    if (alts.doshaNote) step.doshaNote = alts.doshaNote;
+    setData('faceRoutine', Object.assign({}, cached, { result: routine }));
+
+    const chipsDiv = card.querySelector('.face-ingredients');
+    if (chipsDiv && alts.ingredients) chipsDiv.innerHTML = alts.ingredients.map(i => `<span class="face-ingredient-chip">${i}</span>`).join('');
+    const methodDiv = card.querySelector('.face-method');
+    if (methodDiv && alts.method) methodDiv.textContent = alts.method;
+    const noteDiv = card.querySelector('.face-dosha-note');
+    if (noteDiv && alts.doshaNote) noteDiv.innerHTML = `<span class="mio" style="font-size:14px;vertical-align:middle;margin-right:4px;">info</span>${alts.doshaNote}`;
+
+    if (btn) { btn.disabled = false; btn.innerHTML = '<span class="mio">swap_horiz</span> Find alternatives'; }
+    showToast('Alternative ingredients updated');
+  } catch(e) {
+    logError('alternateFaceStep', e);
+    showToast('Error: ' + e.message);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<span class="mio">swap_horiz</span> Find alternatives'; }
+  }
 }
