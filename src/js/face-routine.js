@@ -1,6 +1,6 @@
 let faceState = {
   step: 1,
-  skinType: null,
+  skinTypes: [],
   concerns: [],
   pulse: { weather: null, redness: null, pores: null, temperature: null },
   lifestyle: {},
@@ -26,7 +26,7 @@ function initFaceRoutine() {
       </div>`;
     return;
   }
-  faceState = { step: 1, skinType: null, concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null, goals: '' };
+  faceState = { step: 1, skinTypes: [], concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null, goals: '' };
   renderFaceWelcome();
 }
 
@@ -83,7 +83,7 @@ function renderFaceStep(step, scrollToTop = true) {
     html += `
       <div class="quiz-options" style="margin-top:16px;">
         <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--charcoal);margin-bottom:4px;">What is your skin type?</div>
-        <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Select the option that best describes your skin on a typical day</div>`;
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Select all that apply — or one if clear</div>`;
     const types = [
       { val: 'oily',        label: 'Oily',           desc: 'Shiny, enlarged pores, prone to breakouts' },
       { val: 'dry',         label: 'Dry',            desc: 'Tight, flaky, rough patches after cleansing' },
@@ -93,9 +93,9 @@ function renderFaceStep(step, scrollToTop = true) {
       { val: 'mature',      label: 'Mature / Ageing', desc: 'Fine lines, loss of firmness, dullness' },
     ];
     types.forEach(t => {
-      const sel = faceState.skinType === t.val ? ' selected' : '';
+      const sel = faceState.skinTypes.includes(t.val) ? ' selected' : '';
       html += `
-        <div class="quiz-option${sel}" data-val="${t.val}" onclick="selectFaceSkinType('${t.val}')">
+        <div class="quiz-option${sel}" data-val="${t.val}" onclick="toggleFaceSkinType('${t.val}')">
           <div class="opt-dot"></div>
           <div>
             <div style="font-weight:600;font-size:15px;color:var(--charcoal);">${t.label}</div>
@@ -263,7 +263,7 @@ function renderFaceStep(step, scrollToTop = true) {
 }
 
 function _faceNextDisabled(step) {
-  if (step === 1) return !faceState.skinType;
+  if (step === 1) return !faceState.skinTypes || faceState.skinTypes.length === 0;
   if (step === 3) return !faceState.pulse.weather || !faceState.pulse.redness || !faceState.pulse.pores || !faceState.pulse.temperature;
   if (step === 5) return !faceState.frequency;
   return false;
@@ -276,13 +276,17 @@ function _faceToggleChip(container, sel, matcher) {
   });
 }
 
-function selectFaceSkinType(type) {
-  faceState.skinType = type;
+function toggleFaceSkinType(type) {
+  const idx = faceState.skinTypes.indexOf(type);
+  if (idx === -1) faceState.skinTypes.push(type);
+  else faceState.skinTypes.splice(idx, 1);
   const c = el('face-q-container');
   if (!c) return;
-  c.querySelectorAll('.quiz-option').forEach(o => o.classList.toggle('selected', o.dataset.val === type));
+  c.querySelectorAll('.quiz-option').forEach(o => {
+    o.classList.toggle('selected', faceState.skinTypes.includes(o.dataset.val));
+  });
   const btn = c.querySelector('.face-nav .btn-primary');
-  if (btn) btn.style.cssText = '';
+  if (btn && !_faceNextDisabled(1)) btn.style.cssText = '';
 }
 
 function toggleFaceConcern(concern) {
@@ -417,7 +421,7 @@ User profile:
 - Age: ${age ? age + ' years' : 'not specified'}
 - Gender: ${d.gender || 'unspecified'}
 - Current month: ${month}
-- Skin type: ${faceState.skinType}
+- Skin type: ${faceState.skinTypes.length ? faceState.skinTypes.join(', ') : 'not specified'}
 - Skin concerns: ${concernsText}
 - Ayurvedic pulse assessment: ${pulseText}
 - Lifestyle factors: ${lifestyleFlags}
@@ -568,7 +572,7 @@ function switchFaceDay(day) {
 
 function resetFaceRoutine() {
   setData('faceRoutine', null);
-  faceState = { step: 1, skinType: null, concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null, goals: '' };
+  faceState = { step: 1, skinTypes: [], concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null, goals: '' };
   if (el('face-reset-btn')) el('face-reset-btn').style.display = 'none';
   renderFaceQuestionnaire();
 }

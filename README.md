@@ -312,9 +312,9 @@ Daily Routine (Dinacharya) generator — filter screen with day selector (today/
 ### `src/js/face-routine.js`
 Facial Skin Routine — 5-step Ayurvedic skincare questionnaire (skin type, primary concerns, Ayurvedic pulse, lifestyle, frequency) followed by AI-generated morning, evening, and weekly routines with dosha-matched ingredients. Caches result in `localStorage` under `faceRoutine`; shows a welcome card on first visit and re-renders the cached routine on revisit. Each step card has a "Find alternatives" button (`alternateFaceStep`) that calls the AI to suggest grocery-available ingredient substitutes and updates the card in-place without re-rendering the full routine.
 
-**Key functions:** `initFaceRoutine()`, `renderFaceWelcome()`, `renderFaceQuestionnaire()`, `renderFaceStep(step, scrollToTop)`, `selectFaceSkinType()`, `toggleFaceConcern()`, `selectFacePulse()`, `toggleFaceLifestyle()`, `selectFaceFrequency()`, `faceNextStep()`, `facePrevStep()`, `generateFaceRoutine()`, `renderFaceRoutine()`, `resetFaceRoutine()`, `alternateFaceStep(section, idx)`
+**Key functions:** `initFaceRoutine()`, `renderFaceWelcome()`, `renderFaceQuestionnaire()`, `renderFaceStep(step, scrollToTop)`, `toggleFaceSkinType()`, `toggleFaceConcern()`, `selectFacePulse()`, `toggleFaceLifestyle()`, `selectFaceFrequency()`, `faceNextStep()`, `facePrevStep()`, `generateFaceRoutine()`, `renderFaceRoutine()`, `resetFaceRoutine()`, `alternateFaceStep(section, idx)`
 
-**State:** `faceState` — `{ step, skinType, concerns[], pulse{weather,redness,pores,temperature}, lifestyle{}, frequency }`
+**State:** `faceState` — `{ step, skinTypes[], concerns[], pulse{weather,redness,pores,temperature}, lifestyle{}, frequency }`
 
 ### `src/js/ask-anything.js`
 Ask Anything — full-screen overlay chat powered by the user's full Ayurveda profile. Scope-limited to Ayurvedic topics; gracefully declines off-topic queries with inline suggestion cards. Chat history is per-session (in-memory, not persisted).

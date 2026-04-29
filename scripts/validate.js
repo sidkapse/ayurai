@@ -85,7 +85,7 @@ const REQUIRED_FUNCTIONS = [
   'updateTabIcons',
   // Face Routine
   'initFaceRoutine', 'renderFaceWelcome', 'renderFaceQuestionnaire', 'renderFaceStep',
-  'selectFaceSkinType', 'toggleFaceConcern', 'toggleFaceLifestyle',
+  'toggleFaceSkinType', 'toggleFaceConcern', 'toggleFaceLifestyle',
   'selectFacePulse', 'selectFaceFrequency',
   'faceNextStep', 'facePrevStep', 'generateFaceRoutine',
   'renderFaceRoutine', 'resetFaceRoutine', 'alternateFaceStep', 'switchFaceDay',

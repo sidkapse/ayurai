@@ -257,7 +257,7 @@ setData('settings.openaiApiKey', key) // dot-path setter, auto-saves
 | `symptomState` | symptoms.js | Selected areas, duration, severity, description |
 | `quizState` | quiz.js | Phase, question index, scores, ailments |
 | `askState` | ask-anything.js | `{chatHistory: [], loading: false}` — cleared on overlay close |
-| `faceState` | face-routine.js | `{ step, skinType, concerns[], pulse{weather,redness,pores,temperature}, lifestyle{}, frequency }` — reset on `resetFaceRoutine()` |
+| `faceState` | face-routine.js | `{ step, skinTypes[], concerns[], pulse{weather,redness,pores,temperature}, lifestyle{}, frequency }` — reset on `resetFaceRoutine()` |
 | `window._activeAilments` | meal-timing.js | Active ailment overrides for current food check |
 | `window._mealTimingMode` | meal-timing.js | `'now'` or `'plan'` |
 | `window._lastCheckedFood` | food.js | Food name for remedy lookup |
