@@ -8056,7 +8056,8 @@ let faceState = {
   concerns: [],
   pulse: { weather: null, redness: null, pores: null, temperature: null },
   lifestyle: {},
-  frequency: null
+  frequency: null,
+  goals: ''
 };
 
 function initFaceRoutine() {
@@ -8077,7 +8078,7 @@ function initFaceRoutine() {
       </div>`;
     return;
   }
-  faceState = { step: 1, skinType: null, concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null };
+  faceState = { step: 1, skinType: null, concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null, goals: '' };
   renderFaceWelcome();
 }
 
@@ -8122,12 +8123,12 @@ function renderFaceQuestionnaire() {
 }
 
 function renderFaceStep(step, scrollToTop = true) {
-  const pct = Math.round((step / 5) * 100);
+    const pct = Math.round((step / 6) * 100);
   let html = `
     <div class="face-step-container">
       <div class="quiz-progress">
         <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
-        <div class="quiz-progress-text">Step ${step} of 5</div>
+        <div class="quiz-progress-text">Step ${step} of 6</div>
       </div>`;
 
   if (step === 1) {
@@ -8146,7 +8147,7 @@ function renderFaceStep(step, scrollToTop = true) {
     types.forEach(t => {
       const sel = faceState.skinType === t.val ? ' selected' : '';
       html += `
-        <div class="quiz-option${sel}" onclick="selectFaceSkinType('${t.val}')">
+        <div class="quiz-option${sel}" data-val="${t.val}" onclick="selectFaceSkinType('${t.val}')">
           <div class="opt-dot"></div>
           <div>
             <div style="font-weight:600;font-size:15px;color:var(--charcoal);">${t.label}</div>
@@ -8190,7 +8191,7 @@ function renderFaceStep(step, scrollToTop = true) {
         <div class="duration-chips">`;
       g.items.forEach(item => {
         const sel = faceState.concerns.includes(item.val) ? ' selected' : '';
-        html += `<span class="duration-chip${sel}" onclick="toggleFaceConcern('${item.val}')">${item.label}</span>`;
+        html += `<span class="duration-chip${sel}" data-val="${item.val}" onclick="toggleFaceConcern('${item.val}')">${item.label}</span>`;
       });
       html += '</div></div>';
     });
@@ -8198,10 +8199,10 @@ function renderFaceStep(step, scrollToTop = true) {
 
   } else if (step === 3) {
     const pulseQ = [
-      { key: 'weather',     q: 'Which climate do you prefer or feel best in?',                hint: 'Your natural comfort zone',       opts: [{ val: 'winter', label: 'Winter / Cool' }, { val: 'summer', label: 'Summer / Warm' }, { val: 'monsoon', label: 'Monsoon / Humid' }] },
-      { key: 'redness',     q: 'Does your skin flush after spicy food or a hot shower?',      hint: 'Pitta sensitivity indicator',     opts: [{ val: 'yes', label: 'Yes' }, { val: 'no', label: 'No' }] },
-      { key: 'pores',       q: 'Do pores look larger when tired or in humidity?',             hint: 'Kapha congestion indicator',      opts: [{ val: 'yes', label: 'Yes' }, { val: 'no', label: 'No' }] },
-      { key: 'temperature', q: 'How does your skin feel to the touch?',                       hint: 'Vata vs Pitta dominance signal',  opts: [{ val: 'cool', label: 'Cool / Dry' }, { val: 'warm', label: 'Warm / Oily' }] },
+      { key: 'weather',     q: 'Which climate do you prefer or feel best in?',                     hint: 'Your natural comfort zone',             opts: [{ val: 'winter', label: 'Winter / Cool' }, { val: 'summer', label: 'Summer / Warm' }, { val: 'monsoon', label: 'Monsoon / Humid' }] },
+      { key: 'redness',     q: 'Does your skin flush after spicy food or a hot shower?',           hint: 'Pitta sensitivity indicator',           opts: [{ val: 'yes', label: 'Yes' }, { val: 'no', label: 'No' }] },
+      { key: 'pores',       q: 'Do pores look larger when tired or in humidity?',                  hint: 'Kapha congestion indicator',            opts: [{ val: 'yes', label: 'Yes' }, { val: 'no', label: 'No' }] },
+      { key: 'temperature', q: 'How does your skin feel to the touch?',                            hint: 'Vata vs Pitta dominance signal',         opts: [{ val: 'cool', label: 'Cool / Dry' }, { val: 'warm', label: 'Warm / Oily' }] },
     ];
     html += `
       <div style="margin-top:16px;">
@@ -8215,7 +8216,7 @@ function renderFaceStep(step, scrollToTop = true) {
         <div class="duration-chips">`;
       pq.opts.forEach(o => {
         const sel = faceState.pulse[pq.key] === o.val ? ' selected' : '';
-        html += `<span class="duration-chip${sel}" onclick="selectFacePulse('${pq.key}','${o.val}')">${o.label}</span>`;
+        html += `<span class="duration-chip${sel}" data-pulse-key="${pq.key}" data-val="${o.val}" onclick="selectFacePulse('${pq.key}','${o.val}')">${o.label}</span>`;
       });
       html += '</div></div>';
     });
@@ -8245,28 +8246,28 @@ function renderFaceStep(step, scrollToTop = true) {
         <div class="symptom-section-card" style="margin-bottom:12px;">
           <h4>Environmental</h4>
           <div class="duration-chips">
-            ${envItems.map(i => `<span class="duration-chip${faceState.lifestyle[i.val] ? ' selected' : ''}" onclick="toggleFaceLifestyle('${i.val}')">${i.label}</span>`).join('')}
+            ${envItems.map(i => `<span class="duration-chip${faceState.lifestyle[i.val] ? ' selected' : ''}" data-val="${i.val}" onclick="toggleFaceLifestyle('${i.val}')">${i.label}</span>`).join('')}
           </div>
         </div>
         <div class="symptom-section-card" style="margin-bottom:12px;">
           <h4>Products</h4>
           <div class="duration-chips">
-            ${productItems.map(i => `<span class="duration-chip${faceState.lifestyle[i.val] ? ' selected' : ''}" onclick="toggleFaceLifestyle('${i.val}')">${i.label}</span>`).join('')}
+            ${productItems.map(i => `<span class="duration-chip${faceState.lifestyle[i.val] ? ' selected' : ''}" data-val="${i.val}" onclick="toggleFaceLifestyle('${i.val}')">${i.label}</span>`).join('')}
           </div>
         </div>
         <div class="symptom-section-card" style="margin-bottom:12px;">
           <h4>Lifestyle</h4>
           <div class="duration-chips">
-            ${lifeItems.map(i => `<span class="duration-chip${faceState.lifestyle[i.val] ? ' selected' : ''}" onclick="toggleFaceLifestyle('${i.val}')">${i.label}</span>`).join('')}
+            ${lifeItems.map(i => `<span class="duration-chip${faceState.lifestyle[i.val] ? ' selected' : ''}" data-val="${i.val}" onclick="toggleFaceLifestyle('${i.val}')">${i.label}</span>`).join('')}
           </div>
         </div>
       </div>`;
 
   } else if (step === 5) {
     const freqs = [
-      { val: 'daily',    icon: 'wb_sunny',       title: 'Daily',     desc: 'Full morning & evening routine every day' },
-      { val: 'biweekly', icon: 'event_repeat',   title: 'Bi-Weekly', desc: 'Comprehensive routine 3–4 times per week' },
-      { val: 'weekly',   icon: 'calendar_month', title: 'Weekly',    desc: 'One deep treatment session per week' },
+      { val: 'daily',     icon: 'wb_sunny',       title: 'Daily',      desc: 'Full morning & evening routine every day' },
+      { val: 'triweekly', icon: 'event_repeat',   title: 'Tri-Weekly', desc: '3 times a week — Mon · Thu · Sun' },
+      { val: 'weekly',    icon: 'calendar_month', title: 'Weekly',     desc: 'One deep treatment session per week' },
     ];
     html += `
       <div style="margin-top:16px;">
@@ -8274,7 +8275,7 @@ function renderFaceStep(step, scrollToTop = true) {
         <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">We'll tailor the steps to your schedule</div>
         <div class="face-frequency-options">
           ${freqs.map(f => `
-            <div class="face-freq-option${faceState.frequency === f.val ? ' selected' : ''}" onclick="selectFaceFrequency('${f.val}')">
+            <div class="face-freq-option${faceState.frequency === f.val ? ' selected' : ''}" data-val="${f.val}" onclick="selectFaceFrequency('${f.val}')">
               <span class="mio face-freq-icon">${f.icon}</span>
               <div>
                 <div class="face-freq-title">${f.title}</div>
@@ -8283,9 +8284,16 @@ function renderFaceStep(step, scrollToTop = true) {
             </div>`).join('')}
         </div>
       </div>`;
+  } else if (step === 6) {
+    html += `
+      <div style="margin-top:16px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--charcoal);margin-bottom:4px;">Desired Goals & Notes</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Anything specific you want to focus on? (Optional)</div>
+        <textarea id="face-goals-input" class="face-goal-textarea" placeholder="e.g. reduce pigmentation, clear acne scars, brighten dull skin...">${faceState.goals}</textarea>
+      </div>`;
   }
 
-  const nextLabel = step === 5 ? 'Generate My Routine →' : 'Next →';
+  const nextLabel = step === 6 ? 'Generate My Routine →' : 'Next →';
   const disabled = _faceNextDisabled(step) ? ' style="opacity:0.4;pointer-events:none;"' : '';
   html += `
     <div class="face-nav">
