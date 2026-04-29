@@ -2733,6 +2733,54 @@ body.has-pwa-banner{padding-top:max(var(--pwa-mini-h),calc(env(safe-area-inset-t
   color:var(--text-muted);
   margin-bottom:8px;
 }
+.face-freq-tab-bar{
+  display:flex;
+  gap:8px;
+  margin:16px 0 12px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.face-freq-tab{
+  flex-shrink:0;
+  background:#fff;
+  border:1.5px solid var(--cream-dark);
+  border-radius:20px;
+  padding:6px 16px;
+  font-size:13px;
+  font-weight:600;
+  color:var(--text-muted);
+  cursor:pointer;
+  transition:border-color 0.18s,color 0.18s,background 0.18s;
+}
+.face-freq-tab.active{
+  border-color:var(--burgundy);
+  background:rgba(107,30,58,0.06);
+  color:var(--burgundy);
+}
+.face-weekend-card{
+  background:linear-gradient(135deg,rgba(201,168,76,0.08),rgba(212,117,138,0.06));
+  border:1.5px solid rgba(201,168,76,0.35);
+  border-radius:14px;
+  padding:14px 16px;
+  margin-bottom:10px;
+}
+.face-goal-textarea{
+  width:100%;
+  min-height:100px;
+  border:1.5px solid var(--cream-dark);
+  border-radius:12px;
+  padding:12px 14px;
+  font-family:'Jost',sans-serif;
+  font-size:14px;
+  color:var(--charcoal);
+  background:#fff;
+  resize:vertical;
+  outline:none;
+  transition:border-color 0.2s;
+}
+.face-goal-textarea:focus{
+  border-color:var(--lotus);
+}
 
 /* ── COMING SOON ── */
 .coming-soon-wrap{
@@ -8265,34 +8313,67 @@ function _faceNextDisabled(step) {
   return false;
 }
 
+function _faceToggleChip(container, sel, matcher) {
+  const chips = container.querySelectorAll('.duration-chip, .face-freq-option, .quiz-option');
+  chips.forEach(c => {
+    if (matcher(c)) c.classList.toggle('selected', sel);
+  });
+}
+
 function selectFaceSkinType(type) {
   faceState.skinType = type;
-  renderFaceStep(1, false);
+  const c = el('face-q-container');
+  if (!c) return;
+  c.querySelectorAll('.quiz-option').forEach(o => o.classList.toggle('selected', o.dataset.val === type));
+  const btn = c.querySelector('.face-nav .btn-primary');
+  if (btn) btn.style.cssText = '';
 }
 
 function toggleFaceConcern(concern) {
   const idx = faceState.concerns.indexOf(concern);
   if (idx === -1) faceState.concerns.push(concern);
   else faceState.concerns.splice(idx, 1);
-  renderFaceStep(2, false);
+  const c = el('face-q-container');
+  if (!c) return;
+  c.querySelectorAll('.duration-chip').forEach(chip => {
+    if (chip.dataset.val === concern) chip.classList.toggle('selected', faceState.concerns.includes(concern));
+  });
 }
 
 function toggleFaceLifestyle(key) {
   faceState.lifestyle[key] = !faceState.lifestyle[key];
-  renderFaceStep(4, false);
+  const c = el('face-q-container');
+  if (!c) return;
+  c.querySelectorAll('.duration-chip').forEach(chip => {
+    if (chip.dataset.val === key) chip.classList.toggle('selected', faceState.lifestyle[key]);
+  });
 }
 
 function selectFacePulse(key, value) {
   faceState.pulse[key] = value;
-  renderFaceStep(3, false);
+  const c = el('face-q-container');
+  if (!c) return;
+  c.querySelectorAll('.duration-chip').forEach(chip => {
+    if (chip.dataset.pulseKey === key) chip.classList.toggle('selected', chip.dataset.val === value);
+  });
+  const btn = c.querySelector('.face-nav .btn-primary');
+  if (btn && !_faceNextDisabled(3)) btn.style.cssText = '';
 }
 
 function selectFaceFrequency(val) {
   faceState.frequency = val;
-  renderFaceStep(5, false);
+  const c = el('face-q-container');
+  if (!c) return;
+  c.querySelectorAll('.face-freq-option').forEach(o => o.classList.toggle('selected', o.dataset.val === val));
+  const btn = c.querySelector('.face-nav .btn-primary');
+  if (btn) btn.style.cssText = '';
 }
 
 function facePrevStep() {
+  if (faceState.step === 6) {
+    const ta = document.getElementById('face-goals-input');
+    if (ta) faceState.goals = ta.value.trim();
+  }
   if (faceState.step > 1) {
     faceState.step--;
     renderFaceStep(faceState.step);
@@ -8304,7 +8385,9 @@ function faceNextStep() {
   if (faceState.step === 2 && faceState.concerns.length === 0) {
     showToast('No concerns selected — we\'ll give a general routine');
   }
-  if (faceState.step === 5) {
+  if (faceState.step === 6) {
+    const ta = document.getElementById('face-goals-input');
+    if (ta) faceState.goals = ta.value.trim();
     generateFaceRoutine();
     return;
   }
@@ -8354,7 +8437,22 @@ async function generateFaceRoutine() {
     `pores enlarge in humidity: ${faceState.pulse.pores}`,
     `skin temperature: ${faceState.pulse.temperature}`,
   ].join('; ');
-  const freqMap = { daily: 'daily (morning + evening)', biweekly: '3-4 times per week', weekly: 'once per week' };
+  const freqMap = { daily: 'daily (morning + evening)', triweekly: '3 times a week (Mon, Thu, Sun)', weekly: 'once per week (Sat or Sun)' };
+  const goalsLine = faceState.goals ? `\n- Desired goals / notes: ${faceState.goals}` : '';
+
+  const freq = faceState.frequency;
+  let schemaNote = '';
+  let schemaExtra = '';
+  if (freq === 'daily') {
+    schemaNote = 'Include 4-5 morning steps, 1-2 afternoon tips, 4-5 evening steps, 2 weekend treatments.';
+    schemaExtra = `,\n  "afternoonTips": [{"tip":""}]`;
+  } else if (freq === 'triweekly') {
+    schemaNote = 'Include 5-6 steps per day, ~95% overlap between Mon and Thu, Sun may have 1 deeper step. Include 2 weekend treatments.';
+    schemaExtra = `,\n  "dayRoutines": {"mon": [{"step":1,"name":"","duration":"","ingredients":[],"method":"","doshaNote":""}], "thu": [], "sun": []}`;
+  } else {
+    schemaNote = 'Include 8-12 comprehensive steps for a single weekly session. No weekend section needed.';
+    schemaExtra = '';
+  }
 
   const prompt = `You are an expert Ayurvedic dermatologist. Create a personalised facial skincare routine.
 
@@ -8367,7 +8465,7 @@ User profile:
 - Skin concerns: ${concernsText}
 - Ayurvedic pulse assessment: ${pulseText}
 - Lifestyle factors: ${lifestyleFlags}
-- Routine frequency: ${freqMap[faceState.frequency] || faceState.frequency}
+- Routine frequency: ${freqMap[freq] || freq}${goalsLine}
 
 Return ONLY valid JSON (no markdown, no code fences) with this exact structure:
 {
@@ -8376,17 +8474,18 @@ Return ONLY valid JSON (no markdown, no code fences) with this exact structure:
   "imbalanceExplanation": "2-sentence explanation of current imbalance based on inputs",
   "morningRoutine": [{"step":1,"name":"","duration":"","ingredients":[],"method":"","doshaNote":""}],
   "eveningRoutine": [{"step":1,"name":"","duration":"","ingredients":[],"method":"","doshaNote":""}],
-  "weeklyTreatments": [{"name":"","frequency":"","ingredients":[],"method":"","benefit":""}],
+  "weeklyTreatments": [{"name":"","frequency":"","ingredients":[],"method":"","benefit":""}]${schemaExtra},
   "dietaryTips": [],
   "avoidList": [],
   "mantra": ""
 }
 
-Include 4-6 morning steps, 4-6 evening steps, 2-3 weekly treatments, 4 dietary tips, 4-6 avoid items.
+${schemaNote}
+Include 4-6 dietary tips, 4-6 avoid items.
 Tailor all recommendations to the user's dosha, skin type, concerns, and current season (${month}).`;
 
   try {
-    const resp = await callOpenAILarge(prompt, d.settings.openaiApiKey, 2000);
+    const resp = await callOpenAILarge(prompt, d.settings.openaiApiKey, 3500);
     clearTimeout(_lt1); clearTimeout(_lt2);
     const data = JSON.parse(resp.replace(/```json|```/g, '').trim());
     setData('faceRoutine', { inputs: Object.assign({}, faceState), result: data, generatedAt: new Date().toISOString() });
@@ -8400,31 +8499,69 @@ Tailor all recommendations to the user's dosha, skin type, concerns, and current
   }
 }
 
+const _faceMkChips = (arr) => (arr || []).map(i => `<span class="face-ingredient-chip">${i}</span>`).join('');
+const _faceMkSteps = (steps, section) => (steps || []).map((s, i) => `
+  <div class="face-step-card" id="face-${section[0]}-${i}">
+    <div class="face-step-header">
+      <div class="face-step-num">${s.step}</div>
+      <div class="face-step-name">${s.name}</div>
+      <div class="face-duration-badge">${s.duration}</div>
+    </div>
+    ${s.ingredients && s.ingredients.length ? `<div class="face-ingredients">${_faceMkChips(s.ingredients)}</div>` : ''}
+    <div class="face-method">${s.method}</div>
+    ${s.doshaNote ? `<div class="face-dosha-note"><span class="mio" style="font-size:14px;vertical-align:middle;margin-right:4px;">info</span>${s.doshaNote}</div>` : ''}
+    <button class="face-alt-btn" onclick="alternateFaceStep('${section}',${i})"><span class="mio">swap_horiz</span> Find alternatives</button>
+  </div>`).join('');
+
+const _faceMkWeekly = (treatments) => (treatments || []).map((t, i) => `
+  <div class="face-weekly-card" id="face-w-${i}">
+    <div class="face-weekly-name">${t.name}</div>
+    <div class="face-weekly-freq"><span class="mio" style="font-size:13px;vertical-align:middle;margin-right:3px;">schedule</span>${t.frequency}</div>
+    ${t.ingredients && t.ingredients.length ? `<div class="face-ingredients" style="margin-bottom:8px;">${_faceMkChips(t.ingredients)}</div>` : ''}
+    <div class="face-method">${t.method}</div>
+    ${t.benefit ? `<div class="face-dosha-note">${t.benefit}</div>` : ''}
+    <button class="face-alt-btn" onclick="alternateFaceStep('weekly',${i})"><span class="mio">swap_horiz</span> Find alternatives</button>
+  </div>`).join('');
+
 function renderFaceRoutine(data) {
-  const mkChips = (arr) => (arr || []).map(i => `<span class="face-ingredient-chip">${i}</span>`).join('');
+  const cached = getData('faceRoutine');
+  const freq = cached?.inputs?.frequency || 'daily';
 
-  const mkSteps = (steps, section) => (steps || []).map((s, i) => `
-    <div class="face-step-card" id="face-${section[0]}-${i}">
-      <div class="face-step-header">
-        <div class="face-step-num">${s.step}</div>
-        <div class="face-step-name">${s.name}</div>
-        <div class="face-duration-badge">${s.duration}</div>
+  let routineBody = '';
+  if (freq === 'daily') {
+    const afternoon = data.afternoonTips?.length
+      ? `<div class="face-routine-section"><span class="mio">wb_twilight</span> Afternoon Tips</div>
+         <div class="face-tip-card"><ul>${data.afternoonTips.map(t => `<li>${t.tip}</li>`).join('')}</ul></div>`
+      : '';
+    routineBody = `
+      <div class="face-routine-section"><span class="mio">wb_sunny</span> Morning Routine</div>
+      ${_faceMkSteps(data.morningRoutine, 'morning')}
+      ${afternoon}
+      <div class="face-routine-section"><span class="mio">nights_stay</span> Evening Routine</div>
+      ${_faceMkSteps(data.eveningRoutine, 'evening')}
+      <div class="face-routine-section"><span class="mio">spa</span> Weekly Treatments</div>
+      ${_faceMkWeekly(data.weeklyTreatments)}`;
+  } else if (freq === 'triweekly') {
+    const dr = data.dayRoutines || {};
+    const days = ['mon','thu','sun'];
+    const dayNames = { mon: 'MON', thu: 'THU', sun: 'SUN' };
+    const tabs = days.map(d => `<span class="face-freq-tab${d === 'mon' ? ' active' : ''}" data-day="${d}" onclick="switchFaceDay('${d}')">${dayNames[d]}</span>`).join('');
+    routineBody = `
+      <div class="face-freq-tab-bar">${tabs}</div>
+      <div id="face-day-content">
+        <div class="face-routine-section"><span class="mio">wb_sunny</span> ${dayNames['mon']} Routine</div>
+        ${_faceMkSteps(dr.mon || data.morningRoutine, 'mon')}
       </div>
-      ${s.ingredients && s.ingredients.length ? `<div class="face-ingredients">${mkChips(s.ingredients)}</div>` : ''}
-      <div class="face-method">${s.method}</div>
-      ${s.doshaNote ? `<div class="face-dosha-note"><span class="mio" style="font-size:14px;vertical-align:middle;margin-right:4px;">info</span>${s.doshaNote}</div>` : ''}
-      <button class="face-alt-btn" onclick="alternateFaceStep('${section}',${i})"><span class="mio">swap_horiz</span> Find alternatives</button>
-    </div>`).join('');
-
-  const mkWeekly = (treatments) => (treatments || []).map((t, i) => `
-    <div class="face-weekly-card" id="face-w-${i}">
-      <div class="face-weekly-name">${t.name}</div>
-      <div class="face-weekly-freq"><span class="mio" style="font-size:13px;vertical-align:middle;margin-right:3px;">schedule</span>${t.frequency}</div>
-      ${t.ingredients && t.ingredients.length ? `<div class="face-ingredients" style="margin-bottom:8px;">${mkChips(t.ingredients)}</div>` : ''}
-      <div class="face-method">${t.method}</div>
-      ${t.benefit ? `<div class="face-dosha-note">${t.benefit}</div>` : ''}
-      <button class="face-alt-btn" onclick="alternateFaceStep('weekly',${i})"><span class="mio">swap_horiz</span> Find alternatives</button>
-    </div>`).join('');
+      <div class="face-routine-section"><span class="mio">spa</span> Weekly Treatments</div>
+      ${_faceMkWeekly(data.weeklyTreatments)}`;
+  } else {
+    routineBody = `
+      <div class="face-freq-tab-bar">
+        <span class="face-freq-tab active">SAT / SUN</span>
+      </div>
+      <div class="face-routine-section"><span class="mio">wb_sunny</span> Weekly Routine</div>
+      ${_faceMkSteps(data.morningRoutine, 'morning')}`;
+  }
 
   el('face-wrap').innerHTML = `
     <div class="face-hero-card">
@@ -8433,14 +8570,7 @@ function renderFaceRoutine(data) {
       <p>${data.imbalanceExplanation}</p>
     </div>
 
-    <div class="face-routine-section"><span class="mio">wb_sunny</span> Morning Routine</div>
-    ${mkSteps(data.morningRoutine, 'morning')}
-
-    <div class="face-routine-section"><span class="mio">nights_stay</span> Evening Routine</div>
-    ${mkSteps(data.eveningRoutine, 'evening')}
-
-    <div class="face-routine-section"><span class="mio">spa</span> Weekly Treatments</div>
-    ${mkWeekly(data.weeklyTreatments)}
+    ${routineBody}
 
     <div class="face-routine-section"><span class="mio">restaurant</span> Dietary Tips</div>
     <div class="face-tip-card">
@@ -8461,9 +8591,28 @@ function renderFaceRoutine(data) {
   requestAnimationFrame(() => { el('face-wrap').closest('[id="app-content"]').scrollTop = 0; });
 }
 
+function switchFaceDay(day) {
+  const cached = getData('faceRoutine');
+  if (!cached?.result) return;
+  const data = cached.result;
+  const dr = data.dayRoutines || {};
+  const dayNames = { mon: 'MON', thu: 'THU', sun: 'SUN' };
+  const sectionName = dayNames[day] || day.toUpperCase();
+  const steps = dr[day] || [];
+  const content = document.getElementById('face-day-content');
+  if (!content) return;
+  content.innerHTML = `
+    <div class="face-routine-section"><span class="mio">wb_sunny</span> ${sectionName} Routine</div>
+    ${_faceMkSteps(steps, day)}`;
+  requestAnimationFrame(() => {
+    const tabs = el('face-wrap').querySelectorAll('.face-freq-tab');
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.day === day));
+  });
+}
+
 function resetFaceRoutine() {
   setData('faceRoutine', null);
-  faceState = { step: 1, skinType: null, concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null };
+  faceState = { step: 1, skinType: null, concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null, goals: '' };
   if (el('face-reset-btn')) el('face-reset-btn').style.display = 'none';
   renderFaceQuestionnaire();
 }

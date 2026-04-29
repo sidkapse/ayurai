@@ -4,7 +4,8 @@ let faceState = {
   concerns: [],
   pulse: { weather: null, redness: null, pores: null, temperature: null },
   lifestyle: {},
-  frequency: null
+  frequency: null,
+  goals: ''
 };
 
 function initFaceRoutine() {
@@ -25,7 +26,7 @@ function initFaceRoutine() {
       </div>`;
     return;
   }
-  faceState = { step: 1, skinType: null, concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null };
+  faceState = { step: 1, skinType: null, concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null, goals: '' };
   renderFaceWelcome();
 }
 
@@ -70,12 +71,12 @@ function renderFaceQuestionnaire() {
 }
 
 function renderFaceStep(step, scrollToTop = true) {
-  const pct = Math.round((step / 5) * 100);
+    const pct = Math.round((step / 6) * 100);
   let html = `
     <div class="face-step-container">
       <div class="quiz-progress">
         <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
-        <div class="quiz-progress-text">Step ${step} of 5</div>
+        <div class="quiz-progress-text">Step ${step} of 6</div>
       </div>`;
 
   if (step === 1) {
@@ -94,7 +95,7 @@ function renderFaceStep(step, scrollToTop = true) {
     types.forEach(t => {
       const sel = faceState.skinType === t.val ? ' selected' : '';
       html += `
-        <div class="quiz-option${sel}" onclick="selectFaceSkinType('${t.val}')">
+        <div class="quiz-option${sel}" data-val="${t.val}" onclick="selectFaceSkinType('${t.val}')">
           <div class="opt-dot"></div>
           <div>
             <div style="font-weight:600;font-size:15px;color:var(--charcoal);">${t.label}</div>
@@ -138,7 +139,7 @@ function renderFaceStep(step, scrollToTop = true) {
         <div class="duration-chips">`;
       g.items.forEach(item => {
         const sel = faceState.concerns.includes(item.val) ? ' selected' : '';
-        html += `<span class="duration-chip${sel}" onclick="toggleFaceConcern('${item.val}')">${item.label}</span>`;
+        html += `<span class="duration-chip${sel}" data-val="${item.val}" onclick="toggleFaceConcern('${item.val}')">${item.label}</span>`;
       });
       html += '</div></div>';
     });
@@ -163,7 +164,7 @@ function renderFaceStep(step, scrollToTop = true) {
         <div class="duration-chips">`;
       pq.opts.forEach(o => {
         const sel = faceState.pulse[pq.key] === o.val ? ' selected' : '';
-        html += `<span class="duration-chip${sel}" onclick="selectFacePulse('${pq.key}','${o.val}')">${o.label}</span>`;
+        html += `<span class="duration-chip${sel}" data-pulse-key="${pq.key}" data-val="${o.val}" onclick="selectFacePulse('${pq.key}','${o.val}')">${o.label}</span>`;
       });
       html += '</div></div>';
     });
@@ -193,28 +194,28 @@ function renderFaceStep(step, scrollToTop = true) {
         <div class="symptom-section-card" style="margin-bottom:12px;">
           <h4>Environmental</h4>
           <div class="duration-chips">
-            ${envItems.map(i => `<span class="duration-chip${faceState.lifestyle[i.val] ? ' selected' : ''}" onclick="toggleFaceLifestyle('${i.val}')">${i.label}</span>`).join('')}
+            ${envItems.map(i => `<span class="duration-chip${faceState.lifestyle[i.val] ? ' selected' : ''}" data-val="${i.val}" onclick="toggleFaceLifestyle('${i.val}')">${i.label}</span>`).join('')}
           </div>
         </div>
         <div class="symptom-section-card" style="margin-bottom:12px;">
           <h4>Products</h4>
           <div class="duration-chips">
-            ${productItems.map(i => `<span class="duration-chip${faceState.lifestyle[i.val] ? ' selected' : ''}" onclick="toggleFaceLifestyle('${i.val}')">${i.label}</span>`).join('')}
+            ${productItems.map(i => `<span class="duration-chip${faceState.lifestyle[i.val] ? ' selected' : ''}" data-val="${i.val}" onclick="toggleFaceLifestyle('${i.val}')">${i.label}</span>`).join('')}
           </div>
         </div>
         <div class="symptom-section-card" style="margin-bottom:12px;">
           <h4>Lifestyle</h4>
           <div class="duration-chips">
-            ${lifeItems.map(i => `<span class="duration-chip${faceState.lifestyle[i.val] ? ' selected' : ''}" onclick="toggleFaceLifestyle('${i.val}')">${i.label}</span>`).join('')}
+            ${lifeItems.map(i => `<span class="duration-chip${faceState.lifestyle[i.val] ? ' selected' : ''}" data-val="${i.val}" onclick="toggleFaceLifestyle('${i.val}')">${i.label}</span>`).join('')}
           </div>
         </div>
       </div>`;
 
   } else if (step === 5) {
     const freqs = [
-      { val: 'daily',    icon: 'wb_sunny',       title: 'Daily',      desc: 'Full morning & evening routine every day' },
-      { val: 'biweekly', icon: 'event_repeat',   title: 'Bi-Weekly',  desc: 'Comprehensive routine 3–4 times per week' },
-      { val: 'weekly',   icon: 'calendar_month', title: 'Weekly',     desc: 'One deep treatment session per week' },
+      { val: 'daily',     icon: 'wb_sunny',       title: 'Daily',      desc: 'Full morning & evening routine every day' },
+      { val: 'triweekly', icon: 'event_repeat',   title: 'Tri-Weekly', desc: '3 times a week — Mon · Thu · Sun' },
+      { val: 'weekly',    icon: 'calendar_month', title: 'Weekly',     desc: 'One deep treatment session per week' },
     ];
     html += `
       <div style="margin-top:16px;">
@@ -222,7 +223,7 @@ function renderFaceStep(step, scrollToTop = true) {
         <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">We'll tailor the steps to your schedule</div>
         <div class="face-frequency-options">
           ${freqs.map(f => `
-            <div class="face-freq-option${faceState.frequency === f.val ? ' selected' : ''}" onclick="selectFaceFrequency('${f.val}')">
+            <div class="face-freq-option${faceState.frequency === f.val ? ' selected' : ''}" data-val="${f.val}" onclick="selectFaceFrequency('${f.val}')">
               <span class="mio face-freq-icon">${f.icon}</span>
               <div>
                 <div class="face-freq-title">${f.title}</div>
@@ -231,9 +232,16 @@ function renderFaceStep(step, scrollToTop = true) {
             </div>`).join('')}
         </div>
       </div>`;
+  } else if (step === 6) {
+    html += `
+      <div style="margin-top:16px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--charcoal);margin-bottom:4px;">Desired Goals & Notes</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">Anything specific you want to focus on? (Optional)</div>
+        <textarea id="face-goals-input" class="face-goal-textarea" placeholder="e.g. reduce pigmentation, clear acne scars, brighten dull skin...">${faceState.goals}</textarea>
+      </div>`;
   }
 
-  const nextLabel = step === 5 ? 'Generate My Routine →' : 'Next →';
+  const nextLabel = step === 6 ? 'Generate My Routine →' : 'Next →';
   const disabled = _faceNextDisabled(step) ? ' style="opacity:0.4;pointer-events:none;"' : '';
   html += `
     <div class="face-nav">
@@ -261,34 +269,67 @@ function _faceNextDisabled(step) {
   return false;
 }
 
+function _faceToggleChip(container, sel, matcher) {
+  const chips = container.querySelectorAll('.duration-chip, .face-freq-option, .quiz-option');
+  chips.forEach(c => {
+    if (matcher(c)) c.classList.toggle('selected', sel);
+  });
+}
+
 function selectFaceSkinType(type) {
   faceState.skinType = type;
-  renderFaceStep(1, false);
+  const c = el('face-q-container');
+  if (!c) return;
+  c.querySelectorAll('.quiz-option').forEach(o => o.classList.toggle('selected', o.dataset.val === type));
+  const btn = c.querySelector('.face-nav .btn-primary');
+  if (btn) btn.style.cssText = '';
 }
 
 function toggleFaceConcern(concern) {
   const idx = faceState.concerns.indexOf(concern);
   if (idx === -1) faceState.concerns.push(concern);
   else faceState.concerns.splice(idx, 1);
-  renderFaceStep(2, false);
+  const c = el('face-q-container');
+  if (!c) return;
+  c.querySelectorAll('.duration-chip').forEach(chip => {
+    if (chip.dataset.val === concern) chip.classList.toggle('selected', faceState.concerns.includes(concern));
+  });
 }
 
 function toggleFaceLifestyle(key) {
   faceState.lifestyle[key] = !faceState.lifestyle[key];
-  renderFaceStep(4, false);
+  const c = el('face-q-container');
+  if (!c) return;
+  c.querySelectorAll('.duration-chip').forEach(chip => {
+    if (chip.dataset.val === key) chip.classList.toggle('selected', faceState.lifestyle[key]);
+  });
 }
 
 function selectFacePulse(key, value) {
   faceState.pulse[key] = value;
-  renderFaceStep(3, false);
+  const c = el('face-q-container');
+  if (!c) return;
+  c.querySelectorAll('.duration-chip').forEach(chip => {
+    if (chip.dataset.pulseKey === key) chip.classList.toggle('selected', chip.dataset.val === value);
+  });
+  const btn = c.querySelector('.face-nav .btn-primary');
+  if (btn && !_faceNextDisabled(3)) btn.style.cssText = '';
 }
 
 function selectFaceFrequency(val) {
   faceState.frequency = val;
-  renderFaceStep(5, false);
+  const c = el('face-q-container');
+  if (!c) return;
+  c.querySelectorAll('.face-freq-option').forEach(o => o.classList.toggle('selected', o.dataset.val === val));
+  const btn = c.querySelector('.face-nav .btn-primary');
+  if (btn) btn.style.cssText = '';
 }
 
 function facePrevStep() {
+  if (faceState.step === 6) {
+    const ta = document.getElementById('face-goals-input');
+    if (ta) faceState.goals = ta.value.trim();
+  }
   if (faceState.step > 1) {
     faceState.step--;
     renderFaceStep(faceState.step);
@@ -300,7 +341,9 @@ function faceNextStep() {
   if (faceState.step === 2 && faceState.concerns.length === 0) {
     showToast('No concerns selected — we\'ll give a general routine');
   }
-  if (faceState.step === 5) {
+  if (faceState.step === 6) {
+    const ta = document.getElementById('face-goals-input');
+    if (ta) faceState.goals = ta.value.trim();
     generateFaceRoutine();
     return;
   }
@@ -350,7 +393,22 @@ async function generateFaceRoutine() {
     `pores enlarge in humidity: ${faceState.pulse.pores}`,
     `skin temperature: ${faceState.pulse.temperature}`,
   ].join('; ');
-  const freqMap = { daily: 'daily (morning + evening)', biweekly: '3-4 times per week', weekly: 'once per week' };
+  const freqMap = { daily: 'daily (morning + evening)', triweekly: '3 times a week (Mon, Thu, Sun)', weekly: 'once per week (Sat or Sun)' };
+  const goalsLine = faceState.goals ? `\n- Desired goals / notes: ${faceState.goals}` : '';
+
+  const freq = faceState.frequency;
+  let schemaNote = '';
+  let schemaExtra = '';
+  if (freq === 'daily') {
+    schemaNote = 'Include 4-5 morning steps, 1-2 afternoon tips, 4-5 evening steps, 2 weekend treatments.';
+    schemaExtra = `,\n  "afternoonTips": [{"tip":""}]`;
+  } else if (freq === 'triweekly') {
+    schemaNote = 'Include 5-6 steps per day, ~95% overlap between Mon and Thu, Sun may have 1 deeper step. Include 2 weekend treatments.';
+    schemaExtra = `,\n  "dayRoutines": {"mon": [{"step":1,"name":"","duration":"","ingredients":[],"method":"","doshaNote":""}], "thu": [], "sun": []}`;
+  } else {
+    schemaNote = 'Include 8-12 comprehensive steps for a single weekly session. No weekend section needed.';
+    schemaExtra = '';
+  }
 
   const prompt = `You are an expert Ayurvedic dermatologist. Create a personalised facial skincare routine.
 
@@ -363,7 +421,7 @@ User profile:
 - Skin concerns: ${concernsText}
 - Ayurvedic pulse assessment: ${pulseText}
 - Lifestyle factors: ${lifestyleFlags}
-- Routine frequency: ${freqMap[faceState.frequency] || faceState.frequency}
+- Routine frequency: ${freqMap[freq] || freq}${goalsLine}
 
 Return ONLY valid JSON (no markdown, no code fences) with this exact structure:
 {
@@ -372,17 +430,18 @@ Return ONLY valid JSON (no markdown, no code fences) with this exact structure:
   "imbalanceExplanation": "2-sentence explanation of current imbalance based on inputs",
   "morningRoutine": [{"step":1,"name":"","duration":"","ingredients":[],"method":"","doshaNote":""}],
   "eveningRoutine": [{"step":1,"name":"","duration":"","ingredients":[],"method":"","doshaNote":""}],
-  "weeklyTreatments": [{"name":"","frequency":"","ingredients":[],"method":"","benefit":""}],
+  "weeklyTreatments": [{"name":"","frequency":"","ingredients":[],"method":"","benefit":""}]${schemaExtra},
   "dietaryTips": [],
   "avoidList": [],
   "mantra": ""
 }
 
-Include 4-6 morning steps, 4-6 evening steps, 2-3 weekly treatments, 4 dietary tips, 4-6 avoid items.
+${schemaNote}
+Include 4-6 dietary tips, 4-6 avoid items.
 Tailor all recommendations to the user's dosha, skin type, concerns, and current season (${month}).`;
 
   try {
-    const resp = await callOpenAILarge(prompt, d.settings.openaiApiKey, 2000);
+    const resp = await callOpenAILarge(prompt, d.settings.openaiApiKey, 3500);
     clearTimeout(_lt1); clearTimeout(_lt2);
     const data = JSON.parse(resp.replace(/```json|```/g, '').trim());
     setData('faceRoutine', { inputs: Object.assign({}, faceState), result: data, generatedAt: new Date().toISOString() });
@@ -396,31 +455,69 @@ Tailor all recommendations to the user's dosha, skin type, concerns, and current
   }
 }
 
+const _faceMkChips = (arr) => (arr || []).map(i => `<span class="face-ingredient-chip">${i}</span>`).join('');
+const _faceMkSteps = (steps, section) => (steps || []).map((s, i) => `
+  <div class="face-step-card" id="face-${section[0]}-${i}">
+    <div class="face-step-header">
+      <div class="face-step-num">${s.step}</div>
+      <div class="face-step-name">${s.name}</div>
+      <div class="face-duration-badge">${s.duration}</div>
+    </div>
+    ${s.ingredients && s.ingredients.length ? `<div class="face-ingredients">${_faceMkChips(s.ingredients)}</div>` : ''}
+    <div class="face-method">${s.method}</div>
+    ${s.doshaNote ? `<div class="face-dosha-note"><span class="mio" style="font-size:14px;vertical-align:middle;margin-right:4px;">info</span>${s.doshaNote}</div>` : ''}
+    <button class="face-alt-btn" onclick="alternateFaceStep('${section}',${i})"><span class="mio">swap_horiz</span> Find alternatives</button>
+  </div>`).join('');
+
+const _faceMkWeekly = (treatments) => (treatments || []).map((t, i) => `
+  <div class="face-weekly-card" id="face-w-${i}">
+    <div class="face-weekly-name">${t.name}</div>
+    <div class="face-weekly-freq"><span class="mio" style="font-size:13px;vertical-align:middle;margin-right:3px;">schedule</span>${t.frequency}</div>
+    ${t.ingredients && t.ingredients.length ? `<div class="face-ingredients" style="margin-bottom:8px;">${_faceMkChips(t.ingredients)}</div>` : ''}
+    <div class="face-method">${t.method}</div>
+    ${t.benefit ? `<div class="face-dosha-note">${t.benefit}</div>` : ''}
+    <button class="face-alt-btn" onclick="alternateFaceStep('weekly',${i})"><span class="mio">swap_horiz</span> Find alternatives</button>
+  </div>`).join('');
+
 function renderFaceRoutine(data) {
-  const mkChips = (arr) => (arr || []).map(i => `<span class="face-ingredient-chip">${i}</span>`).join('');
+  const cached = getData('faceRoutine');
+  const freq = cached?.inputs?.frequency || 'daily';
 
-  const mkSteps = (steps, section) => (steps || []).map((s, i) => `
-    <div class="face-step-card" id="face-${section[0]}-${i}">
-      <div class="face-step-header">
-        <div class="face-step-num">${s.step}</div>
-        <div class="face-step-name">${s.name}</div>
-        <div class="face-duration-badge">${s.duration}</div>
+  let routineBody = '';
+  if (freq === 'daily') {
+    const afternoon = data.afternoonTips?.length
+      ? `<div class="face-routine-section"><span class="mio">wb_twilight</span> Afternoon Tips</div>
+         <div class="face-tip-card"><ul>${data.afternoonTips.map(t => `<li>${t.tip}</li>`).join('')}</ul></div>`
+      : '';
+    routineBody = `
+      <div class="face-routine-section"><span class="mio">wb_sunny</span> Morning Routine</div>
+      ${_faceMkSteps(data.morningRoutine, 'morning')}
+      ${afternoon}
+      <div class="face-routine-section"><span class="mio">nights_stay</span> Evening Routine</div>
+      ${_faceMkSteps(data.eveningRoutine, 'evening')}
+      <div class="face-routine-section"><span class="mio">spa</span> Weekly Treatments</div>
+      ${_faceMkWeekly(data.weeklyTreatments)}`;
+  } else if (freq === 'triweekly') {
+    const dr = data.dayRoutines || {};
+    const days = ['mon','thu','sun'];
+    const dayNames = { mon: 'MON', thu: 'THU', sun: 'SUN' };
+    const tabs = days.map(d => `<span class="face-freq-tab${d === 'mon' ? ' active' : ''}" data-day="${d}" onclick="switchFaceDay('${d}')">${dayNames[d]}</span>`).join('');
+    routineBody = `
+      <div class="face-freq-tab-bar">${tabs}</div>
+      <div id="face-day-content">
+        <div class="face-routine-section"><span class="mio">wb_sunny</span> ${dayNames['mon']} Routine</div>
+        ${_faceMkSteps(dr.mon || data.morningRoutine, 'mon')}
       </div>
-      ${s.ingredients && s.ingredients.length ? `<div class="face-ingredients">${mkChips(s.ingredients)}</div>` : ''}
-      <div class="face-method">${s.method}</div>
-      ${s.doshaNote ? `<div class="face-dosha-note"><span class="mio" style="font-size:14px;vertical-align:middle;margin-right:4px;">info</span>${s.doshaNote}</div>` : ''}
-      <button class="face-alt-btn" onclick="alternateFaceStep('${section}',${i})"><span class="mio">swap_horiz</span> Find alternatives</button>
-    </div>`).join('');
-
-  const mkWeekly = (treatments) => (treatments || []).map((t, i) => `
-    <div class="face-weekly-card" id="face-w-${i}">
-      <div class="face-weekly-name">${t.name}</div>
-      <div class="face-weekly-freq"><span class="mio" style="font-size:13px;vertical-align:middle;margin-right:3px;">schedule</span>${t.frequency}</div>
-      ${t.ingredients && t.ingredients.length ? `<div class="face-ingredients" style="margin-bottom:8px;">${mkChips(t.ingredients)}</div>` : ''}
-      <div class="face-method">${t.method}</div>
-      ${t.benefit ? `<div class="face-dosha-note">${t.benefit}</div>` : ''}
-      <button class="face-alt-btn" onclick="alternateFaceStep('weekly',${i})"><span class="mio">swap_horiz</span> Find alternatives</button>
-    </div>`).join('');
+      <div class="face-routine-section"><span class="mio">spa</span> Weekly Treatments</div>
+      ${_faceMkWeekly(data.weeklyTreatments)}`;
+  } else {
+    routineBody = `
+      <div class="face-freq-tab-bar">
+        <span class="face-freq-tab active">SAT / SUN</span>
+      </div>
+      <div class="face-routine-section"><span class="mio">wb_sunny</span> Weekly Routine</div>
+      ${_faceMkSteps(data.morningRoutine, 'morning')}`;
+  }
 
   el('face-wrap').innerHTML = `
     <div class="face-hero-card">
@@ -429,14 +526,7 @@ function renderFaceRoutine(data) {
       <p>${data.imbalanceExplanation}</p>
     </div>
 
-    <div class="face-routine-section"><span class="mio">wb_sunny</span> Morning Routine</div>
-    ${mkSteps(data.morningRoutine, 'morning')}
-
-    <div class="face-routine-section"><span class="mio">nights_stay</span> Evening Routine</div>
-    ${mkSteps(data.eveningRoutine, 'evening')}
-
-    <div class="face-routine-section"><span class="mio">spa</span> Weekly Treatments</div>
-    ${mkWeekly(data.weeklyTreatments)}
+    ${routineBody}
 
     <div class="face-routine-section"><span class="mio">restaurant</span> Dietary Tips</div>
     <div class="face-tip-card">
@@ -457,9 +547,28 @@ function renderFaceRoutine(data) {
   requestAnimationFrame(() => { el('face-wrap').closest('[id="app-content"]').scrollTop = 0; });
 }
 
+function switchFaceDay(day) {
+  const cached = getData('faceRoutine');
+  if (!cached?.result) return;
+  const data = cached.result;
+  const dr = data.dayRoutines || {};
+  const dayNames = { mon: 'MON', thu: 'THU', sun: 'SUN' };
+  const sectionName = dayNames[day] || day.toUpperCase();
+  const steps = dr[day] || [];
+  const content = document.getElementById('face-day-content');
+  if (!content) return;
+  content.innerHTML = `
+    <div class="face-routine-section"><span class="mio">wb_sunny</span> ${sectionName} Routine</div>
+    ${_faceMkSteps(steps, day)}`;
+  requestAnimationFrame(() => {
+    const tabs = el('face-wrap').querySelectorAll('.face-freq-tab');
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.day === day));
+  });
+}
+
 function resetFaceRoutine() {
   setData('faceRoutine', null);
-  faceState = { step: 1, skinType: null, concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null };
+  faceState = { step: 1, skinType: null, concerns: [], pulse: { weather: null, redness: null, pores: null, temperature: null }, lifestyle: {}, frequency: null, goals: '' };
   if (el('face-reset-btn')) el('face-reset-btn').style.display = 'none';
   renderFaceQuestionnaire();
 }

@@ -88,7 +88,7 @@ const REQUIRED_FUNCTIONS = [
   'selectFaceSkinType', 'toggleFaceConcern', 'toggleFaceLifestyle',
   'selectFacePulse', 'selectFaceFrequency',
   'faceNextStep', 'facePrevStep', 'generateFaceRoutine',
-  'renderFaceRoutine', 'resetFaceRoutine', 'alternateFaceStep',
+  'renderFaceRoutine', 'resetFaceRoutine', 'alternateFaceStep', 'switchFaceDay',
 ];
 REQUIRED_FUNCTIONS.forEach(fn => check(fn + '()', js.includes('function ' + fn)));
 
