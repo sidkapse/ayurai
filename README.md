@@ -24,13 +24,15 @@ A fully client-side Ayurvedic wellness web application. No backend required. Run
 |---|---|
 | **Onboarding** | 5-slide introduction shown to first-time visitors — covers Dosha, Food, Herbs & Daily Routine before reaching sign-up |
 | **Dosha Quiz** | Two-stage quiz (10Q + 10Q deep-dive) to determine Vata/Pitta/Kapha constitution |
-| **Food Check** | AI verdict on whether a food suits your dosha, time, season & ailments |
+| **Food Check** | AI verdict on whether a food suits your dosha, time, season & ailments — full-screen overlay from Home |
 | **Meal Planner** | Plan meals in advance with date/time window selector |
 | **Damage Control** | If food is not ideal, get remedies to reduce its negative effect |
 | **Ask Anything** | Personalised Ayurvedic chat assistant — full-screen overlay with multi-turn conversation, starter prompts, and profile-aware responses |
-| **Herb Advisor** | Personalised herb recommendations by dosha, concern, or season |
+| **Herb Advisor** | Personalised herb recommendations by dosha, concern, or season — full-screen overlay from Home |
 | **Herb Chat** | Free-form conversation with an Ayurvedic herb expert |
-| **Symptom Checker** | Root-cause Ayurvedic diagnosis with food, herb & lifestyle guidance |
+| **Symptom Checker** | Root-cause Ayurvedic diagnosis with food, herb & lifestyle guidance — accessed from Home quick-action |
+| **Face Care** | 5-step Ayurvedic skincare questionnaire (skin type, concerns, pulse, lifestyle, frequency) → AI-generated morning/evening/weekly routine with dosha-matched ingredients; "Find alternatives" per step for grocery-available substitutes |
+| **Hair Care** | Personalised Ayurvedic hair care routines — gender-aware tab (in progress) |
 | **Daily Routine** | AI-generated Dinacharya with 8 personalised time blocks |
 | **Dosha Insights** | Home card with foods to avoid, best meal times, top 3 care tips |
 | **PWA / Installable** | Works offline (app shell cached), installable on mobile and desktop |
@@ -48,7 +50,7 @@ A fully client-side Ayurvedic wellness web application. No backend required. Run
 │                                                 │
 │  ┌──────────┐   ┌─────────┐   ┌──────────────┐ │
 │  │   HTML   │   │   CSS   │   │      JS      │ │
-│  │ (markup) │   │(styles) │   │ 8 modules    │ │
+│  │ (markup) │   │(styles) │   │ 9 modules    │ │
 │  └──────────┘   └─────────┘   └──────┬───────┘ │
 │                                      │         │
 │  ┌───────────────────────────────────▼───────┐ │
@@ -75,7 +77,9 @@ A fully client-side Ayurvedic wellness web application. No backend required. Run
 | OpenAI key in browser | Intended for personal use — user owns their key |
 | No framework | Vanilla JS keeps the bundle size minimal and the app framework-agnostic |
 | Module split in source | Source files are split by feature for maintainability; assembled into one file for deployment |
-| Ask Anything as overlay | Full-screen chat without adding a 9th tab — accessed from Home quick-actions |
+| Food/Herbs/Ask as overlays | Full-screen overlays keep the nav bar to 5 tabs — all accessed from Home quick-actions |
+| Symptom/Quiz/History as hidden tabs | No nav item needed; reached via quick-action card (Symptom), Settings (Quiz), Home link (History) |
+| Gender-aware Face/Hair icons | `face`/`face_6` and `face_2`/`face_retouching_natural` swap at login based on stored gender |
 
 ---
 
@@ -95,7 +99,7 @@ ayurai/
 │
 ├── src/                        # Source files (same code split by module for readability)
 │   ├── css/
-│   │   └── main.css            # All styles (~2300 lines, CSS variables, components)
+│   │   └── main.css            # All styles (~2742 lines, CSS variables, components)
 │   │
 │   ├── js/
 │   │   ├── core.js             # Data layer, error logger, auth, app init, tab routing, PWA
@@ -105,6 +109,7 @@ ayurai/
 │   │   ├── herbs.js            # Herb Advisor (by dosha, concern, seasonal, chat)
 │   │   ├── symptoms.js         # Symptom Checker with Ayurvedic Nidana analysis
 │   │   ├── dinacharya.js       # Daily Routine generator with filter state
+│   │   ├── face-routine.js     # Face Care — 5-step questionnaire, AI skincare routine, alternatives
 │   │   └── ask-anything.js     # Ask Anything full-screen overlay chat
 │   │
 │   └── html/
@@ -264,13 +269,15 @@ Data layer, error logging, auth (signup/login/logout), app initialisation, tab r
 - `loadData()` / `saveData()` / `getData(path)` / `setData(path, value)` — localStorage CRUD
 - `logError(context, error)` — appends to `ayurai_error_log` (max 5 entries)
 - `callOpenAI(prompt, key)` / `callOpenAILarge(prompt, key, maxTokens)` — API wrappers
-- `initApp()` — populates all UI after login
+- `initApp()` — populates all UI after login; also updates gender-aware Face/Hair tab icons
 - `switchTab(name)` — tab navigation and lazy init
 - `showToast(msg)` — bottom notification
 - `el(id)` / `setText(id, text)` / `setHTML(id, html)` — safe DOM helpers
 - `initPWA()` / `triggerPWAInstall()` — PWA install prompt handling
 - `shareApp()` — native Web Share API with clipboard-copy fallback for desktop
 - `initPullToRefresh()` — pull-to-refresh gesture on the app scroller
+- `openFoodOverlay()` / `closeFoodOverlay()` — Food Check full-screen overlay
+- `openHerbsOverlay()` / `closeHerbsOverlay()` — Herb Advisor full-screen overlay
 
 ### `src/js/quiz.js`
 Two-stage Dosha Quiz. Stage 1 (10 questions) → Ailment selection → Save → offer Stage 2 (10 questions) → merge scores and update profile.
@@ -301,6 +308,13 @@ Ayurvedic Symptom Checker — body area selector, severity/duration inputs, free
 Daily Routine (Dinacharya) generator — filter screen with day selector (today/tomorrow/day after), wake/sleep time, diet preferences, and active symptom chips. Generates 8 personalised time blocks with live clock highlighting the current block.
 
 **Key functions:** `initDinacharya()`, `renderDinacharya_StartScreen()`, `generateDinacharya()`, `renderDinacharya()`, `stopDinaTicker()`
+
+### `src/js/face-routine.js`
+Facial Skin Routine — 5-step Ayurvedic skincare questionnaire (skin type, primary concerns, Ayurvedic pulse, lifestyle, frequency) followed by AI-generated morning, evening, and weekly routines with dosha-matched ingredients. Caches result in `localStorage` under `faceRoutine`; shows a welcome card on first visit and re-renders the cached routine on revisit. Each step card has a "Find alternatives" button (`alternateFaceStep`) that calls the AI to suggest grocery-available ingredient substitutes and updates the card in-place without re-rendering the full routine.
+
+**Key functions:** `initFaceRoutine()`, `renderFaceWelcome()`, `renderFaceQuestionnaire()`, `renderFaceStep(step, scrollToTop)`, `toggleFaceSkinType()`, `toggleFaceConcern()`, `selectFacePulse()`, `toggleFaceLifestyle()`, `selectFaceFrequency()`, `faceNextStep()`, `facePrevStep()`, `generateFaceRoutine()`, `renderFaceRoutine()`, `resetFaceRoutine()`, `alternateFaceStep(section, idx)`
+
+**State:** `faceState` — `{ step, skinTypes[], concerns[], pulse{weather,redness,pores,temperature}, lifestyle{}, frequency }`
 
 ### `src/js/ask-anything.js`
 Ask Anything — full-screen overlay chat powered by the user's full Ayurveda profile. Scope-limited to Ayurvedic topics; gracefully declines off-topic queries with inline suggestion cards. Chat history is per-session (in-memory, not persisted).

@@ -218,7 +218,7 @@ function showFoodInput() {
   const chevron = el('adv-chevron');
   if(panel) panel.style.display = 'none';
   if(chevron) chevron.style.transform = '';
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('food-overlay-content').scrollTop = 0; });
 }
 
 function showFoodResult(food, result, timeContext, isPlanned, generatedAt) {
@@ -240,7 +240,7 @@ function showFoodResult(food, result, timeContext, isPlanned, generatedAt) {
       b.innerHTML = '<span class="mi" style="font-size:16px;">refresh</span> Refresh Remedies';
     }
   }
-  el('app-content').scrollTop = 0;
+  requestAnimationFrame(() => { el('food-overlay-content').scrollTop = 0; });
 }
 
 
@@ -931,6 +931,7 @@ function renderHistory() {
 function renderHomeHistory() {
   const d = loadData();
   const container = el('home-recent-checks');
+  if(!container) return;
   if(!d.foodHistory||!d.foodHistory.length) {
     container.innerHTML=`<div style="text-align:center;padding:20px;color:var(--text-light);font-size:13px;">No food checks yet — try the Food Check tab!</div>`;
     return;
@@ -995,6 +996,7 @@ function saveBirthDate() {
 function saveGender() {
   const gender = el('settings-gender')?.value || '';
   setData('gender', gender);
+  updateTabIcons();
   showToast(gender ? 'Gender saved: ' + gender : 'Gender cleared');
 }
 
@@ -1039,3 +1041,18 @@ ${i+1}. [${new Date(l.ts).toLocaleString()}]
 
 Thanks`
   );
+}
+
+function openFoodOverlay() {
+  const overlay = el('food-overlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('open'));
+  initFoodCheck();
+  setTimeout(initMealTiming, 50);
+}
+
+function closeFoodOverlay() {
+  const overlay = el('food-overlay');
+  overlay.classList.remove('open');
+  overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
+}

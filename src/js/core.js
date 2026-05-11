@@ -1,6 +1,6 @@
 // ── DATA LAYER (localStorage as my_info.json equivalent) ──
 const STORAGE_KEY = 'ayurai_my_info';
-const APP_VERSION = '1.86'; // kept in sync by pre-push hook (scripts/stamp-version.js)
+const APP_VERSION = '1.109'; // kept in sync by pre-push hook (scripts/stamp-version.js)
 function loadData() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
   catch { return {}; }
@@ -304,6 +304,7 @@ function initApp() {
   if(el('settings-birth-month')) el('settings-birth-month').value = d.birth_month || '';
   if(el('settings-birth-year'))  el('settings-birth-year').value  = d.birth_year  || '';
   if(el('settings-gender'))      el('settings-gender').value      = d.gender       || '';
+  updateTabIcons();
   el('settings-apikey').value = d.settings?.openaiApiKey || '';
   // Dosha badge + card
   if(d.dosha) {
@@ -365,12 +366,10 @@ function initApp() {
   renderHistory();
   // Init quiz
   initQuiz();
-  // Restore tab after pull-to-refresh reload
+  // Always switch explicitly: restores PTR tab or defaults home so no tab flashes unexpectedly
   const _reloadTab = sessionStorage.getItem('ayurai_reload_tab');
-  if (_reloadTab) {
-    sessionStorage.removeItem('ayurai_reload_tab');
-    switchTab(_reloadTab);
-  }
+  sessionStorage.removeItem('ayurai_reload_tab');
+  switchTab(_reloadTab || 'home');
 }
 
 // ── TABS ──
@@ -385,11 +384,20 @@ function switchTab(name) {
   currentTab = name;
   el('app-content').scrollTop = 0;
   if(name==='history') renderHistory();
-  if(name==='herbs') initHerbAdvisor();
-  if(name==='symptom') initSymptomChecker();
-  if(name==='food') { initFoodCheck(); setTimeout(initMealTiming, 50); }
+  if(name==='symptom') openSymptomOverlay();
   if(name==='dina') initDinacharya();
+  if(name==='face') initFaceRoutine();
+  if(name==='hair') {}
   if(name==='settings') { renderErrorLogs(); setApiErrorState(false); renderRecoveryCodeSettings(); }
+}
+
+function updateTabIcons() {
+  const female = loadData().gender === 'female';
+  const faceIcon = female ? 'face' : 'face_6';
+  const hairIcon = female ? 'face_2' : 'face_retouching_natural';
+  if(el('face-nav-icon')) el('face-nav-icon').textContent = faceIcon;
+  if(el('hair-nav-icon')) el('hair-nav-icon').textContent = hairIcon;
+  if(el('hair-placeholder-icon')) el('hair-placeholder-icon').textContent = hairIcon;
 }
 
 // ── ONBOARDING ──

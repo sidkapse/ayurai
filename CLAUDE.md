@@ -39,10 +39,10 @@ docs/manifest.json     ← PWA manifest
 docs/DATA_MODEL.md     ← localStorage schema reference
 docs/superpowers/specs/← Feature design specs (markdown)
 src/js/                ← JS split by feature for readability (mirror of docs/index.html)
-src/css/main.css       ← All CSS (~2300 lines)
+src/css/main.css       ← All CSS (~2742 lines)
 src/html/app.html      ← HTML markup only (~4100 lines)
 scripts/build.js       ← Assembles src/ → public/index.html (NOT docs/)
-scripts/validate.js    ← Validates docs/index.html (~262 required function checks)
+scripts/validate.js    ← Validates docs/index.html (294 required function + HTML ID checks)
 scripts/stamp-version.js ← Bumps version + SW cache key across all files
 ```
 
@@ -59,6 +59,7 @@ scripts/stamp-version.js ← Bumps version + SW cache key across all files
    | `sendHerbChat()` — signature + first 8 lines | `meal-timing.js` | herbs.js |
    | `sendHerbChat()` — body (rest of function) | `symptoms.js` | herbs.js |
    | `updateChatDisplay()`, `resetHerbAdvisor()` | `symptoms.js` | herbs.js |
+   | `renderSymptomResult()`, `resetSymptomChecker()` | `dinacharya.js` | symptoms.js |
 
    ```bash
    grep -rn "function functionName" src/js/
@@ -84,8 +85,18 @@ The `error: failed to push some refs` message printed after every push is **cosm
 - **PR titles must also end with the app version** (same format): `feat: description v1.XX`
   — read the current version with: `grep -o "APP_VERSION = '[^']*'" src/js/core.js | grep -o "'[^']*'" | tr -d "'"`
   — the pre-push hook bumps the version on push, so use the post-push version in the PR title
-- Always branch from latest main: `git checkout -b claude/feature-name origin/main`
-- Never develop directly on `main`
+- Branch from the base that matches the target — **always `origin/uat`** for normal feature/fix work: `git checkout -b claude/feature-name origin/uat`
+- Never develop directly on `main` or `uat`
+- **All PRs from feature branches must target `origin/uat`** — never open a PR directly to `main`
+
+### Pre-Push Checklist
+
+Before pushing code to the feature branch, update the following files if the change warrants it:
+
+- **`CLAUDE.md`** — reflect any new tabs, overlays, functions, state variables, constants, or architectural decisions
+- **`README.md`** — update the Features table, Module Reference, and Key Design Decisions to match
+- **`scripts/validate.js`** — add new top-level functions and HTML IDs to `REQUIRED_FUNCTIONS` / the ID check list
+- Any other shared reference files (e.g. `docs/DATA_MODEL.md` for localStorage schema changes, `.claude/rules/` for new coding patterns)
 
 ## Architecture
 
@@ -103,6 +114,8 @@ OpenAI API (gpt-4o-mini)
 
 **Ask Anything** is a full-screen overlay (not a tab) opened via `openAskAnything()` from the Home tab.
 
+**Food Check** and **Herb Advisor** are full-screen overlays opened via `openFoodOverlay()` / `openHerbsOverlay()` from the Home quick-action grid.
+
 ## Screens
 
 | Screen ID | When shown |
@@ -110,29 +123,44 @@ OpenAI API (gpt-4o-mini)
 | `#screen-onboarding` | First-time visitors (no `d.user` in localStorage). 5 slides + CTA. |
 | `#screen-login` | Returning users who are not logged in. |
 | `#screen-signup` | New users after completing/skipping onboarding. |
-| `#screen-app` | Authenticated users — 8-tab main app. |
+| `#screen-app` | Authenticated users — 5-tab main app + overlays. |
 
 JS functions: `isFirstTimeUser()`, `goToOnboardingSlide(n)`, `skipOnboarding()`, `nextOnboardingSlide()`, `replayOnboarding()`, `closeOnboarding()`, `initOnboardingSwipe()`, `initOnboardingParticles()`. CSS classes use `ob-` prefix.
 
-## Tabs (8 total)
+## Nav Tabs (5 in nav bar)
 
 | Tab ID | Nav ID | Feature |
 |---|---|---|
 | `tab-home` | `tabn-home` | Home dashboard, dosha insights, quick actions |
-| `tab-food` | `tabn-food` | Food check + meal timing |
-| `tab-herbs` | `tabn-herbs` | Herb advisor + herb chat |
 | `tab-dina` | `tabn-dina` | Daily routine (Dinacharya) |
+| `tab-face` | `tabn-face` | Face Care — 5-step Ayurvedic questionnaire + AI skincare routine, gender-aware icon |
+| `tab-hair` | `tabn-hair` | Hair Care (in progress) — gender-aware icon |
 | `tab-settings` | `tabn-settings` | Profile, API key, export/import, error logs |
-| `tab-quiz` | `tabn-quiz` | Dosha quiz (2-stage) |
-| `tab-symptom` | `tabn-symptom` | Symptom checker |
-| `tab-history` | `tabn-history` | Food check history |
+
+## Hidden Tabs (no nav item — accessed via quick actions or settings)
+
+| Tab ID | How Accessed |
+|---|---|
+| `tab-symptom` | Empty shell — Home quick-action card → `openSymptomOverlay()` |
+| `tab-quiz` | Settings → Retake Quiz; or `switchTab('quiz')` |
+| `tab-history` | Home → "View All →" link → `switchTab('history')` |
+
+## Full-Screen Overlays
+
+| Overlay ID | Open Function | Close Function | Accessed From |
+|---|---|---|---|
+| `symptom-overlay` | `openSymptomOverlay()` | `closeSymptomOverlay()` | Home quick-action grid |
+| `food-overlay` | `openFoodOverlay()` | `closeFoodOverlay()` | Home quick-action grid |
+| `herbs-overlay` | `openHerbsOverlay()` | `closeHerbsOverlay()` | Home quick-action grid |
+| `herb-chat-overlay` | `openHerbChatOverlay()` | `closeHerbChatOverlay()` | Herb Advisor overlay |
+| `ask-overlay` | `openAskAnything()` | `closeAskAnything()` | Home quick-action grid |
 
 `switchTab(name)` handles all tab navigation. Add `if(name==='feature') initFeature();` there for new tabs.
 
 ## JS Module Order (matters for build)
 
 ```
-core.js → quiz.js → meal-timing.js → food.js → herbs.js → symptoms.js → dinacharya.js
+core.js → quiz.js → meal-timing.js → food.js → herbs.js → symptoms.js → dinacharya.js → face-routine.js
 ```
 
 `ask-anything.js` is appended directly to `docs/index.html` and `src/html/app.html` — it is not in `scripts/build.js`.
@@ -176,15 +204,22 @@ overlay.classList.remove('open');
 overlay.addEventListener('transitionend', () => { overlay.style.display = 'none'; }, { once: true });
 ```
 
-**Android keyboard + fixed overlay:** Use `top:0; left:0; right:0; bottom:0` — **not** `height:100dvh`. Add `overflow:hidden` to overlay, `min-height:0` to the scrollable flex child (`.ask-chat`). Both `#ask-overlay` and `#herb-chat-overlay` use `.ask-overlay` and inherit this fix.
+**Android keyboard + fixed overlay:** Use `top:0; left:0; right:0; bottom:0` — **not** `height:100dvh`. Add `overflow:hidden` to overlay, `min-height:0` to the scrollable flex child (`.ask-chat`). All overlays (`#ask-overlay`, `#symptom-overlay`, `#food-overlay`, `#herbs-overlay`, `#herb-chat-overlay`) use `.ask-overlay` and inherit this fix.
 
 **`#herb-chat-overlay` reuses element IDs** from the old inline herb chat: `herb-chat-history`, `herb-chat-input`, `herb-send-btn`. This lets `sendHerbChat()`, `updateChatDisplay()`, and `scrollChatToBottom()` work unmodified.
 
 ### scrollTop after innerHTML
 Always use `requestAnimationFrame` — synchronous `scrollTop = 0` fires before the browser paints:
 ```js
-requestAnimationFrame(() => { el('app-content').scrollTop = 0; });
+requestAnimationFrame(() => { el('container-id').scrollTop = 0; });
 ```
+
+Scroll the correct container — overlays have their own scrollable div, not `#app-content`:
+- Main tab content → `el('face-wrap').closest('[id="app-content"]')` (not `el('app-content')` — see note below)
+- Symptom Check overlay → `el('symptom-overlay-content')`
+- Food Check overlay → `el('food-overlay-content')`
+
+**Duplicate `#app-content` warning:** Two elements carry `id="app-content"` — one inside `#screen-login` (first in DOM) and one inside `#screen-app` (the real app scroller). `getElementById` always returns the first, so plain `el('app-content')` targets the wrong element for tab content. Inside face-routine (and any feature rendered into `#screen-app`), always navigate via `el('face-wrap').closest('[id="app-content"]')` to reach the correct scroller.
 
 ### Shared dosha rules
 `buildDoshaRules(dosha)` in `core.js` returns per-dosha dietary rules used by both Food Check and Ask Anything. Edit only this function to change Ayurvedic rules globally. Key nuance: ripe pineapple/mango are classified as sweet fruits (acceptable for Pitta in moderation), not sour/acidic.
@@ -222,6 +257,7 @@ setData('settings.openaiApiKey', key) // dot-path setter, auto-saves
 | `symptomState` | symptoms.js | Selected areas, duration, severity, description |
 | `quizState` | quiz.js | Phase, question index, scores, ailments |
 | `askState` | ask-anything.js | `{chatHistory: [], loading: false}` — cleared on overlay close |
+| `faceState` | face-routine.js | `{ step, skinTypes[], concerns[], pulse{weather,redness,pores,temperature}, lifestyle{}, frequency }` — reset on `resetFaceRoutine()` |
 | `window._activeAilments` | meal-timing.js | Active ailment overrides for current food check |
 | `window._mealTimingMode` | meal-timing.js | `'now'` or `'plan'` |
 | `window._lastCheckedFood` | food.js | Food name for remedy lookup |
@@ -240,7 +276,7 @@ setData('settings.openaiApiKey', key) // dot-path setter, auto-saves
 | `DINA_CACHE_KEY` | dinacharya.js | `'ayurai_dina_cache'` — cached generated routine |
 | `DINA_DEFAULT_WAKE` | dinacharya.js | `'06:30'` |
 | `DINA_DEFAULT_SLEEP` | dinacharya.js | `'22:30'` |
-| `APP_VERSION` | core.js | Current version string (auto-bumped by stamp-version.js) — currently `v1.76` |
+| `APP_VERSION` | core.js | Current version string (auto-bumped by stamp-version.js) — currently `v1.105` |
 
 > **Note:** Wake/sleep times and day offset are persisted separately under `ayurai_dina_prefs` (not inside `ayurai_my_info`).
 
@@ -275,7 +311,14 @@ setData('settings.openaiApiKey', key) // dot-path setter, auto-saves
 - **API key in localStorage** — intentional. For shared use, proxy through a backend.
 - **Single HTML file** — maximum portability; the monolithic approach is a feature.
 - **Ask Anything is overlay, not a tab** — keeps tab bar uncluttered; accessed from Home quick-actions.
+- **Food Check and Herbs are overlays** — moved out of the nav bar to keep it to 5 tabs; accessed from the Home quick-action grid.
+- **Symptom Check is an overlay** — `#tab-symptom` is an empty shell; content lives in `#symptom-overlay`. Accessed via Home quick-action (`openSymptomOverlay()`). Quiz and History remain hidden tabs.
+- **`#tab-food` and `#tab-herbs` do NOT have `class="tab-panel"`** — intentional. `switchTab()` hides all `.tab-panel` elements; adding that class to overlay inner divs would blank them out on every tab navigation.
+- **Face/Hair tabs are gender-aware** — icons update at login based on gender (`face`/`face_6` for face, `face_2`/`face_retouching_natural` for hair).
 - **Ask AI suggestions JSON** — when the AI declines an off-topic question, it appends `{"suggestions":["...", "..."]}`. `sendAskMessage` strips this before displaying and renders suggestions as clickable cards.
+- **Face routine welcome card** — `initFaceRoutine()` shows `renderFaceWelcome()` (not the questionnaire directly) when no cached routine exists. The welcome card's "Get Started →" button calls `renderFaceQuestionnaire()`. `resetFaceRoutine()` skips the welcome card and goes straight to `renderFaceQuestionnaire()` — intentional.
+- **`alternateFaceStep` in-place DOM update** — updates only the specific step card's ingredient chips, method text, and dosha note via direct DOM manipulation (no full `renderFaceRoutine()` re-render). Card IDs use the pattern `face-m-N` (morning), `face-e-N` (evening), `face-w-N` (weekly). These are dynamic IDs not in static HTML — access via `document.getElementById(cardId)`, not `el()`, to avoid triggering validator failures.
+- **`renderFaceStep(step, scrollToTop = true)`** — the optional `scrollToTop` parameter lets selection functions (skinType, concern, pulse, lifestyle, frequency) pass `false` to avoid resetting scroll position when the user picks an option within a step.
 
 ## Deployment
 

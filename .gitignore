@@ -66,3 +66,4 @@ CLAUDE.local.md
 # my_info.json is user data — never commit it
 my_info.json
 *_error_logs.json
+.worktrees/
